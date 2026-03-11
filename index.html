@@ -793,18 +793,42 @@
 
             .attendance-table {
                 margin-top: 0;
-                min-width: 480px;
+                min-width: 100%;
+                /* Changed from 480px to 100% to fit screen */
+                table-layout: fixed;
             }
 
             .attendance-table th,
             .attendance-table td {
-                padding: 8px 10px;
-                font-size: 0.9rem;
+                padding: 8px 4px;
+                font-size: 0.85rem;
+                word-wrap: break-word;
             }
 
             .attendance-checkbox {
-                width: 26px;
-                height: 26px;
+                width: 24px;
+                height: 24px;
+            }
+
+            /* Adjust column widths for mobile */
+            .col-num {
+                width: 40px !important;
+            }
+
+            .col-id {
+                width: 70px !important;
+            }
+
+            .col-name {
+                width: 65px !important;
+            }
+
+            .col-check {
+                width: 70px !important;
+            }
+
+            .col-remark {
+                width: auto !important;
             }
 
             /* Larger touch target */
@@ -923,10 +947,17 @@
 
         function handleLogin() {
             const nameInput = document.getElementById('teacherNameInput').value.trim();
+            const allowedTeachers = ['유연주', '김유민', '송세윤', '김수환', '최철화', '장순지', '박상현', '오창현', '전봉수', '길현진', '이승호', '박종선', '홍남숙', '김지현', '김동석', '이상현', '김소연', '주현희', '이준영', '김인영', '양강훈', '이현정'];
+
             if (!nameInput) {
                 alert('감독 교사 성함을 입력해주세요.');
                 return;
             }
+            if (!allowedTeachers.includes(nameInput)) {
+                alert('등록되지 않은 선생님입니다. 입력하신 성함을 다시 한 번 확인해주세요.');
+                return;
+            }
+
             supervisorName = nameInput;
             sessionStorage.setItem('yajaSupervisor', supervisorName);
             document.getElementById('loginOverlay').style.display = 'none';
@@ -1313,11 +1344,11 @@
                         <table class="attendance-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;">번호</th>
-                                    <th style="width: 120px;">학번</th>
-                                    <th>이름</th>
-                                    <th style="width: 100px;">출석여부</th>
-                                    <th>비고</th>
+                                    <th class="col-num" style="width: 60px;">번호</th>
+                                    <th class="col-id" style="width: 100px;">학번</th>
+                                    <th class="col-name" style="width: 80px;">이름</th>
+                                    <th class="col-check" style="width: 80px;">출석여부</th>
+                                    <th class="col-remark">비고</th>
                                 </tr>
                             </thead>
                             <tbody>
