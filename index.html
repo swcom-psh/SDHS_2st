@@ -11,33 +11,29 @@
         rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --bg-canvas: #f8fafc;
+            --primary: #ff85a2; /* Cherry Blossom Pink */
+            --primary-dark: #f06292;
+            --secondary: #7fb069; /* Soft Leaf Green */
+            --bg-canvas: #fdf5f7; /* Softened off-white to reduce glare */
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-sub: #475569;
-            --border: #e2e8f0;
+            --text-main: #4a2c2c; /* Deep Brownish Pink for contrast */
+            --text-sub: #7d5a5a;
+            --border: #fce4ec;
             --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --drag-over: #eff6ff;
+            --shadow-md: 0 4px 6px -1px rgb(255 133 162 / 0.1), 0 2px 4px -2px rgb(255 133 162 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(255 133 162 / 0.1);
+            --drag-over: #fff0f3;
 
             /* Attendance Table Colors */
-            --table-header: #f1f5f9;
-            --table-border: #e2e8f0;
-            --table-row-hover: #f8fafc;
+            --table-header: #fff5f7;
+            --table-border: #fce4ec;
+            --table-row-hover: #fffcfd;
 
-            /* Room specific colors */
-            --room-2-3: #6366f1;
-            /* Indigo */
-            --room-2-4: #10b981;
-            /* Emerald */
-            --room-2-5: #f59e0b;
-            /* Amber */
-            --room-2-6: #f43f5e;
-            /* Rose */
+            /* Room specific colors (Spring Edition) */
+            --room-2-3: #f48fb1; /* Pink */
+            --room-2-4: #81c784; /* Green */
+            --room-2-5: #ffd54f; /* Sun Yellow */
+            --room-2-6: #ffab91; /* Soft Coral */
         }
 
         * {
@@ -49,12 +45,64 @@
         body {
             font-family: 'Outfit', 'Noto Sans KR', sans-serif;
             background-color: var(--bg-canvas);
-            background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
-            background-size: 24px 24px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 133, 162, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(127, 176, 105, 0.05) 0%, transparent 20%);
             color: var(--text-main);
             line-height: 1.6;
             padding: 40px 20px;
             letter-spacing: -0.01em;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Cherry Blossom Petals Animation */
+        .blossom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .petal {
+            position: absolute;
+            background-color: #ffc1d1;
+            border-radius: 150% 0 150% 0;
+            opacity: 0.5; /* Increased from 0.3 */
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translate(0, -10px) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translate(100px, 100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Tree Background Elements */
+        .tree-bg {
+            position: fixed;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.18; /* Increased from 0.07 */
+            filter: blur(0.5px);
+        }
+
+        .tree-left {
+            bottom: -50px;
+            left: -50px;
+            width: 500px;
+            transform: rotate(10deg);
+        }
+
+        .tree-right {
+            top: -50px;
+            right: -50px;
+            width: 450px;
+            transform: scaleX(-1) rotate(15deg);
         }
 
         header {
@@ -71,16 +119,18 @@
 
         h1 {
             font-size: 2.25rem;
-            font-weight: 700;
+            font-weight: 800;
             color: var(--text-main);
             margin-bottom: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            background: linear-gradient(to right, #1e293b, #334155);
+            background: linear-gradient(to right, #ff4081, #7fb069);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(255, 133, 162, 0.1);
         }
 
         .controls {
@@ -136,10 +186,18 @@
         }
 
         .day-btn.active {
-            background: var(--text-main);
+            background: var(--primary);
             color: white;
-            border-color: var(--text-main);
-            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3);
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(255, 133, 162, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fffcfd;
         }
 
         /* Layout Grid */
@@ -233,8 +291,8 @@
         .teacher-desk {
             width: 240px;
             height: 48px;
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-            border: 1px solid #94a3b8;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            border: 1px solid #f48fb1;
             border-radius: 12px;
             margin: 20px auto 0;
             display: flex;
@@ -243,7 +301,7 @@
             font-weight: 800;
             font-size: 1rem;
             letter-spacing: 0.8em;
-            color: #475569;
+            color: #ad1457;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05), var(--shadow-md);
         }
 
@@ -903,6 +961,23 @@
 </head>
 
 <body>
+    <!-- Spring Tree Backgrounds -->
+    <svg class="tree-bg tree-left" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50,450 Q150,350 100,200 Q120,150 200,100" stroke="#5d4037" stroke-width="8" fill="none" />
+        <path d="M100,250 Q200,200 250,250" stroke="#5d4037" stroke-width="5" fill="none" />
+        <circle cx="200" cy="100" r="40" fill="#fce4ec" opacity="0.6"/>
+        <circle cx="230" cy="80" r="30" fill="#f8bbd0" opacity="0.6"/>
+        <circle cx="170" cy="70" r="25" fill="#f48fb1" opacity="0.6"/>
+        <circle cx="250" cy="250" r="35" fill="#fce4ec" opacity="0.6"/>
+        <circle cx="280" cy="230" r="25" fill="#f8bbd0" opacity="0.6"/>
+    </svg>
+    <svg class="tree-bg tree-right" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50,450 Q150,350 100,200 Q120,150 200,100" stroke="#5d4037" stroke-width="8" fill="none" />
+        <path d="M100,250 Q200,200 250,250" stroke="#5d4037" stroke-width="5" fill="none" />
+        <circle cx="200" cy="100" r="40" fill="#fce4ec" opacity="0.4"/>
+        <circle cx="230" cy="80" r="30" fill="#f8bbd0" opacity="0.4"/>
+        <circle cx="250" cy="250" r="35" fill="#fce4ec" opacity="0.4"/>
+    </svg>
 
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
@@ -924,7 +999,7 @@
                 <div class="btn-group" id="dayButtons">
                     <button class="btn day-btn active" data-day="월">월요일</button>
                     <button class="btn day-btn" data-day="화">화요일</button>
-                    <button class="btn day-btn" data-day="수">수요일</button>
+                    <button class="btn day-btn" data-day="수">수요일 🌸</button>
                     <button class="btn day-btn" data-day="목">목요일</button>
                     <button class="btn day-btn" data-day="금">금요일</button>
                 </div>
@@ -963,6 +1038,29 @@
     </div> <!-- Close mainApp -->
 
     <script>
+        // Create Blossom Petals
+        function createPetals() {
+            const container = document.createElement('div');
+            container.className = 'blossom-container';
+            document.body.appendChild(container);
+
+            for (let i = 0; i < 25; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                
+                const size = Math.random() * 10 + 5;
+                petal.style.width = size + 'px';
+                petal.style.height = size + 'px';
+                
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 5 + 5 + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+                
+                container.appendChild(petal);
+            }
+        }
+        createPetals();
+
         let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
 
         document.addEventListener('DOMContentLoaded', () => {
