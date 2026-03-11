@@ -660,43 +660,288 @@
                 margin-bottom: 2px !important;
             }
         }
+
+        /* Login Overlay */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(248, 250, 252, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 15px;
+            color: var(--text-main);
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            text-align: center;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+
+        .login-box input:focus {
+            border-color: var(--primary);
+        }
+
+        .login-box button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 10px;
+                background-size: 16px 16px;
+            }
+
+            header {
+                padding: 25px 15px;
+                border-radius: 16px;
+                margin-bottom: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+                text-align: center;
+                justify-content: center;
+                word-break: keep-all;
+                flex-wrap: wrap;
+            }
+
+            .classroom-section {
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+
+            .room-title {
+                font-size: 1.4rem;
+            }
+
+            .grid-6x5 {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 8px;
+                margin: 20px 0;
+            }
+
+            .grid-6x5 .spacer {
+                display: none;
+            }
+
+            .seat {
+                border-radius: 8px;
+                font-size: 0.75rem;
+                aspect-ratio: 1 / 1.2;
+            }
+
+            .student-name {
+                font-size: 0.95rem;
+            }
+
+            .student-id {
+                font-size: 0.65rem;
+                margin-bottom: 0;
+            }
+
+            .teacher-desk {
+                width: 100%;
+                height: 36px;
+                font-size: 0.9rem;
+                margin-top: 15px;
+            }
+
+            /* Table Scroller for Mobile */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin-top: 15px;
+                border-radius: 12px;
+            }
+
+            .attendance-table {
+                margin-top: 0;
+                min-width: 480px;
+            }
+
+            .attendance-table th,
+            .attendance-table td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .attendance-checkbox {
+                width: 26px;
+                height: 26px;
+            }
+
+            /* Larger touch target */
+
+            /* Buttons and Controls */
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .btn-group {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .view-toggle {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .toggle-btn {
+                flex: 1;
+                text-align: center;
+            }
+
+            /* Login Box */
+            .login-box {
+                padding: 30px 20px;
+            }
+
+            .login-box h2 {
+                font-size: 1.5rem;
+            }
+
+            /* Header Info */
+            .header-left {
+                min-width: auto;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>2026학년도 2학년 1학기 자기주도적 학습 자리 배치도</h1>
-        <div class="controls">
-            <div class="btn-group" id="dayButtons">
-                <button class="btn day-btn active" data-day="월">월요일</button>
-                <button class="btn day-btn" data-day="화">화요일</button>
-                <button class="btn day-btn" data-day="수">수요일</button>
-                <button class="btn day-btn" data-day="목">목요일</button>
-                <button class="btn day-btn" data-day="금">금요일</button>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-box">
+            <h2>야자 감독 교사 로그인</h2>
+            <div style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 10px; word-break: keep-all;">
+                출석부에 기록될 감독 선생님 성함을 입력해주세요.
             </div>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="window.print()">🖨️ A4 인쇄하기</button>
-                <button class="btn btn-danger" onclick="resetArrangement()">🔄 배치 초기화</button>
-            </div>
-            <div class="view-toggle">
-                <button class="toggle-btn active" id="btnSeating" onclick="switchMode('seating')">🪑 자리 배치도</button>
-                <button class="toggle-btn" id="btnAttendance" onclick="switchMode('attendance')">📋 출석 명단</button>
-            </div>
-            <input type="hidden" id="gasUrl"
-                value="https://script.google.com/macros/s/AKfycbwXMAvnsUaCeFBTTBaNUkbWRdAfaJQUL8RagtnVCuGtTwaTAXDdgsXI0thsPP1CIGnU/exec">
-            <div class="info-text">
-                <span>💡</span>
-                <span>3/16(월) 이전까지는 자유롭게 위치를 변경할 수 있습니다. 변경사항이 있으면 2학년부 박상현 선생님에게 오세요.</span>
-            </div>
+            <input type="text" id="teacherNameInput" placeholder="이름 입력 (예: 홍길동)"
+                onkeypress="if(event.key==='Enter') handleLogin()">
+            <button class="btn btn-primary" onclick="handleLogin()">출석부 시작하기</button>
         </div>
-    </header>
+    </div>
 
-    <div class="seating-container active" id="seatingDisplay"></div>
-    <div class="attendance-container" id="attendanceDisplay"></div>
-    <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
+    <div id="mainApp" style="display: none;">
+
+        <header>
+            <h1>2026학년도 2학년 1학기 자기주도적 학습 자리 배치도</h1>
+            <div class="controls">
+                <div class="btn-group" id="dayButtons">
+                    <button class="btn day-btn active" data-day="월">월요일</button>
+                    <button class="btn day-btn" data-day="화">화요일</button>
+                    <button class="btn day-btn" data-day="수">수요일</button>
+                    <button class="btn day-btn" data-day="목">목요일</button>
+                    <button class="btn day-btn" data-day="금">금요일</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ A4 인쇄하기</button>
+                    <button class="btn btn-danger" id="btnResetArrangement" onclick="resetArrangement()">🔄 배치
+                        초기화</button>
+                    <button class="btn btn-danger" id="btnResetAttendance" onclick="resetAttendance()"
+                        style="display: none;">🗑️ 출석 초기화</button>
+                </div>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" id="btnSeating" onclick="switchMode('seating')">🪑 자리 배치도</button>
+                    <button class="toggle-btn" id="btnAttendance" onclick="switchMode('attendance')">📋 출석 명단</button>
+                </div>
+                <input type="hidden" id="gasUrl"
+                    value="https://script.google.com/macros/s/AKfycbwn11dqjsWJqyT0KU7DsGTKXXnw9EfELjmNSKxS2N2Opin1ITTYmiFTQqHa3poF1aM/exec">
+                <div class="info-text"
+                    style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; gap: 8px;">
+                        <span>💡</span>
+                        <span>3/16(월) 이전까지는 자유롭게 위치를 변경할 수 있습니다. 변경사항이 있으면 2학년부 박상현 선생님에게 오세요.</span>
+                    </div>
+                    <div
+                        style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                        👤 <span id="displaySupervisorName"></span> 선생님
+                        <button onclick="handleLogout()"
+                            style="background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.2s;">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="seating-container active" id="seatingDisplay"></div>
+        <div class="attendance-container" id="attendanceDisplay"></div>
+        <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
+    </div> <!-- Close mainApp -->
 
     <script>
+        let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (supervisorName) {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                document.getElementById('displaySupervisorName').innerText = supervisorName;
+            }
+        });
+
+        function handleLogin() {
+            const nameInput = document.getElementById('teacherNameInput').value.trim();
+            if (!nameInput) {
+                alert('감독 교사 성함을 입력해주세요.');
+                return;
+            }
+            supervisorName = nameInput;
+            sessionStorage.setItem('yajaSupervisor', supervisorName);
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('displaySupervisorName').innerText = supervisorName;
+        }
+
+        function handleLogout() {
+            if (!confirm('로그아웃 하시겠습니까?')) return;
+            sessionStorage.removeItem('yajaSupervisor');
+            supervisorName = '';
+            document.getElementById('teacherNameInput').value = '';
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
         // CSV 데이터 임베딩
         const rawData = `순번,학번,이름,메모,좌석번호,신청시간,참여시간,참여횟수,월1,월2,월3,화1,화2,화3,수1,수2,수3,목1,목2,목3,금1,금2,금3
 1,20306,남선우,,,2026-03-04 15:17:49,"화1,화2,화3,목1,목2,목3",6,,,,1,1,1,,,,1,1,1,,,
@@ -816,6 +1061,7 @@
             document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentPeriod = btn.dataset.period;
+            if (currentMode === 'attendance') renderAttendance();
         }
 
         function switchMode(mode) {
@@ -831,12 +1077,16 @@
                 seatingDisp.classList.add('active');
                 attendanceDisp.style.display = 'none';
                 attendanceDisp.classList.remove('active');
+                document.getElementById('btnResetArrangement').style.display = 'inline-block';
+                document.getElementById('btnResetAttendance').style.display = 'none';
                 renderSeating();
             } else {
                 seatingDisp.style.display = 'none';
                 seatingDisp.classList.remove('active');
                 attendanceDisp.style.display = 'flex';
                 attendanceDisp.classList.add('active');
+                document.getElementById('btnResetArrangement').style.display = 'none';
+                document.getElementById('btnResetAttendance').style.display = 'inline-block';
                 renderAttendance();
             }
         }
@@ -895,6 +1145,12 @@
             display.innerHTML = '';
             const roomStudents = getRoomStudents(currentDay);
             const rooms = ['2-3', '2-4', '2-5', '2-6'];
+
+            // 현재 실제 요일 계산 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+            const daysMap = ['일', '월', '화', '수', '목', '금', '토'];
+            const todayIndex = new Date().getDay();
+            const actualToday = daysMap[todayIndex];
+            const isToday = currentDay === actualToday;
 
             rooms.forEach(roomName => {
                 const students = roomStudents[roomName];
@@ -1001,16 +1257,23 @@
         function saveToStorage(roomName, gridSeats) {
             localStorage.setItem(`yajaArrangement_${currentDay}_${roomName}`, JSON.stringify(gridSeats.map(s => s ? s.학번 : "")));
         }
-        function showToast() {
+        function showToast(msg = '배치 정보가 자동 저장되었습니다.') {
             const toast = document.getElementById('toast');
+            toast.innerHTML = `<span>✅</span> ${msg}`;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 2000);
         }
         function resetArrangement() {
             if (!confirm('현재 요일의 모든 배치를 초기화하시겠습니까?')) return;
             Object.keys(localStorage).filter(k => k.startsWith(`yajaArrangement_${currentDay}_`)).forEach(k => localStorage.removeItem(k));
-            showToast();
+            showToast('배치가 초기화되었습니다.');
             renderSeating();
+        }
+        function resetAttendance() {
+            if (!confirm(`현재 요일(${currentDay}요일)의 출석 체크 내역을 모두 초기화하시겠습니까?`)) return;
+            Object.keys(sessionStorage).filter(k => k.startsWith(`att_${currentDay}_`)).forEach(k => sessionStorage.removeItem(k));
+            showToast('출석 데이터가 초기화되었습니다.');
+            renderAttendance();
         }
         function renderAttendance() {
             const display = document.getElementById('attendanceDisplay');
@@ -1020,13 +1283,20 @@
             const periodSelector = document.createElement('div');
             periodSelector.style.cssText = 'display:flex;gap:10px;margin-bottom:20px;justify-content:center;';
             periodSelector.innerHTML = `
-                <button class="btn day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
-                <button class="btn day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
+                <button class="btn day-btn ${currentPeriod === '1' ? 'active' : ''}" data-period="1" onclick="selectPeriod(this)">1교시</button>
+                <button class="btn day-btn ${currentPeriod === '2' ? 'active' : ''}" data-period="2" onclick="selectPeriod(this)">2교시</button>
             `;
             display.appendChild(periodSelector);
 
             const roomStudents = getRoomStudents(currentDay);
             const rooms = ['2-3', '2-4', '2-5', '2-6'];
+
+            // 현재 실제 요일 계산 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+            const daysMap = ['일', '월', '화', '수', '목', '금', '토'];
+            const todayIndex = new Date().getDay();
+            const actualToday = daysMap[todayIndex];
+            const isToday = currentDay === actualToday;
+
 
             rooms.forEach(roomName => {
                 const students = roomStudents[roomName];
@@ -1036,38 +1306,53 @@
                 section.className = 'attendance-section';
                 section.innerHTML = `
                     <div class="classroom-header">
-                        <span class="room-title">${roomName}반 출석부</span>
+                        <span class="room-title">${roomName}반 출석부 (${currentPeriod}교시)</span>
                         <span class="room-meta">${currentDay}요일 | 총 ${students.length}명</span>
                     </div>
-                    <table class="attendance-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80px;">번호</th>
-                                <th style="width: 120px;">학번</th>
-                                <th>이름</th>
-                                <th style="width: 100px;">출석여부</th>
-                                <th>비고</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${students.map((s, idx) => `
+                    <div class="table-responsive">
+                        <table class="attendance-table">
+                            <thead>
                                 <tr>
-                                    <td>${idx + 1}</td>
-                                    <td>${s.학번}</td>
-                                    <td style="font-weight: 700;">${s.이름}</td>
-                                    <td><input type="checkbox" class="attendance-checkbox"></td>
-                                    <td></td>
+                                    <th style="width: 80px;">번호</th>
+                                    <th style="width: 120px;">학번</th>
+                                    <th>이름</th>
+                                    <th style="width: 100px;">출석여부</th>
+                                    <th>비고</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <button class="btn-save-sheet" onclick="saveAttendanceToSheet('${roomName}', this)">💾 현재 반 출석 데이터 시트로 저장하기</button>
+                            </thead>
+                            <tbody>
+                                ${students.map((s, idx) => {
+                    const stateKey = `att_${currentDay}_${currentPeriod}_${s.학번}`;
+                    const isChecked = sessionStorage.getItem(stateKey) === 'true';
+                    return `
+                                    <tr style="${!isToday ? 'opacity: 0.6; background-color: #f8fafc;' : ''}">
+                                        <td>${idx + 1}</td>
+                                        <td>${s.학번}</td>
+                                        <td style="font-weight: 700;">${s.이름}</td>
+                                        <td><input type="checkbox" class="attendance-checkbox" data-id="${s.학번}" ${isChecked ? 'checked' : ''} ${!isToday ? 'disabled' : ''} onchange="sessionStorage.setItem('${stateKey}', this.checked)"></td>
+                                        <td></td>
+                                    </tr>
+                                    `;
+                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    ${!isToday ? `<div style="color: #ef4444; font-size: 0.9rem; margin-top: 15px; text-align: center; font-weight: 600;">⚠️ 오늘은 ${actualToday}요일입니다. ${currentDay}요일 출석체크는 불가능합니다.</div>` : ''}
+                    <button class="btn-save-sheet" onclick="saveAttendanceToSheet('${roomName}', this)" ${!isToday ? 'disabled style="background: #9ca3af; cursor: not-allowed;"' : ''}>💾 ${currentPeriod}교시 ${roomName}반 출석 시트로 저장</button>
                 `;
                 display.appendChild(section);
             });
         }
 
         async function saveAttendanceToSheet(roomName, btn) {
+            // 이중 안전 장치: 다시 한번 현재 요일 확인
+            const daysMap = ['일', '월', '화', '수', '목', '금', '토'];
+            const actualToday = daysMap[new Date().getDay()];
+            if (currentDay !== actualToday) {
+                alert(`오늘은 ${actualToday}요일입니다. ${currentDay}요일 출석체크는 불가능합니다.`);
+                return;
+            }
+
             const gasUrl = document.getElementById('gasUrl').value.trim();
             if (!gasUrl) {
                 alert('먼저 Google Apps Script URL을 입력해주세요.');
@@ -1085,6 +1370,7 @@
                 day: currentDay,
                 period: currentPeriod + '교시',
                 room: roomName,
+                supervisor: supervisorName, // 감독 교사 데이터 추가
                 students: roomStudents.map((s, idx) => ({
                     id: s.학번,
                     name: s.이름,
@@ -1100,7 +1386,7 @@
                 const response = await fetch(gasUrl, {
                     method: 'POST',
                     mode: 'no-cors', // GAS web apps often require no-cors for simple requests from different origins
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(attendanceData)
                 });
 
