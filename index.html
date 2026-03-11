@@ -428,6 +428,28 @@
             cursor: pointer;
         }
 
+        /* Attendance Table Column Widths */
+        .col-num { width: 50px; }
+        .col-id { width: 90px; }
+        .col-name { width: 80px; }
+        .col-check { width: 100px; white-space: nowrap; }
+        .col-remark { width: auto; }
+
+        .attendance-remark {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .attendance-remark:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: #f8fafc;
+        }
+
         .view-toggle {
             display: flex;
             gap: 10px;
@@ -812,23 +834,29 @@
 
             /* Adjust column widths for mobile */
             .col-num {
-                width: 40px !important;
+                width: 35px !important;
+                padding: 8px 2px !important;
             }
 
             .col-id {
-                width: 70px !important;
-            }
-
-            .col-name {
                 width: 65px !important;
             }
 
+            .col-name {
+                width: 60px !important;
+            }
+
             .col-check {
-                width: 70px !important;
+                width: 65px !important;
             }
 
             .col-remark {
                 width: auto !important;
+            }
+
+            .attendance-remark {
+                font-size: 0.8rem;
+                padding: 5px;
             }
 
             /* Larger touch target */
@@ -912,7 +940,7 @@
                     <button class="toggle-btn" id="btnAttendance" onclick="switchMode('attendance')">📋 출석 명단</button>
                 </div>
                 <input type="hidden" id="gasUrl"
-                    value="https://script.google.com/macros/s/AKfycbwn11dqjsWJqyT0KU7DsGTKXXnw9EfELjmNSKxS2N2Opin1ITTYmiFTQqHa3poF1aM/exec">
+                    value="https://script.google.com/macros/s/AKfycbxHS4vIKZGhPjV-xmrtC6D-l__GZNt3u-JYcs_JZUwjAXgjb7oBt2BcyhqTG6y6Of7a/exec">
                 <div class="info-text"
                     style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
                     <div style="display: flex; gap: 8px;">
@@ -1084,7 +1112,13 @@
         }
 
         const globalData = parseCSV(rawData);
-        let currentDay = '월';
+
+        // 오늘 요일 자동 감지 및 초기값 설정
+        const daysMap = ['일', '월', '화', '수', '목', '금', '토'];
+        const todayIdx = new Date().getDay();
+        const initialDay = (todayIdx >= 1 && todayIdx <= 5) ? daysMap[todayIdx] : '월';
+
+        let currentDay = initialDay;
         let currentMode = 'seating';
         let currentPeriod = '1';
 
@@ -1344,24 +1378,26 @@
                         <table class="attendance-table">
                             <thead>
                                 <tr>
-                                    <th class="col-num" style="width: 60px;">번호</th>
-                                    <th class="col-id" style="width: 100px;">학번</th>
-                                    <th class="col-name" style="width: 80px;">이름</th>
-                                    <th class="col-check" style="width: 80px;">출석여부</th>
+                                    <th class="col-num">번호</th>
+                                    <th class="col-id">학번</th>
+                                    <th class="col-name">이름</th>
+                                    <th class="col-check">출석여부</th>
                                     <th class="col-remark">비고</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${students.map((s, idx) => {
                     const stateKey = `att_${currentDay}_${currentPeriod}_${s.학번}`;
+                    const remarkKey = `rem_${currentDay}_${currentPeriod}_${s.학번}`;
                     const isChecked = sessionStorage.getItem(stateKey) === 'true';
+                    const remarkValue = sessionStorage.getItem(remarkKey) || '';
                     return `
                                     <tr style="${!isToday ? 'opacity: 0.6; background-color: #f8fafc;' : ''}">
                                         <td>${idx + 1}</td>
                                         <td>${s.학번}</td>
                                         <td style="font-weight: 700;">${s.이름}</td>
                                         <td><input type="checkbox" class="attendance-checkbox" data-id="${s.학번}" ${isChecked ? 'checked' : ''} ${!isToday ? 'disabled' : ''} onchange="sessionStorage.setItem('${stateKey}', this.checked)"></td>
-                                        <td></td>
+                                        <td><input type="text" class="attendance-remark" data-id="${s.학번}" value="${remarkValue}" placeholder="비고 입력" ${!isToday ? 'disabled' : ''} onchange="sessionStorage.setItem('${remarkKey}', this.value)"></td>
                                     </tr>
                                     `;
                 }).join('')}
@@ -1402,11 +1438,16 @@
                 period: currentPeriod + '교시',
                 room: roomName,
                 supervisor: supervisorName, // 감독 교사 데이터 추가
-                students: roomStudents.map((s, idx) => ({
-                    id: s.학번,
-                    name: s.이름,
-                    status: checkboxes[idx].checked
-                }))
+                students: roomStudents.map((s, idx) => {
+                    const checkbox = section.querySelector(`.attendance-checkbox[data-id="${s.학번}"]`);
+                    const remarkInput = section.querySelector(`.attendance-remark[data-id="${s.학번}"]`);
+                    return {
+                        id: s.학번,
+                        name: s.이름,
+                        status: checkbox ? checkbox.checked : false,
+                        remark: remarkInput ? remarkInput.value : ""
+                    };
+                })
             };
 
             const originalText = btn.innerText;
@@ -1430,6 +1471,13 @@
                 btn.disabled = false;
                 btn.innerText = originalText;
             }
+        }
+
+        // 요일 버튼 초기 활성화
+        const activeBtn = document.querySelector(`.day-btn[data-day="${currentDay}"]`);
+        if (activeBtn) {
+            document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+            activeBtn.classList.add('active');
         }
 
         renderSeating();
