@@ -972,12 +972,48 @@
                 width: 100%;
             }
         }
+
+        /* Cherry Blossom Petals Animation */
+        .blossom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .petal {
+            position: absolute;
+            background: linear-gradient(135deg, #ffc1d1, #ff9eb5);
+            border-radius: 150% 0 150% 0;
+            opacity: 0.6;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translate(0, -10px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+                transform: translate(20px, 10vh) rotate(45deg) scale(1);
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(150px, 105vh) rotate(360deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
     </style>
 </head>
 
 <body>
-    <!-- Spring Tree Backgrounds -->
-
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
             <h2>야자 감독 교사 로그인</h2>
@@ -1565,6 +1601,30 @@
             document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
             activeBtn.classList.add('active');
         }
+
+        // Create Fluttering Cherry Blossom Petals
+        function createPetals() {
+            const container = document.createElement('div');
+            container.className = 'blossom-container';
+            document.body.appendChild(container);
+
+            const petalCount = 80;
+            for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+
+                const size = Math.random() * 12 + 6;
+                petal.style.width = size + 'px';
+                petal.style.height = size + 'px';
+
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 8 + 6 + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+
+                container.appendChild(petal);
+            }
+        }
+        createPetals();
 
         renderSeating();
     </script>
