@@ -1537,7 +1537,7 @@
 
 
             rooms.forEach(roomName => {
-                const students = roomStudents[roomName];
+                const students = roomStudents[roomName].filter(s => s[`${currentDay}${currentPeriod}`] === '1');
                 if (students.length === 0) return;
 
                 const section = document.createElement('div');
