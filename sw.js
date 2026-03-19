@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yaja-seating-v3';
+const CACHE_NAME = 'yaja-seating-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -11,12 +11,11 @@ const ASSETS_TO_CACHE = [
 
 // 서비스 워커 설치 및 캐싱
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); // 새로운 서비스 워커가 즉시 활성화되도록 설정
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Opened cache');
-        // 개별적으로 캐시하여 하나가 실패해도 나머지는 저장되도록 시도 (선택 사항)
-        // 여기서는 다시 한 번 전체 캐싱을 시도하되, 오류를 잡아냅니다.
         return cache.addAll(ASSETS_TO_CACHE).catch(err => {
           console.error('Core assets caching failed:', err);
         });
@@ -35,7 +34,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim()) // 즉시 제어권 획득
   );
 });
 

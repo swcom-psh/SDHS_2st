@@ -1885,8 +1885,28 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registered!', reg))
+                    .then(reg => {
+                        console.log('Service Worker registered!', reg);
+                        // 새로운 서비스 워커가 업데이트되었을 때 자동 새로고침
+                        reg.onupdatefound = () => {
+                            const newWorker = reg.installing;
+                            newWorker.onstatechange = () => {
+                                if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                                    location.reload();
+                                }
+                            };
+                        };
+                    })
                     .catch(err => console.log('Service Worker registration failed:', err));
+            });
+
+            // 제어권이 변경되었을 때(새로운 SW 활성화 시) 새로고침
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>
