@@ -177,10 +177,10 @@
         }
 
         .day-btn.active {
-            background: linear-gradient(135deg, var(--primary) 0%, #D4628A 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            box-shadow: 0 4px 14px rgba(232, 115, 154, 0.4);
+            box-shadow: 0 4px 14px rgba(17, 138, 142, 0.4);
         }
 
         /* Layout Grid */
@@ -303,25 +303,40 @@
         /* Toast notification */
         #toast {
             position: fixed;
-            bottom: 32px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: linear-gradient(135deg, var(--primary), #0D6F72);
+            background: rgba(17, 138, 142, 0.95);
+            backdrop-filter: blur(8px);
             color: white;
-            padding: 18px 32px;
-            border-radius: 20px;
+            padding: 14px 24px;
+            border-radius: 16px;
             font-weight: 700;
-            box-shadow: 0 12px 32px rgba(17, 138, 142, 0.25);
+            box-shadow: var(--shadow-lg);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
+            z-index: 10000;
             display: flex;
             align-items: center;
-            gap: 10px;
-            letter-spacing: -0.01em;
+            gap: 12px;
+            width: fit-content;
+            max-width: 90vw;
+            white-space: normal;
+            word-break: keep-all;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
         }
 
         #toast.show {
             transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            #toast {
+                padding: 12px 20px;
+                bottom: 30px;
+                font-size: 0.9rem;
+            }
         }
 
         .spacer {
@@ -1545,11 +1560,11 @@
         function saveToStorage(roomName, gridSeats) {
             localStorage.setItem(`yajaArrangement_${currentDay}_${roomName}`, JSON.stringify(gridSeats.map(s => s ? s.학번 : "")));
         }
-        function showToast(msg = '배치 정보가 자동 저장되었습니다.') {
+        function showToast(msg = '배치가 저장되었습니다.') {
             const toast = document.getElementById('toast');
-            toast.innerHTML = `<span>✅</span> ${msg}`;
+            toast.innerHTML = `<span>✅</span> <span>${msg}</span>`;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
         function resetArrangement() {
             if (!confirm('현재 요일의 모든 배치를 초기화하시겠습니까?')) return;
@@ -1667,8 +1682,8 @@
 
             // 토스트 메시지 작게 표시 (실시간 저장 효과)
             const indicator = document.createElement('div');
-            indicator.style.cssText = 'position:fixed;bottom:100px;right:20px;background:rgba(92,196,171,0.9);color:white;padding:5px 15px;border-radius:15px;font-size:0.8rem;z-index:2000;';
-            indicator.innerText = `💾 ${student.이름} 저장 중...`;
+            indicator.style.cssText = 'position:fixed;bottom:100px;right:20px;background:rgba(17,138,142,0.9);backdrop-filter:blur(4px);color:white;padding:6px 16px;border-radius:20px;font-size:0.8rem;z-index:9999;pointer-events:none;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:6px;';
+            indicator.innerHTML = `<span>💾</span> ${student.이름} 저장 중...`;
             document.body.appendChild(indicator);
 
             try {
@@ -1678,11 +1693,12 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 });
-                setTimeout(() => { if(indicator.parentNode) indicator.parentNode.removeChild(indicator); }, 1000);
+                indicator.innerHTML = `<span>✅</span> ${student.이름} 완료`;
+                setTimeout(() => { if(indicator.parentNode) indicator.parentNode.removeChild(indicator); }, 1500);
             } catch (error) {
                 console.error('Single save error:', error);
                 indicator.style.background = '#ef4444';
-                indicator.innerText = '❌ 저장 실패';
+                indicator.innerHTML = '❌ 저장 실패';
                 setTimeout(() => { if(indicator.parentNode) indicator.parentNode.removeChild(indicator); }, 3000);
             }
         }
