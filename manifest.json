@@ -4,8 +4,8 @@
   "description": "야간자율학습 학생들의 자리를 배치하고 출석을 관리하는 프로그램입니다.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FAF1E8",
-  "theme_color": "#E8739A",
+  "background_color": "#F5FAFA",
+  "theme_color": "#118A8E",
   "icons": [
     {
       "src": "icon-192.png",

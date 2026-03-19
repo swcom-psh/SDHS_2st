@@ -15,49 +15,47 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
-            /* 🌸 Spring Pastel Theme (Softened Contrast) */
-            --primary: #E8739A;
-            /* Rose Pink */
-            --primary-dark: #C9557F;
-            --secondary: #FDEAF1;
-            /* slightly warmer blush */
+            /* 🎨 Modern Teal & Cyan Theme (Travelin Inspired) */
+            --primary: #118A8E;
+            /* Deep Teal */
+            --primary-dark: #0B6E71;
+            --secondary: #E0F2F1;
+            /* Mint white */
 
-            --bg-canvas: #FAF1E8;
-            /* Darker, less blinding cream */
-            --card-bg: #FCF5EF;
-            /* Softened white-peach */
+            --bg-canvas: #F5FAFA;
+            /* Cool off-white */
+            --card-bg: #FFFFFF;
 
-            --text-main: #2D1E16;
-            /* Deeper warm brown */
-            --text-sub: #8B6552;
-            /* Darker, high-contrast sub text */
-            --text-muted: #B39586;
+            --text-main: #1D2D2E;
+            /* Dark teal-gray */
+            --text-sub: #5F7D7E;
+            --text-muted: #8FA4A5;
 
-            --border: #E8D0C5;
-            /* More contrasting peach border */
-            --border-focus: #E8739A;
+            --border: #D1E5E6;
+            /* Soft teal border */
+            --border-focus: #118A8E;
 
-            /* Warm Soft Shadows */
-            --shadow-sm: 0 2px 12px rgba(180, 100, 80, 0.07);
-            --shadow-md: 0 6px 24px rgba(180, 100, 80, 0.12);
-            --shadow-lg: 0 12px 40px rgba(180, 100, 80, 0.14);
+            /* Modern Soft Shadows */
+            --shadow-sm: 0 2px 12px rgba(17, 138, 142, 0.05);
+            --shadow-md: 0 8px 32px rgba(17, 138, 142, 0.12);
+            --shadow-lg: 0 16px 48px rgba(17, 138, 142, 0.15);
 
-            --drag-over: #FFF0F5;
+            --drag-over: #F0FBFA;
 
             /* Attendance Table Colors */
-            --table-header: #FDF0EA;
-            --table-border: #F0DDD4;
-            --table-row-hover: #FFF5F0;
+            --table-header: #F1F9F9;
+            --table-border: #E6EEEE;
+            --table-row-hover: #F8FCFC;
 
-            /* Room pastel colors (spring) */
-            --room-2-3: #7BB8F0;
-            /* Sky Blue */
-            --room-2-4: #7DD9C0;
-            /* Mint */
-            --room-2-5: #F4A76A;
-            /* Peach */
-            --room-2-6: #F07EAA;
-            /* Rose */
+            /* Room modern colors (Teal based) */
+            --room-2-3: #118A8E;
+            /* Theme Primary */
+            --room-2-4: #4DB6AC;
+            /* Teal 300 */
+            --room-2-5: #009688;
+            /* Teal 500 */
+            --room-2-6: #00796B;
+            /* Teal 700 */
         }
 
         * {
@@ -85,35 +83,38 @@
             max-width: 1300px;
             margin: 0 auto 40px;
             text-align: center;
-            padding: 36px 40px;
-            background: linear-gradient(135deg, #FFFBF7 0%, #FFF2EC 100%);
-            border-radius: 28px;
-            box-shadow: var(--shadow-sm);
-            border: 1.5px solid var(--border);
+            padding: 48px 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
+            border-radius: 36px;
+            box-shadow: var(--shadow-md);
+            border: none;
             position: relative;
             overflow: hidden;
+            color: white;
         }
 
         header::before {
-            content: '🌸';
+            content: '';
             position: absolute;
-            top: -10px;
-            right: 30px;
-            font-size: 5rem;
-            opacity: 0.08;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
             pointer-events: none;
         }
 
         h1 {
-            font-size: 1.9rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: var(--text-main);
+            color: white;
             margin-bottom: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.04em;
         }
 
         .controls {
@@ -151,17 +152,17 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #D4628A 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
             color: white;
             border: none;
-            box-shadow: 0 4px 16px rgba(232, 115, 154, 0.35);
+            box-shadow: 0 4px 16px rgba(17, 138, 142, 0.25);
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #B84E73 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #095C5E 100%);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(232, 115, 154, 0.45);
+            box-shadow: 0 6px 20px rgba(17, 138, 142, 0.35);
         }
 
         .btn-danger {
@@ -293,10 +294,10 @@
 
         .student-name {
             font-weight: 800;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             color: var(--text-main);
             pointer-events: none;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.04em;
         }
 
         /* Toast notification */
@@ -305,12 +306,12 @@
             bottom: 32px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: linear-gradient(135deg, #F07EAA, #E8739A);
+            background: linear-gradient(135deg, var(--primary), #0D6F72);
             color: white;
-            padding: 16px 28px;
-            border-radius: 50px;
+            padding: 18px 32px;
+            border-radius: 20px;
             font-weight: 700;
-            box-shadow: 0 8px 28px rgba(232, 115, 154, 0.4);
+            box-shadow: 0 12px 32px rgba(17, 138, 142, 0.25);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             display: flex;
@@ -1857,29 +1858,9 @@
             activeBtn.classList.add('active');
         }
 
-        // Create Fluttering Cherry Blossom Petals
-        function createPetals() {
-            const container = document.createElement('div');
-            container.className = 'blossom-container';
-            document.body.appendChild(container);
+        // Removed createPetals to match the new minimalist theme
+        // function createPetals() { ... }
 
-            const petalCount = 80;
-            for (let i = 0; i < petalCount; i++) {
-                const petal = document.createElement('div');
-                petal.className = 'petal';
-
-                const size = Math.random() * 12 + 6;
-                petal.style.width = size + 'px';
-                petal.style.height = size + 'px';
-
-                petal.style.left = Math.random() * 100 + 'vw';
-                petal.style.animationDuration = Math.random() * 8 + 6 + 's';
-                petal.style.animationDelay = Math.random() * 5 + 's';
-
-                container.appendChild(petal);
-            }
-        }
-        createPetals();
 
         renderSeating();
     </script>

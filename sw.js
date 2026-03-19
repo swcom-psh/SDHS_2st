@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yaja-seating-v2';
+const CACHE_NAME = 'yaja-seating-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
