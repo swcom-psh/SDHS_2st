@@ -1930,7 +1930,7 @@
 
             showConfirm(`${roomName}반 출석 데이터를 Google 시트로 전송하시겠습니까?`, async () => {
 
-                const roomStudents = getRoomStudents(currentDay)[roomName];
+                const roomStudents = getRoomStudents(currentDay)[roomName].filter(s => s[`${currentDay}${currentPeriod}`] === '1');
                 const section = btn.closest('.attendance-section');
                 const checkboxes = section.querySelectorAll('.attendance-checkbox');
 
