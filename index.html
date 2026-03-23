@@ -1468,7 +1468,7 @@
         <header>
             <header>
                 <h1>2026학년도 2학년 1학기 자기주도적 학습 자리 배치도 <small
-                        style="font-size: 0.6rem; opacity: 0.7; vertical-align: middle;">v19</small></h1>
+                        style="font-size: 0.6rem; opacity: 0.7; vertical-align: middle;">v21</small></h1>
                 <div class="controls">
                     <div class="btn-group" id="dayButtons">
                         <button class="btn day-btn active" data-day="월">월요일</button>
@@ -1496,7 +1496,7 @@
                             명단</button>
                     </div>
                     <input type="hidden" id="gasUrl"
-                        value="https://script.google.com/macros/s/AKfycbzp0FUJgcB00N2-WgC2t5ys7sfIS9UoCUjauR3-zYkKZuto4EdYD_O3TY7UoP1eOnOu/exec">
+                        value="https://script.google.com/macros/s/AKfycbyTNbzVW1DMlAYp6lcrEYKbkR19eRbU-HAazohxuz1HhVg_b6z1QsPFi4A2MgZSMliR/exec">
                     <input type="hidden" id="gasBackupUrl"
                         value="https://script.google.com/macros/s/AKfycbxvmXW2lKnfqYWSW8DiXbucv0KHSn2sxoSClRXJq7qnlPzXkPdytY9b33J6K-SC3UEb/exec">
                     <div class="info-text"
@@ -1530,6 +1530,7 @@
 
     <script>
         let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
+        let allowedTeachers = []; // 구글 시트에서 받아올 동적 명단 (v20)
 
         function showLoading(text) {
             if (text) document.getElementById('loadingText').innerText = text;
@@ -1542,6 +1543,10 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             showLoading("데이터를 동기화하고 있습니다...");
+            
+            // v20: 감독 교사 명단 먼저 동기화
+            await fetchTeacherList();
+            
             const hasCache = await fetchGlobalData(false);
 
             if (supervisorName) {
@@ -1567,12 +1572,17 @@
 
         async function handleLogin() {
             const nameInput = document.getElementById('teacherNameInput').value.trim();
-            const allowedTeachers = ['유연주', '김유민', '송세윤', '김수환', '최철화', '장순지', '박상현', '오창현', '전봉수', '길현진', '이승호', '박종선', '홍남숙', '김지현', '김동석', '이상현', '김소연', '주현희', '이준영', '김인영', '양강훈', '이현정'];
 
             if (!nameInput) {
                 showAlert('감독 교사 성함을 입력해주세요.');
                 return;
             }
+            
+            // v20: 서버에서 받아온 명단이 아직 없다면 다시 시도
+            if (allowedTeachers.length === 0) {
+                await fetchTeacherList();
+            }
+
             if (!allowedTeachers.includes(nameInput)) {
                 showAlert('등록되지 않은 선생님입니다. 입력하신 성함을 다시 한 번 확인해주세요.');
                 return;
@@ -1588,6 +1598,27 @@
             }
 
             await startAppSession(nameInput);
+        }
+
+        /**
+         * v20: 구글 시트 '감독교사명단' 탭에서 성함을 실시간으로 불러옵니다.
+         */
+        async function fetchTeacherList() {
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            if (!gasUrl) return;
+
+            try {
+                const response = await fetch(`${gasUrl}?action=getTeachers`);
+                const names = await response.json();
+                if (Array.isArray(names)) {
+                    allowedTeachers = names;
+                    console.log("감독 교사 명단 로드 완료:", allowedTeachers.length, "명");
+                }
+            } catch (e) {
+                console.error("Fetch teachers error:", e);
+                // 실패 시 최소한의 폴백(개발자/관리자 등)을 둘 수 있으나, 
+                // 여기서는 시트 데이터가 핵심이므로 경고만 표시
+            }
         }
 
         async function handleLogout() {
