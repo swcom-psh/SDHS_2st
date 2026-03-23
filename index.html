@@ -1543,10 +1543,10 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             showLoading("데이터를 동기화하고 있습니다...");
-            
+
             // v20: 감독 교사 명단 먼저 동기화
             await fetchTeacherList();
-            
+
             const hasCache = await fetchGlobalData(false);
 
             if (supervisorName) {
@@ -1577,7 +1577,7 @@
                 showAlert('감독 교사 성함을 입력해주세요.');
                 return;
             }
-            
+
             // v20: 서버에서 받아온 명단이 아직 없다면 다시 시도
             if (allowedTeachers.length === 0) {
                 await fetchTeacherList();
@@ -2182,7 +2182,7 @@
             if (actualToday === '일' || actualToday === '토') return;
 
             showLoading("데이터를 빠르게 동기화하는 중입니다..."); // 모든 데이터 로드 시 로딩창 표시
-            
+
             try {
                 // v19 개선: 병렬 실행(Promise.all)으로 속도 대폭 향상 (기존 10초+ -> 약 2초)
                 const fetchPromises = [];
