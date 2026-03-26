@@ -1544,10 +1544,11 @@
         document.addEventListener('DOMContentLoaded', async () => {
             showLoading("데이터를 동기화하고 있습니다...");
 
-            // v20: 감독 교사 명단 먼저 동기화
-            await fetchTeacherList();
+            // v20: 감독 교사 명단 및 학생 명단을 병렬로 강제 동기화 (최신 데이터 보장)
+            const teacherPromise = fetchTeacherList();
+            const studentPromise = fetchGlobalData(true); // 강제 캐시 무시
 
-            const hasCache = await fetchGlobalData(false);
+            await Promise.all([teacherPromise, studentPromise]);
 
             if (supervisorName) {
                 // 이미 로그인된 세션이 있는 경우 바로 앱 시작 로직 수행
@@ -1693,9 +1694,6 @@
 
                     localStorage.setItem('yajaStudentList', JSON.stringify(globalData));
                     console.log("학생 명단 서버 로드 완료:", globalData.length, "명");
-
-                    // 명단 로드 직후 오늘 전체 출석 데이터를 백그라운드에서 조용히 불러옴 (로딩창 없음)
-                    fetchAllTodayAttendance();
 
                     return true;
                 }
@@ -2296,10 +2294,10 @@
                     const isChecked = sessionStorage.getItem(stateKey) === 'true';
                     const remarkValue = sessionStorage.getItem(remarkKey) || '';
                     return `
-                                    <tr style="${!isToday ? 'opacity: 0.6; background-color: #f8fafc;' : ''}">
-                                        <td>${idx + 1}</td>
-                                        <td>${s.학번}</td>
-                                        <td style="font-weight: 700;">${s.이름}</td>
+                                    <tr style="color: var(--text-main); ${!isToday ? 'opacity: 0.6; background-color: #f8fafc;' : ''}">
+                                        <td style="color: var(--text-main);">${idx + 1}</td>
+                                        <td style="color: var(--text-muted);">${s.학번}</td>
+                                        <td style="font-weight: 800; color: var(--text-main); font-size: 1.05rem;">${s.이름}</td>
                                         <td><input type="checkbox" class="attendance-checkbox" data-id="${s.학번}" ${isChecked ? 'checked' : ''} ${!isToday ? 'disabled' : ''} onchange="sessionStorage.setItem('${stateKey}', this.checked)"></td>
                                         <td><input type="text" class="attendance-remark" data-id="${s.학번}" value="${remarkValue}" placeholder="비고 입력" ${!isToday ? 'disabled' : ''} onchange="sessionStorage.setItem('${remarkKey}', this.value)"></td>
                                     </tr>
