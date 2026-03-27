@@ -1926,7 +1926,7 @@
                 const students = roomStudents[roomName];
                 if (students.length === 0) return;
 
-                const storageKey = `yajaArrangement_${currentDay}_${roomName}`;
+                const storageKey = `yajaDataV2_${currentDay}_${roomName}`;
                 let savedIds = JSON.parse(localStorage.getItem(storageKey));
                 let gridSeats = new Array(30).fill(null);
                 const currentStudentMap = {};
@@ -2047,7 +2047,7 @@
             const sRoom = draggedElement.parentElement.parentElement.dataset.room;
             const tRoom = this.parentElement.parentElement.dataset.room;
             if (sRoom !== tRoom || sIdx === tIdx) return;
-            const k = `yajaArrangement_${currentDay}_${sRoom}`;
+            const k = `yajaDataV2_${currentDay}_${sRoom}`;
             let arr = JSON.parse(localStorage.getItem(k));
             [arr[sIdx], arr[tIdx]] = [arr[tIdx], arr[sIdx]];
             localStorage.setItem(k, JSON.stringify(arr));
@@ -2056,7 +2056,7 @@
         }
         function saveArrangement(roomName, grid) {
             const dateStr = getTodayDateString();
-            localStorage.setItem(`yajaArrangement_${currentDay}_${roomName}`, JSON.stringify(grid.map(s => s ? s.학번 : "")));
+            localStorage.setItem(`yajaDataV2_${currentDay}_${roomName}`, JSON.stringify(grid.map(s => s ? s.학번 : "")));
         }
         function showToast(msg = '배치가 저장되었습니다.') {
             const toast = document.getElementById('toast');
@@ -2066,7 +2066,7 @@
         }
         function resetArrangement() {
             showConfirm('현재 요일의 모든 배치를 초기화하시겠습니까?', () => {
-                Object.keys(localStorage).filter(k => k.startsWith(`yajaArrangement_${currentDay}_`)).forEach(k => localStorage.removeItem(k));
+                Object.keys(localStorage).filter(k => k.startsWith(`yajaDataV2_${currentDay}_`)).forEach(k => localStorage.removeItem(k));
                 showToast('배치가 초기화되었습니다.');
                 renderSeating();
             });
