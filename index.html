@@ -1484,10 +1484,7 @@
                     </div>
                     <div class="btn-group">
                         <button class="btn btn-primary" onclick="downloadPDF()">📄 저장하기</button>
-                        <button class="btn btn-danger" id="btnResetArrangement" onclick="resetArrangement()">🔄 배치
-                            초기화</button>
-                        <button class="btn btn-danger" id="btnResetAttendance" onclick="resetAttendance()"
-                            style="display: none;">🗑️ 출석 초기화</button>
+                        <!-- 배치 및 출석 초기화 버튼 제거됨 (사용자 요청) -->
                     </div>
                     <div class="view-toggle">
                         <button class="toggle-btn active" id="btnSeating" onclick="switchMode('seating')">🪑 자리
@@ -1738,16 +1735,14 @@
                 seatingDisp.classList.add('active');
                 attendanceDisp.style.display = 'none';
                 attendanceDisp.classList.remove('active');
-                document.getElementById('btnResetArrangement').style.display = 'inline-block';
-                document.getElementById('btnResetAttendance').style.display = 'none';
+                // 초기화 버튼들이 제거되었으므로 display 토글 코드 생략
                 renderSeating();
             } else {
                 seatingDisp.style.display = 'none';
                 seatingDisp.classList.remove('active');
                 attendanceDisp.style.display = 'flex';
                 attendanceDisp.classList.add('active');
-                document.getElementById('btnResetArrangement').style.display = 'none';
-                document.getElementById('btnResetAttendance').style.display = 'inline-block';
+                // 초기화 버튼들이 제거되었으므로 display 토글 코드 생략
                 renderAttendance();
             }
         }
@@ -1787,9 +1782,9 @@
 
             // 3. 미배정 학생들을 참여 시간(P1/P2/Both)에 따라 기본 그룹화
             // (Both 기준은 P1과 P2 참여 여부로 판단하며, P3는 자동 배치 대상에 포함만 시킴)
-            let bothP = unassignedStudents.filter(s => s[col1] === '1' && s[col2] === '1').sort((a, b) => a.학번.localeCompare(b.학번));
-            let p1Only = unassignedStudents.filter(s => s[col1] === '1' && s[col2] !== '1').sort((a, b) => a.학번.localeCompare(b.학번));
-            let p2Only = unassignedStudents.filter(s => s[col1] !== '1' && (s[col2] === '1' || s[col3] === '1')).sort((a, b) => a.학번.localeCompare(b.학번));
+            let bothP = unassignedStudents.filter(s => s[col1] === '1' && s[col2] === '1').sort((a, b) => Number(a.순번) - Number(b.순번));
+            let p1Only = unassignedStudents.filter(s => s[col1] === '1' && s[col2] !== '1').sort((a, b) => Number(a.순번) - Number(b.순번));
+            let p2Only = unassignedStudents.filter(s => s[col1] !== '1' && (s[col2] === '1' || s[col3] === '1')).sort((a, b) => Number(a.순번) - Number(b.순번));
 
             // 4. 일반 자동 배정 (피리오드에 따라 반 할당)
             roomLists['2-5'].push(...p1Only);
@@ -1802,7 +1797,7 @@
 
             // 6. 모든 방 명단 학번 순 정렬 마무리
             Object.keys(roomLists).forEach(room => {
-                roomLists[room].sort((a, b) => a.학번.localeCompare(b.학번));
+                roomLists[room].sort((a, b) => Number(a.순번) - Number(b.순번));
             });
 
             return roomLists;
@@ -1921,7 +1916,7 @@
                             delete currentStudentMap[id];
                         }
                     });
-                    fillZigzag(gridSeats, Object.values(currentStudentMap).sort((a, b) => a.학번.localeCompare(b.학번)));
+                    fillZigzag(gridSeats, Object.values(currentStudentMap).sort((a, b) => Number(a.순번) - Number(b.순번)));
                 } else {
                     fillZigzag(gridSeats, students);
                 }
