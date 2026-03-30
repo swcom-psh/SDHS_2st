@@ -1821,9 +1821,9 @@
 
             // 3. 미배정 학생들을 참여 시간(P1/P2/Both)에 따라 기본 그룹화
             // (1 대신 실제 번호 값이 있으면 참여하는 것으로 간주)
-            let bothP = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.순번) - Number(b.순번));
-            let p1Only = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && !(s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.순번) - Number(b.순번));
-            let p2Only = unassignedStudents.filter(s => !(s[col1] && String(s[col1]).trim() !== '') && ((s[col2] && String(s[col2]).trim() !== '') || (s[col3] && String(s[col3]).trim() !== ''))).sort((a, b) => Number(a.순번) - Number(b.순번));
+            let bothP = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
+            let p1Only = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && !(s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
+            let p2Only = unassignedStudents.filter(s => !(s[col1] && String(s[col1]).trim() !== '') && ((s[col2] && String(s[col2]).trim() !== '') || (s[col3] && String(s[col3]).trim() !== ''))).sort((a, b) => Number(a.학번) - Number(b.학번));
 
             // 4. 일반 자동 배정 (피리오드에 따라 반 할당)
             roomLists['2-5'].push(...p1Only);
@@ -1836,7 +1836,7 @@
 
             // 6. 모든 방 명단 학번 순 정렬 마무리
             Object.keys(roomLists).forEach(room => {
-                roomLists[room].sort((a, b) => Number(a.순번) - Number(b.순번));
+                roomLists[room].sort((a, b) => Number(a.학번) - Number(b.학번));
             });
 
             return roomLists;
