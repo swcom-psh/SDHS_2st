@@ -1428,6 +1428,18 @@
             border: 1.5px solid #F1E9D1 !important;
         }
 
+        .is-exporting-pdf .seat.not-in-period {
+            opacity: 1 !important;
+            border-style: solid !important;
+            background-color: unset !important; /* 요일별 배경색이 그대로 적용되도록 방해하는 속성 제거 */
+        }
+        
+        .is-exporting-pdf .seat.not-in-period .student-name,
+        .is-exporting-pdf .seat.not-in-period .student-id {
+            color: #0f172a !important; /* 옅은 회색이 아닌 진한 남색으로 강제 통일 */
+            opacity: 1 !important;
+        }
+
         .is-exporting-pdf .seat::after {
             display: none !important;
         }
