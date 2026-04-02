@@ -1481,6 +1481,365 @@
         .is-exporting-pdf .overlap-marker {
             display: none !important;
         }
+
+        /* ===== 개인 자리표 섹션 ===== */
+        .personal-card-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: none;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .personal-card-search-bar {
+            background: var(--card-bg);
+            padding: 28px 32px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1.5px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .personal-card-search-bar h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+        }
+
+        .personal-search-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .personal-search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border);
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+            background: #FDFCFB;
+            color: var(--text-main);
+        }
+
+        .personal-search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(17, 138, 142, 0.12);
+            background: white;
+        }
+
+        /* 학생 자리표 카드 그리드 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        /* 개별 학생 카드 */
+        .student-week-card {
+            background: white;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: box-shadow 0.2s, transform 0.2s;
+            page-break-inside: avoid;
+        }
+
+        .student-week-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
+            color: white;
+            padding: 16px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-student-name {
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+        }
+
+        .card-student-id {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+
+        .card-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.02em;
+        }
+
+        /* 주간 자리 표 */
+        .week-seat-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .week-seat-table th {
+            background: var(--table-header);
+            color: var(--text-sub);
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1.5px solid var(--table-border);
+        }
+
+        .week-seat-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--table-border);
+            font-weight: 600;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .week-seat-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .week-seat-table .room-label-cell {
+            font-weight: 800;
+            font-size: 0.88rem;
+            background: #F8FCFC;
+            color: var(--primary-dark);
+            border-right: 1.5px solid var(--table-border);
+            min-width: 54px;
+        }
+
+        .seat-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 4px 10px;
+            font-weight: 800;
+            font-size: 0.92rem;
+            min-width: 36px;
+            box-shadow: 0 2px 6px rgba(17, 138, 142, 0.25);
+            line-height: 1.4;
+        }
+
+        .seat-chip.period-1 {
+            background: linear-gradient(135deg, #118A8E 0%, #0D6F72 100%);
+        }
+
+        .seat-chip.period-2 {
+            background: linear-gradient(135deg, #4DB6AC 0%, #009688 100%);
+        }
+
+        .seat-chip-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .seat-chip-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .seat-empty-cell {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .card-print-btn {
+            width: 100%;
+            padding: 11px;
+            background: var(--secondary);
+            color: var(--primary-dark);
+            border: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        .card-print-btn:hover {
+            background: #C8E6E6;
+        }
+
+        /* 일괄 인쇄용 숨긴 컨테이너 */
+        #printAllContainer {
+            display: none;
+        }
+
+        /* 인쇄 스타일 — 개인 자리표 전용 */
+        @media print {
+
+            html,
+            body {
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            body.printing-personal-cards #mainApp {
+                display: none !important;
+            }
+
+            body.printing-personal-cards #printAllContainer,
+            body.printing-personal-cards #printAllContainer * {
+                visibility: visible;
+            }
+
+            body.printing-personal-cards #printAllContainer {
+                display: block !important;
+                position: relative;
+                width: 100%;
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+
+            body.printing-personal-cards .print-card-page {
+                break-inside: avoid-page;
+                break-after: page;
+                width: fit-content;
+                /* 내부 표에 맞춰 너비 조정 */
+                height: auto;
+                margin: 0 auto;
+                border: none;
+                /* 외부 테두리는 표의 검정 테두리로 대체 */
+                border-radius: 0;
+                font-family: 'Pretendard', sans-serif;
+                background: white;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                overflow: visible;
+            }
+
+            body.printing-personal-cards .print-card-header {
+                background: #118A8E !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color: white !important;
+                padding: 10px 18px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            body.printing-personal-cards .print-card-title {
+                font-size: 36px;
+                /* 더 크게 */
+                font-weight: 900;
+                letter-spacing: -2px;
+                line-height: 1.1;
+            }
+
+            body.printing-personal-cards .print-card-subtitle {
+                font-size: 10px;
+                opacity: 0.85;
+            }
+
+            body.printing-personal-cards .print-seat-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 16px;
+                /* 크게 */
+            }
+
+            body.printing-personal-cards .print-seat-table th,
+            body.printing-personal-cards .print-seat-table td {
+                border: 3px solid #000;
+                padding: 0;
+                text-align: center;
+                font-weight: 900;
+                font-size: 38px;
+                /* 45px -> 38px로 축소 */
+                width: 32mm;
+                /* 38mm -> 32mm로 축소 */
+                height: 32mm;
+                /* 38mm -> 32mm로 축소 */
+                vertical-align: middle;
+                box-sizing: border-box;
+                line-height: 1;
+            }
+
+            body.printing-personal-cards .print-seat-table th {
+                background: #f0f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-weight: 900;
+                color: #036;
+                font-size: 36px;
+                /* 요일이 짤리지 않게 약간 작게 조정 */
+                white-space: nowrap;
+            }
+
+            body.printing-personal-cards .print-seat-table .room-col {
+                background: #f0f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-weight: 950;
+                color: #118A8E;
+                font-size: 22px;
+                /* 한 줄에 들어오도록 조정 */
+                white-space: nowrap;
+            }
+
+            body.printing-personal-cards .print-seat-num {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 92%;
+                height: 92%;
+                margin: 0 auto;
+                background: #118A8E !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                color: white !important;
+                border-radius: 6px;
+                font-weight: 950;
+                font-size: 44px;
+                /* 50px -> 44px로 축소 */
+            }
+
+            body.printing-personal-cards .print-seat-num.p2 {
+                background: #4DB6AC !important;
+            }
+
+            body.printing-personal-cards .print-card-footer {
+                padding: 8px 16px;
+                font-size: 9px;
+                color: #888;
+                text-align: center;
+                border-top: 1px solid #eee;
+            }
+        }
     </style>
 </head>
 
@@ -1535,6 +1894,7 @@
                             배치도</button>
                         <button class="toggle-btn" id="btnAttendance" onclick="switchMode('attendance')">📋 출석
                             명단</button>
+                        <button class="toggle-btn" id="btnPersonal" onclick="switchMode('personal')">🪪 개인 자리표</button>
                     </div>
                     <input type="hidden" id="gasUrl"
                         value="https://script.google.com/macros/s/AKfycbyTNbzVW1DMlAYp6lcrEYKbkR19eRbU-HAazohxuz1HhVg_b6z1QsPFi4A2MgZSMliR/exec">
@@ -1561,8 +1921,12 @@
 
             <div class="seating-container active" id="seatingDisplay"></div>
             <div class="attendance-container" id="attendanceDisplay"></div>
+            <div class="personal-card-container" id="personalCardDisplay"></div>
             <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
     </div> <!-- Close mainApp -->
+
+    <!-- 개인 자리표 일괄 인쇄용 숨긴 컨테이너 -->
+    <div id="printAllContainer"></div>
 
     <div id="loadingOverlay">
         <div class="loader"></div>
@@ -1573,9 +1937,18 @@
         let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
         let allowedTeachers = []; // 구글 시트에서 받아올 동적 명단 (v20)
 
-        function showLoading(text) {
-            if (text) document.getElementById('loadingText').innerText = text;
-            document.getElementById('loadingOverlay').style.display = 'flex';
+        function showLoading(type = 'init', text) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay) return;
+
+            if (text) {
+                document.getElementById('loadingText').innerText = text;
+            } else {
+                const messages = type === 'upload' ? uploadLoadingMessages : initLoadingMessages;
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                document.getElementById('loadingText').innerText = randomMsg;
+            }
+            overlay.style.display = 'flex';
         }
 
         function hideLoading() {
@@ -1583,7 +1956,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            showLoading("데이터를 동기화하고 있습니다...");
+            showLoading('init', "데이터를 동기화하고 있습니다...");
 
             // v20: 감독 교사 명단 및 학생 명단을 병렬로 강제 동기화 (최신 데이터 보장)
             const teacherPromise = fetchTeacherList();
@@ -1627,7 +2000,7 @@
             }
 
             if (needsLoading) {
-                showLoading("누락된 출결 데이터를 마저 불러오고 있습니다...");
+                showLoading('init', "누락된 출결 데이터를 마저 불러오고 있습니다...");
                 await fetchAllTodayAttendance(true);
             }
 
@@ -1654,7 +2027,7 @@
             }
 
             // 로그인 시점에도 명단이 최신인지 한 번 더 확인 (캐시 사용 가능)
-            showLoading("명단 확인 중...");
+            showLoading('init', "명단 확인 중...");
             const success = await fetchGlobalData();
             if (!success) {
                 hideLoading();
@@ -1700,7 +2073,7 @@
         }
 
         async function refreshStudentList() {
-            showLoading();
+            showLoading('init');
             const success = await fetchGlobalData(true); // 강제 새로고침
             hideLoading();
             if (success) {
@@ -1793,24 +2166,29 @@
             currentMode = mode;
             document.getElementById('btnSeating').classList.toggle('active', mode === 'seating');
             document.getElementById('btnAttendance').classList.toggle('active', mode === 'attendance');
+            document.getElementById('btnPersonal').classList.toggle('active', mode === 'personal');
 
             const seatingDisp = document.getElementById('seatingDisplay');
             const attendanceDisp = document.getElementById('attendanceDisplay');
+            const personalDisp = document.getElementById('personalCardDisplay');
+
+            seatingDisp.style.display = 'none';
+            seatingDisp.classList.remove('active');
+            attendanceDisp.style.display = 'none';
+            attendanceDisp.classList.remove('active');
+            personalDisp.style.display = 'none';
 
             if (mode === 'seating') {
                 seatingDisp.style.display = 'flex';
                 seatingDisp.classList.add('active');
-                attendanceDisp.style.display = 'none';
-                attendanceDisp.classList.remove('active');
-                // 초기화 버튼들이 제거되었으므로 display 토글 코드 생략
                 renderSeating();
-            } else {
-                seatingDisp.style.display = 'none';
-                seatingDisp.classList.remove('active');
+            } else if (mode === 'attendance') {
                 attendanceDisp.style.display = 'flex';
                 attendanceDisp.classList.add('active');
-                // 초기화 버튼들이 제거되었으므로 display 토글 코드 생략
                 renderAttendance();
+            } else if (mode === 'personal') {
+                personalDisp.style.display = 'flex';
+                renderPersonalCardView();
             }
         }
 
@@ -1827,7 +2205,6 @@
         function getRoomStudents(day) {
             const col1 = `${day}1`;
             const col2 = `${day}2`;
-            const col3 = `${day}3`; // 3교시 지원 추가
             const overrideCol = `${day}_배정`;
 
             // 1. 방 리스트 초기화
@@ -1839,13 +2216,12 @@
                 const manualRoom = s[overrideCol];
                 const hasP1 = s[col1] && String(s[col1]).trim() !== '';
                 const hasP2 = s[col2] && String(s[col2]).trim() !== '';
-                const hasP3 = s[col3] && String(s[col3]).trim() !== '';
 
                 if (manualRoom && roomLists[manualRoom]) {
                     roomLists[manualRoom].push(s);
                 } else {
-                    // 수동 배정이 없는 경우, 1/2/3교시 중 하나라도 출석 번호가 있으면 미배정 목록에 추가
-                    if (hasP1 || hasP2 || hasP3) {
+                    // 수동 배정이 없는 경우, 1/2교시 중 하나라도 출석 번호가 있으면 미배정 목록에 추가
+                    if (hasP1 || hasP2) {
                         unassignedStudents.push(s);
                     }
                 }
@@ -1917,7 +2293,8 @@
                 students: studentsData
             };
 
-            showLoading();
+            showLoading('upload');
+
             try {
                 await fetch(gasUrl, {
                     method: 'POST',
@@ -2135,23 +2512,21 @@
             });
         }
 
-        const loadingMessages = [
+        const initLoadingMessages = [
             "선생님, 오늘 하루도 고생 많으셨습니다! ☕",
-            "학생들 출석 현황을 꼼꼼하게 확인하고 있어요! 🕵️‍♂️",
             "구글 시트와 열심히 요정들이 소통하는 중입니다... 📡",
-            "잠시만요! 최신 야자 명단을 준비하고 있습니다 ⏳",
-            "야자 감독 화이팅! 데이터를 안전하게 가져오고 있어요 🚀",
+            "잠시만요! 최신 명단을 준비하고 있습니다 ⏳",
+            "데이터를 안전하게 가져오고 있어요 🚀",
             "출석부가 곧 도착합니다. 잠시만 기다려주세요! 📬"
         ];
 
-        function showLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                const randomMsg = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
-                document.getElementById('loadingText').innerText = randomMsg;
-                overlay.style.display = 'flex';
-            }
-        }
+        const uploadLoadingMessages = [
+            "출석 정보를 시트로 전송하고 있습니다... 📤",
+            "선생님의 소중한 기록을 안전하게 저장 중입니다 💾",
+            "시트에 데이터를 기록하고 있어요. 잠시만요! ✍️",
+            "전송 완료까지 아주 조금만 더 기다려주세요 ⏳",
+            "기록된 내용이 구글 시트에 잘 도착하고 있습니다 📡"
+        ];
 
         function hideLoading() {
             const overlay = document.getElementById('loadingOverlay');
@@ -2206,7 +2581,7 @@
             if (sessionStorage.getItem(cacheKey)) return;
 
             fetchingRooms.add(fetchId);
-            if (!silent) showLoading();
+            if (!silent) showLoading('init');
 
             try {
                 const url = `${gasUrl}${gasUrl.includes('?') ? '&' : '?'}date=${encodeURIComponent(dateStr)}&day=${encodeURIComponent(day)}&period=${encodeURIComponent(period + '교시')}&room=${encodeURIComponent(roomName)}`;
@@ -2523,6 +2898,290 @@
         }
 
         renderSeating();
+
+        // ============================================================
+        // 개인 자리표 기능
+        // ============================================================
+
+        /**
+         * 특정 학생의 주간(월~금) 자리 정보를 반환합니다.
+         * 반환값: { '월': { room: '2-3', seats: { '1': '8', '2': '8' } }, ... }
+         * room이 null이면 해당 요일에 야자 없음
+         */
+        function getStudentWeeklySchedule(student) {
+            const days = ['월', '화', '수', '목', '금'];
+            const rooms = ['2-3', '2-4', '2-5', '2-6'];
+            const result = {};
+
+            days.forEach(day => {
+                result[day] = { room: null, seats: {} };
+                const roomStudents = getRoomStudents(day);
+                rooms.forEach(room => {
+                    const found = roomStudents[room].find(s => s.학번 === student.학번);
+                    if (found) {
+                        const s1 = String(found[`${day}1`] || '').trim();
+                        const s2 = String(found[`${day}2`] || '').trim();
+                        result[day] = {
+                            room: room,
+                            seats: {
+                                '1': s1 || null,
+                                '2': s2 || null
+                            }
+                        };
+                    }
+                });
+            });
+            return result;
+        }
+
+        /**
+         * 개인 자리표 뷰 전체를 렌더링합니다.
+         */
+        function renderPersonalCardView() {
+            const container = document.getElementById('personalCardDisplay');
+            container.innerHTML = '';
+
+            // --- 검색 영역 ---
+            const searchBar = document.createElement('div');
+            searchBar.className = 'personal-card-search-bar';
+            searchBar.innerHTML = `
+                <h3>🪪 개인 자리표 생성</h3>
+                <div style="font-size:0.88rem; color:var(--text-sub); margin-top:-8px; word-break:keep-all;">
+                    학생 이름 또는 학번으로 검색하거나, 전체 학생의 자리표를 한 번에 인쇄하세요.
+                </div>
+                <div class="personal-search-row">
+                    <input type="text" id="personalSearchInput" class="personal-search-input"
+                        placeholder="이름 또는 학번 검색 (예: 윤제민 / 20316)"
+                        oninput="filterPersonalCards(this.value)" />
+                    <button class="btn btn-primary" onclick="filterPersonalCards('')">전체 보기</button>
+                    <button class="btn" onclick="printAllPersonalCards()">🖨️ 전체 인쇄</button>
+                </div>
+            `;
+            container.appendChild(searchBar);
+
+            // --- 카드 그리드 ---
+            const grid = document.createElement('div');
+            grid.className = 'cards-grid';
+            grid.id = 'personalCardsGrid';
+            container.appendChild(grid);
+
+            // 전체 학생 카드 렌더
+            renderPersonalCards(globalData);
+        }
+
+        /**
+         * 검색어로 학생 필터링 후 카드 갱신
+         */
+        function filterPersonalCards(query) {
+            const q = query.trim();
+            const filtered = q === ''
+                ? globalData
+                : globalData.filter(s =>
+                    (s.이름 && s.이름.includes(q)) ||
+                    (s.학번 && String(s.학번).includes(q))
+                );
+            renderPersonalCards(filtered);
+        }
+
+        const DAY_LABELS = { '월': '월', '화': '화', '수': '수', '목': '목', '금': '금' };
+        const DAYS_ORDER = ['월', '화', '수', '목', '금'];
+        const ROOMS_ORDER = ['2-3', '2-4', '2-5', '2-6'];
+
+        /**
+         * 학생 배열을 받아 카드 DOM을 생성하여 그리드에 삽입
+         */
+        function renderPersonalCards(students) {
+            const grid = document.getElementById('personalCardsGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            if (!students || students.length === 0) {
+                grid.innerHTML = `<div class="info-text" style="padding:40px; text-align:center; border:2px dashed var(--border); border-radius:20px; width:100%;">검색 결과가 없습니다.</div>`;
+                return;
+            }
+
+            students.forEach(student => {
+                const schedule = getStudentWeeklySchedule(student);
+                const card = buildPersonalCard(student, schedule);
+                grid.appendChild(card);
+            });
+        }
+
+        /**
+         * 단일 학생의 카드 DOM 엘리먼트 생성
+         */
+        function buildPersonalCard(student, schedule) {
+            const card = document.createElement('div');
+            card.className = 'student-week-card';
+            card.dataset.studentId = student.학번;
+
+            // 헤더
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            header.innerHTML = `
+                <div>
+                    <div class="card-student-name">${student.이름}</div>
+                    <div class="card-student-id">${student.학번}</div>
+                </div>
+                <div class="card-label">주간 자리표</div>
+            `;
+            card.appendChild(header);
+
+            // 자리 테이블
+            const tableWrap = document.createElement('div');
+            tableWrap.style.overflowX = 'auto';
+
+            // 테이블 헤더: 빈칸 + 월화수목금
+            let tableHTML = `<table class="week-seat-table"><thead><tr><th style="min-width:54px;"></th>`;
+            DAYS_ORDER.forEach(day => {
+                tableHTML += `<th>${day}</th>`;
+            });
+            tableHTML += `</tr></thead><tbody>`;
+
+            // 각 반별로 행 생성
+            ROOMS_ORDER.forEach(room => {
+                tableHTML += `<tr><td class="room-label-cell">${room}반</td>`;
+                DAYS_ORDER.forEach(day => {
+                    const info = schedule[day];
+                    if (info.room === room) {
+                        // 이 요일에 이 반에 배정됨
+                        const seats = info.seats;
+                        const uniqueSeats = [...new Set([seats['1'], seats['2']].filter(s => s))];
+
+                        let displaySeats = '';
+                        if (uniqueSeats.length > 0) {
+                            displaySeats = `<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;">
+                                ${uniqueSeats.map(s => `<div class="seat-chip-wrap"><span class="seat-chip">${s}번</span></div>`).join('')}
+                            </div>`;
+                        } else {
+                            displaySeats = `<span class="seat-chip">&bull;</span>`;
+                        }
+                        tableHTML += `<td>${displaySeats}</td>`;
+                    } else {
+                        tableHTML += `<td class="seat-empty-cell">—</td>`;
+                    }
+                });
+                tableHTML += `</tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            tableWrap.innerHTML = tableHTML;
+            card.appendChild(tableWrap);
+
+            // 인쇄 버튼
+            const printBtn = document.createElement('button');
+            printBtn.className = 'card-print-btn';
+            printBtn.innerHTML = '🖨️ 이 학생만 인쇄';
+            printBtn.onclick = () => printOnePersonalCard(student, schedule);
+            card.appendChild(printBtn);
+
+            return card;
+        }
+
+        /**
+         * 한 명의 학생 카드를 인쇄
+         */
+        function printOnePersonalCard(student, schedule) {
+            const printContainer = document.getElementById('printAllContainer');
+            printContainer.innerHTML = buildPrintCardHTML(student, schedule);
+            document.body.classList.add('printing-personal-cards');
+            window.print();
+            document.body.classList.remove('printing-personal-cards');
+        }
+
+        /**
+         * 전체 학생 자리표를 한 번에 인쇄
+         */
+        function printAllPersonalCards() {
+            if (!globalData || globalData.length === 0) {
+                showAlert('학생 명단이 없습니다. 먼저 명단을 갱신해 주세요.');
+                return;
+            }
+            const printContainer = document.getElementById('printAllContainer');
+            printContainer.innerHTML = globalData
+                .map(student => buildPrintCardHTML(student, getStudentWeeklySchedule(student)))
+                .join('');
+            document.body.classList.add('printing-personal-cards');
+            window.print();
+            document.body.classList.remove('printing-personal-cards');
+        }
+
+        /**
+         * 인쇄용 HTML 카드 생성 (자리 번호 레이아웃 다이어그램 포함)
+         */
+        function buildPrintCardHTML(student, schedule) {
+            // 각 요일별로 자리번호를 테이블 셀에 표시
+            let headerRow = `<th style="width:60px;"></th>`;
+            DAYS_ORDER.forEach(d => { headerRow += `<th>${d}요일</th>`; });
+
+            let bodyRows = '';
+            ROOMS_ORDER.forEach(room => {
+                bodyRows += `<tr><td class="room-col">${room}반</td>`;
+                DAYS_ORDER.forEach(day => {
+                    const info = schedule[day];
+                    if (info.room === room) {
+                        const seats = info.seats;
+                        const uniqueSeats = [...new Set([seats['1'], seats['2']].filter(s => s))];
+
+                        if (uniqueSeats.length > 0) {
+                            const parts = uniqueSeats.map(s => `<span class="print-seat-num">${s}번</span>`);
+                            bodyRows += `<td>${parts.join('<br>')}</td>`;
+                        } else {
+                            bodyRows += `<td style="color:#ccc;">—</td>`;
+                        }
+                    } else {
+                        bodyRows += `<td style="color:#ccc;">—</td>`;
+                    }
+                });
+                bodyRows += `</tr>`;
+            });
+
+            // 자리 번호 배치도 (5행 × 6열, 번호 1~30)
+            // 번호 체계: 1~6 = 교탁 앞 맨 앞줄 좌→우, 25~30 = 맨 뒷줄
+            let diagramHTML = '';
+            for (let row = 4; row >= 0; row--) {
+                diagramHTML += '<tr>';
+                for (let col = 0; col < 6; col++) {
+                    const seatNum = row * 6 + col + 1;
+                    // 해당 학생이 이 자리를 쓰는 요일들 모으기
+                    const usedDays = [];
+                    DAYS_ORDER.forEach(day => {
+                        const info = schedule[day];
+                        if (info.room) {
+                            Object.values(info.seats).forEach(sn => {
+                                if (sn && parseInt(sn) === seatNum) usedDays.push(day);
+                            });
+                        }
+                    });
+                    const isUsed = usedDays.length > 0;
+                    const usedStyle = isUsed
+                        ? 'background:#118A8E;color:white;font-weight:900;'
+                        : 'background:#f5f5f5;color:#bbb;';
+                    diagramHTML += `<td style="${usedStyle}padding:4px 0px;font-size:14px;text-align:center;border:2px solid #000;border-radius:4px;line-height:1;">`;
+                    diagramHTML += `<div style="font-size:11px;${isUsed ? 'color:rgba(255,255,255,1)' : 'color:#ccc'};font-weight:900;">${seatNum}</div>`;
+                    if (isUsed) diagramHTML += `<div style="font-size:10px;font-weight:900;margin-top:1px;">${usedDays.join(',')}</div>`;
+                    diagramHTML += `</td>`;
+                }
+                diagramHTML += '</tr>';
+            }
+
+            return `
+            <div class="print-card-page">
+                <div class="print-card-header">
+                    <div>
+                        <div class="print-card-title">${student.이름} <span style="font-size:12px;opacity:0.8;font-weight:400;">(${student.학번})</span></div>
+                        <div class="print-card-subtitle">2026학년도 2학년 1학기 야자 개인 자리표</div>
+                    </div>
+                    <div style="font-size:10px;opacity:0.8;">자기주도적 학습</div>
+                </div>
+                <table class="print-seat-table" style="margin:0; border-collapse: collapse; width:auto; border: 3px solid #000;">
+                    <thead><tr>${headerRow}</tr></thead>
+                    <tbody>${bodyRows}</tbody>
+                </table>
+                <div class="print-card-footer">※ 자리는 요일마다 바뀔 수 있습니다. 반드시 해당 요일의 자리를 확인하세요.</div>
+            </div>`;
+        }
+
     </script>
     <script>
         // PWA Service Worker Registration
