@@ -2341,7 +2341,7 @@
             // (1 대신 실제 번호 값이 있으면 참여하는 것으로 간주)
             let bothP = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
             let p1Only = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && !(s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
-            let p2Only = unassignedStudents.filter(s => !(s[col1] && String(s[col1]).trim() !== '') && ((s[col2] && String(s[col2]).trim() !== '') || (s[col3] && String(s[col3]).trim() !== ''))).sort((a, b) => Number(a.학번) - Number(b.학번));
+            let p2Only = unassignedStudents.filter(s => !(s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
 
             // 4. 일반 자동 배정 (피리오드에 따라 반 할당)
             roomLists['2-5'].push(...p1Only);
@@ -2743,7 +2743,7 @@
                     <span style="font-size:1.2rem; font-weight:700; color:var(--primary-dark);">${currentDay}요일에 배정된 학생이 없습니다.</span><br><br>
                     <span style="color:var(--text-sub); display:block; margin-top:10px;">
                         💡 <b>도움말</b><br>
-                        1. 구글 시트의 [${currentDay}1], [${currentDay}2], [${currentDay}3] 컬럼에 숫자 '1'이 입력되어 있나요?<br>
+                        1. 구글 시트의 [${currentDay}1], [${currentDay}2] 컬럼에 숫자 '1'이 입력되어 있나요?<br>
                         2. 시트의 데이터가 [학생명단] 탭에 위치하고 있나요?
                     </span>
                 </div>`;
@@ -2764,7 +2764,7 @@
                     let seatStr = student[`${currentDay}${currentPeriod}`];
                     // 이번 교시에 빈칸이라면 다른 교시 자리를 기본 자리로 인식하여 배치 (.not-in-period 처리 위해)
                     if (!seatStr || String(seatStr).trim() === '') {
-                        seatStr = student[`${currentDay}1`] || student[`${currentDay}2`] || student[`${currentDay}3`];
+                        seatStr = student[`${currentDay}1`] || student[`${currentDay}2`];
                     }
                     if (seatStr && String(seatStr).trim() !== '') {
                         const seatNum = parseInt(String(seatStr).trim(), 10);
