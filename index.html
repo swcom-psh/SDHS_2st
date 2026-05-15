@@ -592,12 +592,45 @@
             transform: none;
         }
 
-        /* Classroom Header */
         .classroom-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-right-btns {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .header-right-btns .btn {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            min-width: auto;
+        }
+
+        .btn-past-memo {
+            background: #F59E0B !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-refresh {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border) !important;
+        }
+
+        .btn-submit {
+            background: var(--primary) !important;
+            color: white !important;
+            border: none !important;
         }
 
         .header-left {
@@ -1121,8 +1154,8 @@
 
             .grid-6x5 {
                 grid-template-columns: repeat(6, 1fr);
-                gap: 8px;
-                margin: 20px 0;
+                gap: 5px;
+                margin: 15px 0;
             }
 
             .grid-6x5 .spacer {
@@ -1136,7 +1169,7 @@
             }
 
             .student-name {
-                font-size: 0.95rem;
+                font-size: 0.85rem;
             }
 
             .student-id {
@@ -1210,15 +1243,16 @@
 
             /* Buttons and Controls */
             .btn {
-                padding: 10px 16px;
-                font-size: 0.9rem;
+                padding: 8px 12px;
+                font-size: 0.85rem;
                 flex: 1;
-                min-width: 120px;
+                min-width: 80px;
             }
 
             .btn-group {
                 width: 100%;
-                justify-content: stretch;
+                justify-content: center;
+                gap: 6px;
             }
 
             .view-toggle {
@@ -1241,9 +1275,47 @@
             }
 
             /* Header Info */
+            .info-text {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+                border-radius: 12px;
+            }
+
+            .info-text > div {
+                width: 100%;
+                justify-content: space-between;
+            }
+
             .header-left {
                 min-width: auto;
                 width: 100%;
+            }
+
+            .classroom-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header-right-btns {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 8px;
+            }
+
+            .header-right-btns .btn {
+                flex: 1;
+                font-size: 0.8rem;
+                padding: 10px 8px;
+            }
+
+            .room-meta {
+                width: 100%;
+                text-align: center;
+                margin-top: 5px;
             }
         }
 
@@ -2792,14 +2864,14 @@
 
                 section.innerHTML = `
                     <div class="print-title">2학년 자기주도적 학습 자리 배치표</div>
-                    <div class="classroom-header" style="flex-wrap: wrap; gap: 12px;">
+                    <div class="classroom-header">
                         <div class="header-left">
                             <span class="room-title ${roomColorClass}">${roomName}반</span>
                         </div>
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            ${(currentDay !== actualToday) ? `<button class="btn" onclick="sendBulkPastMemos('${roomName}')" style="padding:6px 16px; font-size:0.85rem; background: #f59e0b; color: white; border: none; font-weight: bold;">📝 과거 메모 일괄 전송</button>` : ''}
-                            <button class="btn" onclick="fetchAttendanceFromSheet('${roomName}', { force: true })" style="padding:6px 12px; font-size:0.85rem; background: var(--bg-card); border: 1px solid var(--border);">🔄 출결 새로고침</button>
-                            <button class="btn btn-primary" onclick="saveRoomAttendanceToSheet('${roomName}')" style="padding:6px 16px; font-size:0.85rem;">💾 출결 결과 시트 전송</button>
+                        <div class="header-right-btns">
+                            ${(currentDay !== actualToday) ? `<button class="btn btn-past-memo" onclick="sendBulkPastMemos('${roomName}')">📝 과거 메모 일괄 전송</button>` : ''}
+                            <button class="btn btn-refresh" onclick="fetchAttendanceFromSheet('${roomName}', { force: true })">🔄 출결 새로고침</button>
+                            <button class="btn btn-primary btn-submit" onclick="saveRoomAttendanceToSheet('${roomName}')">💾 시트 전송</button>
                             <span class="room-meta">${currentDay}요일 | ${uniqueStudentsForDay.length}명</span>
                         </div>
                     </div>
