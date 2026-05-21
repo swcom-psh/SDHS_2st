@@ -12,35 +12,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
-            /* 🎨 Minimalist Point Color Theme */
-            --primary: #4361EE;
-            /* Vibrant Point Blue */
-            --primary-dark: #3A0CA3;
-            --secondary: #EBF0FF;
-            /* Light blue background for active */
+            /* 🌊 Summer Ocean Color Theme */
+            --primary: #0077b6;      /* Deep Ocean Blue */
+            --primary-dark: #03045e; /* Navy Sea */
+            --secondary: #e0f2fe;    /* Foam Blue */
 
-            --bg-canvas: #F4F7FE;
-            /* Soft light gray-blue background */
-            --card-bg: #FFFFFF;
+            --bg-canvas: #e0f2fe;
+            --card-bg: rgba(255, 255, 255, 0.7); /* Glassmorphism translucent */
 
-            --text-main: #2B2D42;
-            --text-sub: #8D99AE;
-            --text-muted: #A0ABC0;
+            --text-main: #0f172a;    /* Dark slate */
+            --text-sub: #334155;     /* Slate 700 */
+            --text-muted: #64748b;   /* Slate 500 */
 
-            --border: #E2E8F0;
-            --border-focus: #4361EE;
+            --border: rgba(255, 255, 255, 0.4);
+            --border-focus: #0284c7;
 
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 4px 12px rgba(3, 4, 94, 0.04);
+            --shadow-md: 0 8px 32px rgba(3, 4, 94, 0.08);
+            --shadow-lg: 0 16px 40px rgba(3, 4, 94, 0.12);
 
-            --drag-over: #EBF0FF;
+            --drag-over: rgba(224, 242, 254, 0.8);
 
-            /* Room modern point colors */
-            --room-2-3: #4361EE;
-            --room-2-4: #3A0CA3;
-            --room-2-5: #F72585;
-            --room-2-6: #4CC9F0;
+            /* Room Summer point colors */
+            --room-2-3: #0096c7;     /* Ocean Blue */
+            --room-2-4: #ee9b00;     /* Sand Gold */
+            --room-2-5: #ca6702;     /* Coral Orange/Pink */
+            --room-2-6: #0a9396;     /* Bright Mint */
         }
 
         * {
@@ -51,12 +48,27 @@
 
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
-            background-color: var(--bg-canvas);
+            background: linear-gradient(-45deg, #e0f2fe, #bae6fd, #e0f7fa, #b2ebf2, #e0f2fe);
+            background-size: 400% 400%;
+            animation: oceanWaves 15s ease infinite;
             color: var(--text-main);
             line-height: 1.6;
             padding: 40px 20px;
             letter-spacing: -0.01em;
             -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        @keyframes oceanWaves {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         header {
@@ -65,7 +77,9 @@
             text-align: center;
             padding: 40px 40px;
             background: var(--card-bg);
-            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
             color: var(--text-main);
@@ -99,11 +113,13 @@
 
         #dayButtons,
         #periodButtons {
-            background: var(--secondary);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             padding: 6px;
             border-radius: 50px;
             gap: 4px;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         /* Turn day/period buttons into segment toggles */
@@ -118,16 +134,16 @@
 
         #dayButtons .day-btn:hover,
         #periodButtons .day-btn:hover {
-            color: var(--text-main);
+            color: var(--primary-dark);
             transform: none;
             border-color: transparent;
         }
 
         #dayButtons .day-btn.active,
         #periodButtons .day-btn.active {
-            background: var(--card-bg);
-            color: var(--primary);
-            box-shadow: var(--shadow-sm);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 119, 182, 0.2);
             font-weight: 800;
             border: none;
         }
@@ -138,32 +154,34 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease-in-out;
-            border: 1px solid var(--border);
-            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.6);
             color: var(--text-sub);
             font-size: 0.93rem;
             box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
 
         .btn:hover {
-            background: var(--bg-canvas);
-            color: var(--text-main);
-            border-color: var(--border-focus);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-dark);
+            border-color: var(--primary);
             transform: translateY(-1px);
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.2);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #02022e 100%);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 6px 16px rgba(3, 4, 94, 0.3);
         }
 
         .btn-danger {
@@ -188,15 +206,18 @@
 
         .classroom-section {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 36px 40px;
-            border-radius: 24px;
+            border-radius: 28px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
-            transition: box-shadow 0.2s;
+            transition: all 0.3s ease;
         }
 
         .classroom-section:hover {
             box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .grid-6x5 {
@@ -255,45 +276,42 @@
 
         .seat {
             aspect-ratio: 1 / 1.15;
-            border: 1.5px solid #CBD5E1;
-            /* Darker border for visibility */
-            border-radius: 16px;
+            border: 1.5px solid rgba(0, 119, 182, 0.15);
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.85);
             font-size: 0.85rem;
             position: relative;
-
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            /* Slightly stronger shadow */
+            box-shadow: 0 4px 10px rgba(3, 4, 94, 0.03);
         }
 
         .seat:not(.empty):hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--border-focus);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(3, 4, 94, 0.1);
+            border-color: var(--primary);
             z-index: 10;
         }
 
         .seat.empty {
-            border: 1.5px dashed #CBD5E1;
-            background: #F8FAFC;
-            /* Slight tint so it doesn't blend completely */
-            box-shadow: none;
+            border: 1.5px dashed #e9c46a;
+            background: rgba(254, 250, 224, 0.55);
+            box-shadow: inset 0 2px 4px rgba(233, 196, 106, 0.05);
             cursor: default;
-            opacity: 0.6;
+            opacity: 0.85;
         }
 
         .seat.present {
             border: 2px solid var(--primary);
-            background: var(--secondary);
-            box-shadow: var(--shadow-sm);
+            background: rgba(224, 242, 254, 0.9);
+            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.12);
             color: var(--primary-dark);
+            font-weight: 800;
         }
 
         .seat.present::after {
@@ -331,19 +349,29 @@
 
         .teacher-desk {
             width: 55%;
-            height: 40px;
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
             margin: 20px auto 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--text-main);
+            color: var(--primary-dark);
             font-weight: 800;
             letter-spacing: 0.5em;
             font-size: 1.1rem;
             box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .teacher-desk::before {
+            content: '⛱️';
+            margin-right: 8px;
+            font-size: 1.2rem;
+            letter-spacing: normal;
         }
 
         .student-id {
@@ -408,11 +436,13 @@
         .info-text {
             font-size: 0.88rem;
             color: var(--text-sub);
-            background: rgba(255, 248, 244, 0.9);
+            background: rgba(224, 242, 254, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             padding: 10px 20px;
             border-radius: 50px;
             box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -429,10 +459,12 @@
 
         .attendance-section {
             background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 32px;
-            border-radius: 24px;
+            border-radius: 28px;
             box-shadow: var(--shadow-sm);
-            border: 1.5px solid var(--border);
+            border: 1px solid var(--border);
         }
 
         .attendance-table {
@@ -752,8 +784,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(29, 45, 46, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(224, 242, 254, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 20000;
             justify-content: center;
             align-items: center;
@@ -761,7 +794,10 @@
         }
 
         .modal-content {
-            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
             padding: 32px;
             border-radius: 28px;
             max-width: 450px;
@@ -856,7 +892,7 @@
             .view-toggle,
             #toast,
             .info-text,
-            .blossom-container,
+            .bubble-container,
             .tree-bg,
             .login-overlay,
             .gas-config {
@@ -1066,8 +1102,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(248, 250, 252, 0.95);
-            backdrop-filter: blur(8px);
+            background: rgba(224, 242, 254, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1076,9 +1113,11 @@
         }
 
         .login-box {
-            background: white;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 40px;
-            border-radius: 24px;
+            border-radius: 28px;
             box-shadow: var(--shadow-lg);
             width: 90%;
             max-width: 400px;
@@ -1097,17 +1136,20 @@
             width: 100%;
             padding: 15px;
             border-radius: 12px;
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.5);
             font-size: 1.1rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, background-color 0.2s;
             text-align: center;
             margin-top: 10px;
             font-family: inherit;
+            color: var(--text-main);
         }
 
         .login-box input:focus {
             border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .login-box button {
@@ -1315,8 +1357,8 @@
             }
         }
 
-        /* Cherry Blossom Petals Animation */
-        .blossom-container {
+        /* Floating Bubbles Animation */
+        .bubble-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -1324,33 +1366,33 @@
             height: 100%;
             pointer-events: none;
             z-index: -1;
+            overflow: hidden;
         }
 
-        .petal {
+        .bubble {
             position: absolute;
-            background: linear-gradient(135deg, #ffc1d1, #ff9eb5);
-            border-radius: 150% 0 150% 0;
-            opacity: 0.6;
-            animation: fall linear infinite;
+            bottom: -50px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.25);
+            pointer-events: none;
+            animation: rise linear infinite;
         }
 
-        @keyframes fall {
+        @keyframes rise {
             0% {
-                transform: translate(0, -10px) rotate(0deg) scale(0.5);
+                transform: translateY(0) translateX(0);
                 opacity: 0;
             }
-
             10% {
-                opacity: 0.8;
-                transform: translate(20px, 10vh) rotate(45deg) scale(1);
+                opacity: 0.6;
             }
-
             90% {
-                opacity: 0.5;
+                opacity: 0.6;
             }
-
             100% {
-                transform: translate(150px, 105vh) rotate(360deg) scale(0.8);
+                transform: translateY(-110vh) translateX(100px);
                 opacity: 0;
             }
         }
@@ -1885,7 +1927,10 @@
         }
 
         .memo-modal-content {
-            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
             padding: 28px 24px;
             border-radius: 24px;
             max-width: 380px;
@@ -1938,22 +1983,21 @@
             width: 100%;
             min-height: 100px;
             padding: 14px 16px;
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             border-radius: 16px;
             font-size: 1rem;
             font-family: inherit;
             resize: vertical;
             outline: none;
-            transition: border-color 0.2s;
-            background: #FDFCFB;
+            transition: border-color 0.2s, background-color 0.2s;
+            background: rgba(255, 255, 255, 0.5);
             color: var(--text-main);
             line-height: 1.5;
         }
 
         .memo-textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(17, 138, 142, 0.12);
-            background: white;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .memo-textarea::placeholder {
@@ -2137,7 +2181,7 @@
 <body>
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
-            <h2>야자 감독 교사 로그인</h2>
+            <h2>🌴 야자 감독 교사 로그인 🛟</h2>
             <div style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 10px; word-break: keep-all;">
                 출석부에 기록될 감독 선생님 성함을 입력해주세요.
             </div>
@@ -2184,19 +2228,17 @@
     <div id="mainApp" style="display: none;">
 
         <header>
-            <header>
-                <h1>2026학년도 2학년 1학기 자기주도적 학습 자리 배치도 <small
-                        style="font-size: 0.6rem; opacity: 0.7; vertical-align: middle;">MadeBy 박상현T</small></h1>
-                <div class="controls">
-                    <div class="btn-group" id="dayButtons">
-                        <button class="btn day-btn active" data-day="월">월요일</button>
-                        <button class="btn day-btn" data-day="화">화요일</button>
-                        <button class="btn day-btn" data-day="수">수요일</button>
-                        <button class="btn day-btn" data-day="목">목요일</button>
-                        <button class="btn day-btn" data-day="금">금요일</button>
-                    </div>
-                    <div class="btn-group" id="periodButtons"
-                        style="background: var(--primary); padding: 4px; border-radius: 50px; gap: 4px; box-shadow: inset 0 2px 6px rgba(11, 110, 113, 0.2);">
+            <h1>🌊 2026학년도 2학년 1학기 자기주도적 학습 자리 배치도 🏖️ <small
+                    style="font-size: 0.6rem; opacity: 0.7; vertical-align: middle;">MadeBy 박상현T</small></h1>
+            <div class="controls">
+                <div class="btn-group" id="dayButtons">
+                    <button class="btn day-btn active" data-day="월">월요일</button>
+                    <button class="btn day-btn" data-day="화">화요일</button>
+                    <button class="btn day-btn" data-day="수">수요일</button>
+                    <button class="btn day-btn" data-day="목">목요일</button>
+                    <button class="btn day-btn" data-day="금">금요일</button>
+                </div>
+                <div class="btn-group" id="periodButtons">
                         <button class="btn day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
                         <button class="btn day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
                     </div>
@@ -2216,7 +2258,7 @@
                             <span>학생 출결 체크 후 반드시 '출결 결과 시트 전송' 버튼을 눌러주세요.</span>
                             <button class="btn"
                                 style="padding:4px 12px; font-size:0.8rem; height: 28px; line-height: 1;"
-                                onclick="refreshStudentList()">🔄 명단 갱신</button>
+                                onclick="refreshStudentList()">명단 갱신</button>
                         </div>
                         <div
                             style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-left: auto;">
@@ -2317,6 +2359,7 @@
             const hasStudents = loadGlobalDataFromCache();
             loadTeacherListFromCache();
             SyncManager.init();
+            createBubbles();
 
             if (supervisorName) {
                 if (hasStudents) {
@@ -3185,11 +3228,18 @@
                     return (p1 && String(p1).trim() !== '') || (p2 && String(p2).trim() !== '');
                 });
 
+                const roomEmojis = {
+                    '2-3': '🌊',
+                    '2-4': '🏖️',
+                    '2-5': '🪸',
+                    '2-6': '🛟'
+                };
+                const roomEmoji = roomEmojis[roomName] || '';
                 section.innerHTML = `
                     <div class="print-title">2학년 자기주도적 학습 자리 배치표</div>
                     <div class="classroom-header">
                         <div class="header-left">
-                            <span class="room-title ${roomColorClass}">${roomName}반</span>
+                            <span class="room-title ${roomColorClass}">${roomEmoji} ${roomName}반</span>
                         </div>
                         <div class="header-right-btns">
                             ${(currentDay !== actualToday) ? `<button class="btn btn-past-memo" onclick="sendBulkPastMemos('${roomName}')">📝 과거 메모 일괄 전송</button>` : ''}
@@ -3544,8 +3594,32 @@
             activePeriodBtn.classList.add('active');
         }
 
-        // Removed createPetals to match the new minimalist theme
-        // function createPetals() { ... }
+        // Floating Bubbles dynamic creation
+        function createBubbles() {
+            const container = document.createElement('div');
+            container.className = 'bubble-container';
+            document.body.appendChild(container);
+
+            const bubbleCount = 20;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                // Randomize bubble size (5px to 20px)
+                const size = Math.random() * 15 + 5;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Randomize horizontal position
+                bubble.style.left = `${Math.random() * 100}vw`;
+                
+                // Randomize animation delay and duration
+                bubble.style.animationDelay = `${Math.random() * 8}s`;
+                bubble.style.animationDuration = `${Math.random() * 12 + 8}s`; // 8s to 20s
+                
+                container.appendChild(bubble);
+            }
+        }
 
 
         async function downloadPDF() {
