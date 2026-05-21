@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>주간 야자 출결 보고서 (2026-05-18 ~ 2026-05-22)</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root {
+    --primary: #4361EE;
+    --success: #137333;
+    --danger: #C5221F;
+    --border: #DADCE0;
+    --text: #202124;
+    --muted: #9AA0A6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', sans-serif;
+    background: #525659;
+    padding: 20px;
+    color: var(--text);
+  }
+  .page {
+    background: white;
+    max-width: 900px;
+    margin: 0 auto 30px;
+    padding: 32px 36px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  }
+  @media print {
+    body { background: white; padding: 0; }
+    .page {
+      margin: 0; padding: 12px 16px;
+      box-shadow: none; border-radius: 0;
+      page-break-after: always;
+    }
+    .page:last-child { page-break-after: avoid; }
+  }
+
+  /* 헤더 */
+  .hdr { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 14px; }
+  .hdr h1 { font-size: 1.35rem; color: var(--primary); font-weight: 800; margin-bottom: 4px; }
+  .hdr .sub { font-size: .88rem; color: #5F6368; font-weight: 600; }
+
+  /* 요약 카드 */
+  .summary { display: flex; gap: 8px; margin-bottom: 14px; }
+  .summary .card {
+    flex: 1; background: #F8F9FA; border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 6px; text-align: center;
+  }
+  .summary .card .t { font-size: .7rem; color: #5F6368; font-weight: 600; }
+  .summary .card .v { font-size: 1.1rem; font-weight: 800; }
+  .v-blue { color: var(--primary); }
+  .v-green { color: var(--success); }
+  .v-red { color: var(--danger); }
+
+  /* 테이블 */
+  table { width: 100%; border-collapse: collapse; font-size: .72rem; }
+  thead th {
+    background: #F1F3F4; font-weight: 700; color: #3C4043;
+    border-top: 1px solid var(--border); border-bottom: 2px solid var(--border);
+    padding: 5px 2px; text-align: center; white-space: nowrap;
+  }
+  thead th.day-group { border-bottom: 1px solid var(--border); font-size: .75rem; }
+  tbody td {
+    border-bottom: 1px solid #ECECEC; padding: 4px 2px; text-align: center;
+    vertical-align: middle;
+  }
+  tbody tr:hover { background: #F8F9FA; }
+  .inactive td { color: #C0C4C8; }
+  .has-absent { background: #FFF5F5; }
+
+  /* 기호 */
+  .s-ok { color: var(--success); font-weight: 800; font-size: .85rem; }
+  .s-no { color: var(--danger); font-weight: 800; font-size: .85rem; }
+  .s-na { color: #D0D0D0; }
+  .s-uc { color: #E09200; font-size: .7rem; }
+
+  .name-col { text-align: left !important; padding-left: 6px; font-weight: 600; white-space: nowrap; }
+  .rate-col { font-weight: 700; }
+  .rate-perfect { color: var(--success); }
+  .rate-warn { color: #E09200; }
+  .rate-bad { color: var(--danger); }
+
+  /* 범례 */
+  .legend {
+    display: flex; gap: 14px; justify-content: center;
+    margin-bottom: 10px; font-size: .72rem; color: #5F6368;
+  }
+  .legend span { display: flex; align-items: center; gap: 3px; }
+
+  /* 서명 */
+  .sigs { display: flex; justify-content: flex-end; margin-top: 24px; gap: 16px; }
+  .sig-box {
+    border: 1px solid var(--border); padding: 6px 18px;
+    border-radius: 4px; text-align: center; font-size: .78rem;
+  }
+  .sig-box .sig-t { font-weight: bold; color: #5F6368; margin-bottom: 20px; }
+  .sig-box .sig-l { border-bottom: 1px dashed #DADCE0; width: 70px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 1반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">5명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">5명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">5회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">6회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">35.7%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>04</td><td class="name-col">김예나</td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>11</td><td class="name-col">배수현</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>19</td><td class="name-col">정민기</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class="has-absent"><td>21</td><td class="name-col">정시안</td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>27</td><td class="name-col">한보영</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 2반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">13명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">13명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">22회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">3회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">59.5%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>01</td><td class="name-col">김도윤</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>02</td><td class="name-col">김민주</td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>04</td><td class="name-col">김환</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">75%</span></td></tr>
+<tr class=""><td>10</td><td class="name-col">송민서</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>11</td><td class="name-col">안준환</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>13</td><td class="name-col">유은빈</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>14</td><td class="name-col">이소민</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>15</td><td class="name-col">이연훈</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>16</td><td class="name-col">이재현</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-warn">83%</span></td></tr>
+<tr class=""><td>23</td><td class="name-col">조이현</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class="has-absent"><td>25</td><td class="name-col">최윤진</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>26</td><td class="name-col">최형준</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>27</td><td class="name-col">최희원</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 3반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">8명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">8명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">15회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">6회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">57.7%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class=""><td>01</td><td class="name-col">강서윤</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>06</td><td class="name-col">남선우</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>11</td><td class="name-col">손혜원</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>15</td><td class="name-col">윤제민</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>19</td><td class="name-col">이아린</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>20</td><td class="name-col">이영서</td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>21</td><td class="name-col">이은결</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>26</td><td class="name-col">최현지</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 4반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">11명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">11명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">24회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">9회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">52.2%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>01</td><td class="name-col">김가온</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">25%</span></td></tr>
+<tr class=""><td>06</td><td class="name-col">김효민</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">71%</span></td></tr>
+<tr class=""><td>07</td><td class="name-col">박서이</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>08</td><td class="name-col">박서진</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">75%</span></td></tr>
+<tr class="has-absent"><td>12</td><td class="name-col">신은진</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>14</td><td class="name-col">유주원</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">43%</span></td></tr>
+<tr class=""><td>18</td><td class="name-col">이지영</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>19</td><td class="name-col">이지후</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">60%</span></td></tr>
+<tr class="has-absent"><td>20</td><td class="name-col">이현지</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>21</td><td class="name-col">장온별</td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>27</td><td class="name-col">한다인</td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 5반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">14명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">14명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">18회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">9회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">38.3%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>01</td><td class="name-col">고병민</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">25%</span></td></tr>
+<tr class="has-absent"><td>02</td><td class="name-col">고채은</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>03</td><td class="name-col">김도윤</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>06</td><td class="name-col">김보은</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>09</td><td class="name-col">서여민</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>11</td><td class="name-col">유가영</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>12</td><td class="name-col">유승아</td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class="has-absent"><td>13</td><td class="name-col">유승언</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>19</td><td class="name-col">이초현</td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>21</td><td class="name-col">전시은</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>23</td><td class="name-col">정서연</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>24</td><td class="name-col">지우빈</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>25</td><td class="name-col">최창아</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">60%</span></td></tr>
+<tr class=""><td>26</td><td class="name-col">홍성민</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-warn">80%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 6반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">12명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">12명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">23회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">12회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">46.0%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>02</td><td class="name-col">길범렬</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>04</td><td class="name-col">김아인</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">75%</span></td></tr>
+<tr class=""><td>06</td><td class="name-col">박성결</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>08</td><td class="name-col">안소희</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>09</td><td class="name-col">양지후</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>11</td><td class="name-col">윤서영</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class="has-absent"><td>13</td><td class="name-col">이지인</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class=""><td>15</td><td class="name-col">이충원</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>20</td><td class="name-col">조윤아</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class="has-absent"><td>22</td><td class="name-col">한시원</td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>24</td><td class="name-col">허준혁</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">71%</span></td></tr>
+<tr class="has-absent"><td>27</td><td class="name-col">강예은</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">43%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 7반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">9명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">9명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">13회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">2회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">48.1%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class="has-absent"><td>06</td><td class="name-col">김은비</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>07</td><td class="name-col">김태민</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>14</td><td class="name-col">안성은</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>15</td><td class="name-col">이서후</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>17</td><td class="name-col">이재인</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class=""><td>19</td><td class="name-col">이효린</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>21</td><td class="name-col">전수빈</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class=""><td>23</td><td class="name-col">조문준</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class=""><td>25</td><td class="name-col">한소희</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">71%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 8반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">8명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">8명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">11회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">9회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">34.4%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class=""><td>02</td><td class="name-col">김시연</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>05</td><td class="name-col">박유민</td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>06</td><td class="name-col">박혜령</td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">0%</span></td></tr>
+<tr class="has-absent"><td>13</td><td class="name-col">오서연</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">25%</span></td></tr>
+<tr class=""><td>14</td><td class="name-col">용나경</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class="has-absent"><td>16</td><td class="name-col">이서현</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>18</td><td class="name-col">이하진</td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class=""><td>24</td><td class="name-col">최효민</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hdr">
+    <h1>2학년 9반 주간 야자 출결 보고서</h1>
+    <div class="sub">2026-05-18(월) ~ 2026-05-22(금) 야간자율학습</div>
+  </div>
+
+  <div class="summary">
+    <div class="card"><div class="t">학급 총원</div><div class="v">13명</div></div>
+    <div class="card"><div class="t">야자 참여</div><div class="v v-blue">13명</div></div>
+    <div class="card"><div class="t">주간 출석</div><div class="v v-green">37회</div></div>
+    <div class="card"><div class="t">주간 결석</div><div class="v v-red">9회</div></div>
+    <div class="card"><div class="t">주간 출석률</div><div class="v v-blue">51.4%</div></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="s-ok">●</span> 출석</span>
+    <span><span class="s-no">✕</span> 결석</span>
+    <span><span class="s-na">-</span> 야자 없음</span>
+    <span><span class="s-uc">?</span> 미체크</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th rowspan="2" style="width:5%">번호</th><th rowspan="2" style="width:10%">이름</th><th colspan="2" class="day-group">월 (05/18)</th><th colspan="2" class="day-group">화 (05/19)</th><th colspan="2" class="day-group">수 (05/20)</th><th colspan="2" class="day-group">목 (05/21)</th><th colspan="2" class="day-group">금 (05/22)</th><th rowspan="2" style="width:7%">출석률</th></tr>
+      <tr><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th><th>1</th><th>2</th></tr>
+    </thead>
+    <tbody>
+<tr class=""><td>02</td><td class="name-col">김규민</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">57%</span></td></tr>
+<tr class="has-absent"><td>03</td><td class="name-col">김범</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class=""><td>05</td><td class="name-col">김진서</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">33%</span></td></tr>
+<tr class=""><td>06</td><td class="name-col">김태완</td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">67%</span></td></tr>
+<tr class=""><td>07</td><td class="name-col">마주은</td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-perfect">100%</span></td></tr>
+<tr class="has-absent"><td>09</td><td class="name-col">박수아</td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td class="rate-col"><span class="rate-bad">57%</span></td></tr>
+<tr class="has-absent"><td>15</td><td class="name-col">신채연</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-no">✕</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">43%</span></td></tr>
+<tr class=""><td>16</td><td class="name-col">심재민</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">40%</span></td></tr>
+<tr class="has-absent"><td>17</td><td class="name-col">안정호</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>18</td><td class="name-col">여지우</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class="has-absent"><td>22</td><td class="name-col">장민채</td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">50%</span></td></tr>
+<tr class=""><td>25</td><td class="name-col">지연서</td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">62%</span></td></tr>
+<tr class="has-absent"><td>26</td><td class="name-col">최창준</td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-no">✕</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-ok">●</span></td><td><span class="s-na">-</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td><span class="s-uc">?</span></td><td class="rate-col"><span class="rate-bad">43%</span></td></tr>
+
+    </tbody>
+  </table>
+
+  <div class="sigs">
+    <div class="sig-box"><div class="sig-t">감독교사 확인</div><div class="sig-l"></div></div>
+    <div class="sig-box"><div class="sig-t">담임교사 확인</div><div class="sig-l"></div></div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -5,10 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>야자 자리 배치 프로그램</title>
-    <!-- PWA Settings -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#118A8E">
-    <link rel="apple-touch-icon" href="icon-192.png">
 
     <!-- Pretendard Font -->
     <link rel="stylesheet" as="style" crossorigin
@@ -2062,6 +2058,79 @@
         .is-exporting-pdf .seat-memo-badge {
             display: none !important;
         }
+
+        /* 🔄 Background Sync Floating Container & Cards */
+        #sync-status-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .sync-toast {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 250px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .sync-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .sync-toast.fade-out {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        .sync-toast .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .sync-toast .icon-success {
+            color: #10B981;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .sync-toast .icon-error {
+            color: #EF4444;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .sync-toast .text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* 💾 Temporary Success Button style */
+        .btn-success-temp {
+            background: #10B981 !important;
+            color: white !important;
+            border-color: #10B981 !important;
+        }
     </style>
 </head>
 
@@ -2171,6 +2240,8 @@
     <script>
         let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
         let allowedTeachers = []; // 구글 시트에서 받아올 동적 명단 (v20)
+        let teacherListPromise = null;
+        let studentListPromise = null;
 
         function showLoading(type = 'init', text) {
             const overlay = document.getElementById('loadingOverlay');
@@ -2190,22 +2261,76 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            showLoading('init', "학생 명단 및 실시간 출결 정보를 동기화하고 있습니다...");
+        function cleanupOldCache() {
+            const todayStr = getTodayDateString();
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && (key.startsWith('att_') || key.startsWith('rem_') || key.startsWith('sup_') || key.startsWith('synced_') || key.startsWith('initial_att_') || key.startsWith('initial_rem_'))) {
+                    if (!key.includes(todayStr)) {
+                        keysToRemove.push(key);
+                    }
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+        }
 
-            // 교사 명단 + 학생 명단 + 오늘 출결 현황까지 한꺼번에 병렬 로드 (v22 개선)
-            await Promise.all([
-                fetchTeacherList(),
-                fetchGlobalData(true),
-                fetchAllTodayAttendance(true, true) // silent=true, force=true 로딩 시 항상 최신 데이터 강제 동기화
-            ]);
+        function loadGlobalDataFromCache() {
+            const cached = localStorage.getItem('yajaStudentList');
+            if (cached) {
+                try {
+                    globalData = JSON.parse(cached);
+                    if (Array.isArray(globalData) && globalData.length > 0) return true;
+                } catch (e) {
+                    localStorage.removeItem('yajaStudentList');
+                }
+            }
+            return false;
+        }
+
+        function loadTeacherListFromCache() {
+            const cached = localStorage.getItem('yajaTeacherList');
+            if (cached) {
+                try {
+                    allowedTeachers = JSON.parse(cached);
+                    if (Array.isArray(allowedTeachers) && allowedTeachers.length > 0) return true;
+                } catch (e) {
+                    localStorage.removeItem('yajaTeacherList');
+                }
+            }
+            return false;
+        }
+
+        async function revalidateDataInBackground() {
+            try {
+                await Promise.all([fetchTeacherList(), fetchGlobalData(true)]);
+                if (supervisorName && document.getElementById('mainApp').style.display === 'block') {
+                    renderSeating();
+                }
+            } catch (e) {
+                console.error("백그라운드 동기화 실패:", e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            cleanupOldCache();
+            const hasStudents = loadGlobalDataFromCache();
+            loadTeacherListFromCache();
+            SyncManager.init();
 
             if (supervisorName) {
-                // 이미 로그인된 세션: 바로 앱 시작
-                await startAppSession(supervisorName);
+                if (hasStudents) {
+                    await startAppSession(supervisorName, false);
+                } else {
+                    showLoading('init', "학생 명단을 불러오는 중...");
+                    await fetchGlobalData(true);
+                    await startAppSession(supervisorName, true);
+                }
             } else {
                 hideLoading();
             }
+
+            revalidateDataInBackground();
         });
 
         async function startAppSession(name) {
@@ -2238,6 +2363,11 @@
                 hideLoading();
             }
 
+            if (allowedTeachers.length === 0) {
+                showAlert('인터넷 연결이 원활하지 않거나 구글 시트 주소가 올바르지 않아 교사 명단을 불러올 수 없습니다.\n인터넷 연결을 확인한 후 다시 시도해 주세요.');
+                return;
+            }
+
             if (!allowedTeachers.includes(nameInput)) {
                 showAlert('등록되지 않은 선생님입니다. 입력하신 성함을 다시 한 번 확인해주세요.');
                 return;
@@ -2254,26 +2384,38 @@
                 }
             }
 
-            await startAppSession(nameInput);
+            await startAppSession(nameInput, true);
         }
 
 
         async function fetchTeacherList() {
+            if (teacherListPromise) return teacherListPromise;
+
             const gasUrl = document.getElementById('gasUrl').value.trim();
             if (!gasUrl) return;
 
-            try {
-                const response = await fetch(`${gasUrl}?action=getTeachers`);
-                const names = await response.json();
-                if (Array.isArray(names)) {
-                    allowedTeachers = names;
-                    console.log("감독 교사 명단 로드 완료:", allowedTeachers.length, "명");
+            teacherListPromise = (async () => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
+
+                    const response = await fetch(`${gasUrl}?action=getTeachers`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    const names = await response.json();
+                    if (Array.isArray(names)) {
+                        allowedTeachers = names;
+                        localStorage.setItem('yajaTeacherList', JSON.stringify(allowedTeachers));
+                        console.log("감독 교사 명단 로드 완료:", allowedTeachers.length, "명");
+                    }
+                } catch (e) {
+                    console.error("Fetch teachers error:", e);
+                } finally {
+                    teacherListPromise = null;
                 }
-            } catch (e) {
-                console.error("Fetch teachers error:", e);
-                // 실패 시 최소한의 폴백(개발자/관리자 등)을 둘 수 있으나, 
-                // 여기서는 시트 데이터가 핵심이므로 경고만 표시
-            }
+            })();
+
+            return teacherListPromise;
         }
 
         async function handleLogout() {
@@ -2321,43 +2463,52 @@
                 }
             }
 
+            if (studentListPromise) return studentListPromise;
+
             const gasUrl = document.getElementById('gasUrl').value.trim();
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
+            if (!gasUrl) return false;
 
-                const response = await fetch(`${gasUrl}?action=getStudents`, { signal: controller.signal });
-                clearTimeout(timeoutId);
+            studentListPromise = (async () => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
 
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    if (data.length === 0) {
-                        console.warn("서버에서 빈 명단을 반환했습니다.");
-                        return false;
-                    }
+                    const response = await fetch(`${gasUrl}?action=getStudents`, { signal: controller.signal });
+                    clearTimeout(timeoutId);
 
-                    globalData = data.map(s => {
-                        const obj = {};
-                        for (let key in s) {
-                            // 제목(key)과 내용 모두 trim 처리하여 공백으로 인한 매칭 오류 방지
-                            const cleanKey = String(key).trim();
-                            obj[cleanKey] = (s[key] === null || s[key] === undefined) ? "" : String(s[key]).trim();
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        if (data.length === 0) {
+                            print("서버에서 빈 명단을 반환했습니다.")
+                            return false;
                         }
-                        return obj;
-                    });
 
-                    localStorage.setItem('yajaStudentList', JSON.stringify(globalData));
-                    console.log("학생 명단 서버 로드 완료:", globalData.length, "명");
+                        globalData = data.map(s => {
+                            const obj = {};
+                            for (let key in s) {
+                                const cleanKey = String(key).trim();
+                                obj[cleanKey] = (s[key] === null || s[key] === undefined) ? "" : String(s[key]).trim();
+                            }
+                            return obj;
+                        });
 
-                    return true;
+                        localStorage.setItem('yajaStudentList', JSON.stringify(globalData));
+                        console.log("학생 명단 서버 로드 완료:", globalData.length, "명");
+
+                        return true;
+                    }
+                } catch (e) {
+                    console.error("Fetch students error:", e);
+                    if (!localStorage.getItem('yajaStudentList')) {
+                        showAlert("서버에서 학생 명단을 가져오는 데 실패했습니다.");
+                    }
+                } finally {
+                    studentListPromise = null;
                 }
-            } catch (e) {
-                console.error("Fetch students error:", e);
-                if (!localStorage.getItem('yajaStudentList')) {
-                    showAlert("서버에서 학생 명단을 가져오는 데 실패했습니다.");
-                }
-            }
-            return false;
+                return false;
+            })();
+
+            return studentListPromise;
         }
 
         // 오늘 요일 자동 감지 및 초기값 설정
@@ -2432,11 +2583,177 @@
             return roomLists;
         }
 
+        // ====== Background Sync Manager (v23) ======
+        const SyncManager = {
+            queue: [],
+            isProcessing: false,
+            beforeUnloadHandlerBound: false,
+
+            init() {
+                // 1. localStorage에서 저장된 미전송 큐 로드
+                const stored = localStorage.getItem('yajaSyncQueue');
+                if (stored) {
+                    try {
+                        this.queue = JSON.parse(stored);
+                        console.log("미전송 백그라운드 큐 로드 완료:", this.queue.length, "건");
+                    } catch (e) {
+                        localStorage.removeItem('yajaSyncQueue');
+                    }
+                }
+                
+                // 2. UI 초기화 및 프로세스 시작
+                this.updateUI();
+                if (this.queue.length > 0) {
+                    this.processQueue();
+                }
+            },
+
+            saveQueue() {
+                localStorage.setItem('yajaSyncQueue', JSON.stringify(this.queue));
+                this.checkBeforeUnload();
+            },
+
+            checkBeforeUnload() {
+                const hasPending = this.queue.some(item => item.status === 'pending' || item.status === 'processing');
+                if (hasPending && !this.beforeUnloadHandlerBound) {
+                    window.addEventListener('beforeunload', this.beforeUnloadListener);
+                    this.beforeUnloadHandlerBound = true;
+                } else if (!hasPending && this.beforeUnloadHandlerBound) {
+                    window.removeEventListener('beforeunload', this.beforeUnloadListener);
+                    this.beforeUnloadHandlerBound = false;
+                }
+            },
+
+            beforeUnloadListener(e) {
+                const message = "현재 출결 시트 전송이 백그라운드에서 진행 중입니다. 페이지를 닫으시면 전송이 중단될 수 있습니다.";
+                e.returnValue = message;
+                return message;
+            },
+
+            add(roomName, payload) {
+                const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                const item = {
+                    id,
+                    roomName,
+                    payload,
+                    status: 'pending',
+                    retries: 0
+                };
+                
+                // 동일 학급/교시의 대기 중인 이전 요청이 있다면 제거하고 최신 것으로 대체 (중복 전송 방지)
+                this.queue = this.queue.filter(q => !(q.roomName === roomName && q.payload.period === payload.period && q.status === 'pending'));
+
+                this.queue.push(item);
+                this.saveQueue();
+                this.updateUI();
+                this.processQueue();
+            },
+
+            async processQueue() {
+                if (this.isProcessing) return;
+                this.isProcessing = true;
+
+                while (this.queue.some(item => item.status === 'pending' || item.status === 'failed')) {
+                    const item = this.queue.find(item => item.status === 'pending' || item.status === 'failed');
+                    if (!item) break;
+
+                    item.status = 'processing';
+                    this.saveQueue();
+                    this.updateUI();
+
+                    try {
+                        const gasUrl = document.getElementById('gasUrl').value.trim();
+                        if (!gasUrl) throw new Error("GAS URL이 비어있습니다.");
+
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15초 제한
+
+                        await fetch(gasUrl, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            body: JSON.stringify(item.payload),
+                            signal: controller.signal
+                        });
+
+                        clearTimeout(timeoutId);
+
+                        // 전송 성공 처리
+                        item.status = 'success';
+                        const dateStr = getTodayDateString();
+                        const periodNum = item.payload.period.replace('교시', '');
+                        localStorage.setItem(`synced_${dateStr}_${item.payload.day}_${periodNum}_${item.roomName}`, 'true');
+
+                        // 동기화 완료 토스트 업데이트 후 3초 뒤에 제거
+                        this.saveQueue();
+                        this.updateUI();
+
+                        const toastId = item.id;
+                        setTimeout(() => {
+                            this.queue = this.queue.filter(q => q.id !== toastId);
+                            this.saveQueue();
+                            this.updateUI();
+                        }, 3000);
+
+                    } catch (e) {
+                        console.error("Sync failed for room:", item.roomName, e);
+                        item.retries++;
+                        if (item.retries >= 3) {
+                            item.status = 'failed';
+                            this.saveQueue();
+                            this.updateUI();
+                            showAlert(`${item.roomName}반 출결 시트 전송에 실패했습니다.\n네트워크 연결을 확인한 후 다시 시도해 주세요.`);
+                            break;
+                        } else {
+                            // 재시도 대기 (2초 후)
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
+                    }
+                }
+
+                this.isProcessing = false;
+                this.checkBeforeUnload();
+            },
+
+            updateUI() {
+                let container = document.getElementById('sync-status-container');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'sync-status-container';
+                    document.body.appendChild(container);
+                }
+
+                const activeItems = this.queue.filter(item => ['pending', 'processing', 'success', 'failed'].includes(item.status));
+                
+                container.innerHTML = '';
+                activeItems.forEach(item => {
+                    const toast = document.createElement('div');
+                    toast.className = 'sync-toast show';
+                    toast.id = `toast_${item.id}`;
+
+                    let iconHtml = '';
+                    let textHtml = '';
+
+                    if (item.status === 'pending' || item.status === 'processing') {
+                        iconHtml = '<div class="spinner"></div>';
+                        textHtml = `<span class="text">${item.roomName}반 전송 중...</span>`;
+                    } else if (item.status === 'success') {
+                        iconHtml = '<span class="icon-success">✓</span>';
+                        textHtml = `<span class="text" style="color: #10B981;">${item.roomName}반 전송 완료!</span>`;
+                    } else if (item.status === 'failed') {
+                        iconHtml = '<span class="icon-error">✗</span>';
+                        textHtml = `<span class="text" style="color: #EF4444;">${item.roomName}반 전송 실패 (대기/재시도)</span>`;
+                    }
+
+                    toast.innerHTML = `${iconHtml}${textHtml}`;
+                    container.appendChild(toast);
+                });
+            }
+        };
+
         async function saveRoomAttendanceToSheet(roomName) {
             const gasUrl = document.getElementById('gasUrl').value.trim();
             if (!gasUrl) return;
 
-            // 실제 오늘 요일 확인 (동기화 제한용)
             const dMap = ['일', '월', '화', '수', '목', '금', '토'];
             const actualToday = dMap[new Date().getDay()];
 
@@ -2455,13 +2772,12 @@
 
             const dateStr = getTodayDateString();
 
-            // 1. 먼저 이 반 전체 학생 중 출결 상태가 변한 학생이 있는지 확인
             let isAnyStatusChanged = false;
             activeStudents.forEach(s => {
                 const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`;
-                const attVal = sessionStorage.getItem(attKey);
+                const attVal = localStorage.getItem(attKey);
                 const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true || attVal === '출석');
-                const initialStatus = sessionStorage.getItem(`initial_att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`);
+                const initialStatus = localStorage.getItem(`initial_att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`);
 
                 if (initialStatus !== null) {
                     const currentStatusStr = isPresent ? 'true' : 'false';
@@ -2470,17 +2786,15 @@
                 }
             });
 
-            // 2. 일괄 적용할 감독교사 이름 결정
             const currentSup = (typeof supervisorName !== 'undefined' && supervisorName) ? supervisorName : "선생님";
-            const existingRoomSup = sessionStorage.getItem(`sup_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`);
+            const existingRoomSup = localStorage.getItem(`sup_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`);
             const batchSupervisor = (isAnyStatusChanged || !existingRoomSup || existingRoomSup === "선생님") ? currentSup : existingRoomSup;
 
-            // 3. 학생 데이터 생성 (결정된 batchSupervisor 사용)
             const studentsData = activeStudents.map(s => {
                 const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`;
-                const attVal = sessionStorage.getItem(attKey);
+                const attVal = localStorage.getItem(attKey);
                 const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true || attVal === '출석');
-                const remark = sessionStorage.getItem(`rem_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`) || "";
+                const remark = localStorage.getItem(`rem_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`) || "";
 
                 return {
                     id: s.학번,
@@ -2501,25 +2815,21 @@
                 students: studentsData
             };
 
-            showLoading('upload');
-
-            try {
-                await fetch(gasUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-
-                const dateStr = getTodayDateString();
-                sessionStorage.setItem(`synced_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`, 'true');
-
-                showAlert(`${roomName}반 ${activeStudents.length}명의 출결 정보가 시트로 전송되었습니다.`);
-            } catch (e) {
-                console.error(e);
-                showAlert("전송 중 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
-            } finally {
-                hideLoading();
+            // 버튼 즉시 성공 상태 변경 피드백
+            const submitBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-submit`);
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.classList.add('btn-success-temp');
+                submitBtn.innerHTML = '✅ 전송 요청됨';
+                setTimeout(() => {
+                    submitBtn.classList.remove('btn-success-temp');
+                    submitBtn.innerHTML = '💾 시트 전송';
+                    submitBtn.disabled = false;
+                }, 2000);
             }
+
+            // SyncManager에 위임하여 백그라운드 전송 실행
+            SyncManager.add(roomName, payload);
         }
 
         // ====== Memo (Long Press) Feature ======
@@ -2539,7 +2849,7 @@
 
             const dateStr = getTodayDateString();
             const remarkKey = `rem_${dateStr}_${day}_${period}_${studentId}`;
-            const existing = sessionStorage.getItem(remarkKey) || '';
+            const existing = localStorage.getItem(remarkKey) || '';
             document.getElementById('memoTextarea').value = existing;
 
             // 과거 날짜 여부 확인
@@ -2549,7 +2859,7 @@
 
             if (isPastDay) {
                 document.getElementById('memoDateContainer').style.display = 'block';
-                const lastDate = sessionStorage.getItem('last_past_date') || '';
+                const lastDate = localStorage.getItem('last_past_date') || '';
                 document.getElementById('memoDatePicker').value = lastDate;
             } else {
                 document.getElementById('memoDateContainer').style.display = 'none';
@@ -2591,17 +2901,17 @@
                 if (text) {
                     const d = new Date(dateInput);
                     const formattedDate = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
-                    sessionStorage.setItem(pastDateKey, formattedDate);
-                    sessionStorage.setItem('last_past_date', dateInput); // 다음 입력의 편의성을 위해 기억
+                    localStorage.setItem(pastDateKey, formattedDate);
+                    localStorage.setItem('last_past_date', dateInput); // 다음 입력의 편의성을 위해 기억
                 } else {
-                    sessionStorage.removeItem(pastDateKey);
+                    localStorage.removeItem(pastDateKey);
                 }
             }
 
             if (text) {
-                sessionStorage.setItem(remarkKey, text);
+                localStorage.setItem(remarkKey, text);
             } else {
-                sessionStorage.removeItem(remarkKey);
+                localStorage.removeItem(remarkKey);
             }
 
             closeMemoModal();
@@ -2625,19 +2935,19 @@
             
             const memosToSend = [];
             
-            for (let i = 0; i < sessionStorage.length; i++) {
-                const key = sessionStorage.key(i);
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
                 if (key && key.startsWith(prefix)) {
                     const studentId = key.split('_').pop();
-                    const text = sessionStorage.getItem(key);
-                    const pastDate = sessionStorage.getItem(datePrefix + studentId);
+                    const text = localStorage.getItem(key);
+                    const pastDate = localStorage.getItem(datePrefix + studentId);
                     
                     if (text && pastDate) {
                         const studentObj = globalData.find(s => String(s['학번']) === String(studentId));
                         if (!studentObj) continue;
 
                         const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${studentId}`;
-                        const isChecked = (sessionStorage.getItem(attKey) === 'true');
+                        const isChecked = (localStorage.getItem(attKey) === 'true');
                         if (isChecked) {
                             showAlert(`${studentObj['이름']} 학생의 출결 기록이 변경되어 있습니다.\n지난 과거의 출결 기록은 앱에서 변경할 수 없습니다.\n체크를 해제하고 시트에서 직접 변경해주세요.`);
                             return;
@@ -2735,9 +3045,9 @@
                 clearTimeout(pressTimer);
 
                 if (!isLong && !isMoved) {
-                    const attVal = sessionStorage.getItem(attKey);
+                    const attVal = localStorage.getItem(attKey);
                     const nowPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true);
-                    sessionStorage.setItem(attKey, !nowPresent);
+                    localStorage.setItem(attKey, !nowPresent);
                     seatElement.classList.toggle('present', !nowPresent);
                 }
                 isLong = false;
@@ -2870,6 +3180,10 @@
                         </div>
                         <div class="header-right-btns">
                             ${(currentDay !== actualToday) ? `<button class="btn btn-past-memo" onclick="sendBulkPastMemos('${roomName}')">📝 과거 메모 일괄 전송</button>` : ''}
+                            <span class="sync-loading-indicator" style="color: #2e7d32; font-size: 0.8rem; font-weight: bold; display: none; align-items: center; gap: 4px;">
+                                <span class="spinner-small" style="display:inline-block; width:10px; height:10px; border:2px solid #2e7d32; border-radius:50%; border-top-color:transparent; animation:spin 1s linear infinite; vertical-align: middle;"></span>
+                                불러오는 중...
+                            </span>
                             <button class="btn btn-refresh" onclick="fetchAttendanceFromSheet('${roomName}', { force: true })">🔄 출결 새로고침</button>
                             <button class="btn btn-primary btn-submit" onclick="saveRoomAttendanceToSheet('${roomName}')">💾 시트 전송</button>
                             <span class="room-meta">${currentDay}요일 | ${uniqueStudentsForDay.length}명</span>
@@ -2881,7 +3195,7 @@
 
                 const dateStr = getTodayDateString();
                 const syncCacheKey = `synced_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`;
-                if (!sessionStorage.getItem(syncCacheKey)) {
+                if (!localStorage.getItem(syncCacheKey)) {
                     // 렌더링 시에는 항상 silent 옵션을 주어 로딩창이 뜨지 않게 함
                     fetchAttendanceFromSheet(roomName, { silent: true });
                 }
@@ -2908,12 +3222,12 @@
                             seat.innerHTML = `<div class="student-id">${student.학번}</div><div class="student-name">${student.이름}</div>`;
                         } else {
                             const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${student.학번}`;
-                            const attVal = sessionStorage.getItem(attKey);
+                            const attVal = localStorage.getItem(attKey);
                             const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true);
                             if (isPresent) seat.classList.add('present');
 
                             const remarkKey = `rem_${dateStr}_${currentDay}_${currentPeriod}_${student.학번}`;
-                            const hasMemo = sessionStorage.getItem(remarkKey);
+                            const hasMemo = localStorage.getItem(remarkKey);
 
                             let memoHtml = "";
                             if (hasMemo) {
@@ -3006,14 +3320,7 @@
                 renderSeating();
             });
         }
-        function resetAttendance() {
-            showConfirm(`오늘(${getTodayDateString()})의 출석 체크 내역을 모두 초기화하시겠습니까?`, () => {
-                const dateStr = getTodayDateString();
-                Object.keys(sessionStorage).filter(k => k.startsWith(`att_${dateStr}_`) || k.startsWith(`rem_${dateStr}_`)).forEach(k => sessionStorage.removeItem(k));
-                showToast('출석 데이터가 초기화되었습니다.');
-                renderAttendance();
-            });
-        }
+
 
         const initLoadingMessages = [
             "선생님, 오늘 하루도 고생 많으셨습니다! ☕",
@@ -3082,16 +3389,26 @@
             if (fetchingRooms.has(fetchId)) return;
 
             const cacheKey = `synced_${fetchId}`;
-            if (!force && sessionStorage.getItem(cacheKey)) return;
+            if (!force && localStorage.getItem(cacheKey)) return;
 
             fetchingRooms.add(fetchId);
-            if (!silent || force) showLoading('init', `${roomName}반 출결 정보를 가져오는 중...`);
+            const refreshBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-refresh`);
+            if (refreshBtn && force) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '🔄 로딩 중...';
+            }
+
+            // 🟢 초록색 불러오는 중 표시 활성화 (자동으로 구글 시트에서 가져올 때만 표시)
+            const indicator = document.querySelector(`.classroom-section[data-room="${roomName}"] .sync-loading-indicator`);
+            if (indicator && !force) {
+                indicator.style.display = 'inline-flex';
+            }
 
             try {
                 const url = `${gasUrl}${gasUrl.includes('?') ? '&' : '?'}date=${encodeURIComponent(dateStr)}&day=${encodeURIComponent(day)}&period=${encodeURIComponent(period + '교시')}&room=${encodeURIComponent(roomName)}`;
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
 
                 const response = await fetch(url, { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -3114,16 +3431,16 @@
                         const rawStatus = String(data['상태'] || data.status || "").trim();
                         const statusStr = (rawStatus === '출석' || rawStatus.toLowerCase() === 'true') ? 'true' : 'false';
 
-                        sessionStorage.setItem(`att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
-                        sessionStorage.setItem(`rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
+                        localStorage.setItem(`att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
+                        localStorage.setItem(`rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
 
                         // '감독교사' 열 확인
                         const rawSup = (data['감독교사'] || data.supervisor || data['감독'] || data.teacher || "").trim();
-                        sessionStorage.setItem(`sup_val_${dateStr}_${day}_${period}_${studentId}`, rawSup);
+                        localStorage.setItem(`sup_val_${dateStr}_${day}_${period}_${studentId}`, rawSup);
 
                         // v22: 변동 감지를 위한 초기 상태 별도 보관
-                        sessionStorage.setItem(`initial_att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
-                        sessionStorage.setItem(`initial_rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
+                        localStorage.setItem(`initial_att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
+                        localStorage.setItem(`initial_rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
 
                         // 반 전체 대표 감독교사 정보 업데이트
                         if (rawSup && !existingSup && rawSup !== "선생님") {
@@ -3133,9 +3450,9 @@
 
                     if (hasData) {
                         if (existingSup) {
-                            sessionStorage.setItem(`sup_${dateStr}_${day}_${period}_${roomName}`, existingSup);
+                            localStorage.setItem(`sup_${dateStr}_${day}_${period}_${roomName}`, existingSup);
                         }
-                        sessionStorage.setItem(cacheKey, 'true');
+                        localStorage.setItem(cacheKey, 'true');
                         if (force) showToast(`${roomName}반 출결 정보를 업데이트했습니다.`);
                     } else if (force) {
                         showToast(`${roomName}반의 기존 출결 정보가 없습니다.`);
@@ -3152,8 +3469,14 @@
                 console.error('Fetch error:', error);
             } finally {
                 fetchingRooms.delete(fetchId);
-                if (!silent && fetchingRooms.size === 0) {
-                    hideLoading();
+                // 🟢 초록색 불러오는 중 표시 비활성화
+                const cleanIndicator = document.querySelector(`.classroom-section[data-room="${roomName}"] .sync-loading-indicator`);
+                if (cleanIndicator) {
+                    cleanIndicator.style.display = 'none';
+                }
+                if (refreshBtn && force) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '🔄 출결 새로고침';
                 }
             }
         }
@@ -3251,36 +3574,7 @@
 
 
     </script>
-    <script>
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => {
-                        console.log('Service Worker registered!', reg);
-                        // 새로운 서비스 워커가 업데이트되었을 때 자동 새로고침
-                        reg.onupdatefound = () => {
-                            const newWorker = reg.installing;
-                            newWorker.onstatechange = () => {
-                                if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
-                                    // location.reload(); // 중복 새로고침 현상(더블 로딩) 방지를 위해 제거 (아래 controllerchange에서 1회만 처리)
-                                }
-                            };
-                        };
-                    })
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
 
-            // 제어권이 변경되었을 때(새로운 SW 활성화 시) 새로고침
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
-        }
-    </script>
 </body>
 
 </html>
