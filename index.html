@@ -2747,6 +2747,24 @@
                     toast.innerHTML = `${iconHtml}${textHtml}`;
                     container.appendChild(toast);
                 });
+
+                // 각 자습실의 시트 전송 버튼 상태 동기화
+                const rooms = ['2-3', '2-4', '2-5', '2-6'];
+                rooms.forEach(roomName => {
+                    const submitBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-submit`);
+                    if (submitBtn) {
+                        const isSyncing = this.queue.some(item => item.roomName === roomName && (item.status === 'pending' || item.status === 'processing'));
+                        if (isSyncing) {
+                            submitBtn.disabled = true;
+                            submitBtn.classList.add('btn-success-temp');
+                            submitBtn.innerHTML = '✅ 전송 요청됨';
+                        } else {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('btn-success-temp');
+                            submitBtn.innerHTML = '💾 시트 전송';
+                        }
+                    }
+                });
             }
         };
 
@@ -2821,11 +2839,6 @@
                 submitBtn.disabled = true;
                 submitBtn.classList.add('btn-success-temp');
                 submitBtn.innerHTML = '✅ 전송 요청됨';
-                setTimeout(() => {
-                    submitBtn.classList.remove('btn-success-temp');
-                    submitBtn.innerHTML = '💾 시트 전송';
-                    submitBtn.disabled = false;
-                }, 2000);
             }
 
             // SyncManager에 위임하여 백그라운드 전송 실행
@@ -3263,6 +3276,11 @@
                 });
                 display.appendChild(section);
             });
+
+            // 시트 전송 중인 자습실 버튼 상태 적용
+            if (typeof SyncManager !== 'undefined' && SyncManager.updateUI) {
+                SyncManager.updateUI();
+            }
         }
 
         function fillZigzag(grid, students) {
