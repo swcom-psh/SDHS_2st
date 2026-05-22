@@ -96,14 +96,7 @@ def main():
     # 2. 대상 주간 결정
     today = datetime.date.today()
     # 이번 주 월요일 계산
-    this_monday = today - datetime.timedelta(days=today.weekday())
-    
-    # 월요일이거나 주말이면 지난 주를 기본값으로
-    if today.weekday() == 0 or today.weekday() >= 5:
-        default_monday = this_monday - datetime.timedelta(weeks=1)
-    else:
-        default_monday = this_monday
-
+    default_monday = today - datetime.timedelta(days=today.weekday())
     default_friday = default_monday + datetime.timedelta(days=4)
     default_monday_str = default_monday.strftime("%Y-%m-%d")
     default_friday_str = default_friday.strftime("%Y-%m-%d")
@@ -313,13 +306,28 @@ def main():
     box-shadow: 0 4px 16px rgba(0,0,0,.2);
   }}
   @media print {{
-    body {{ background: white; padding: 0; }}
-    .page {{
-      margin: 0; padding: 12px 16px;
-      box-shadow: none; border-radius: 0;
-      page-break-after: always;
+    @page {{
+      size: A4 portrait;
+      margin: 15mm 15mm 15mm 15mm;
     }}
-    .page:last-child {{ page-break-after: avoid; }}
+    body {{
+      background: white;
+      padding: 0;
+      margin: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }}
+    .page {{
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      border-radius: 0;
+      page-break-after: always;
+      display: block;
+    }}
+    .page:last-child {{
+      page-break-after: avoid;
+    }}
   }}
 
   /* 헤더 */
@@ -519,17 +527,34 @@ def main():
 </html>
 """
 
-    report_path = os.path.join(script_dir, 'yaja_weekly_report.html')
+    report_path = os.path.join(script_dir, '2. 주간 출결 원페이지 만들기.html')
     with open(report_path, 'w', encoding='utf-8') as f:
         f.write(html)
 
     print(f"\n[OK] 주간 출결 보고서 HTML 생성 성공: {report_path}")
     print("브라우저로 화면을 열어 시각적으로 확인합니다...")
 
-    edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-    if os.path.exists(edge_path):
-        subprocess.Popen([edge_path, f"--app=file:///{report_path}", "--no-first-run"])
-    else:
+    # 크롬 브라우저를 최우선으로 앱 모드로 열고, 없으면 엣지, 둘 다 없으면 기본 브라우저로 엶
+    chrome_paths = [
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        os.path.join(os.environ.get('LOCALAPPDATA', ''), r"Google\Chrome\Application\chrome.exe") if os.environ.get('LOCALAPPDATA') else ""
+    ]
+    
+    browser_opened = False
+    for chrome_path in chrome_paths:
+        if chrome_path and os.path.exists(chrome_path):
+            subprocess.Popen([chrome_path, f"--app=file:///{report_path}"])
+            browser_opened = True
+            break
+            
+    if not browser_opened:
+        edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        if os.path.exists(edge_path):
+            subprocess.Popen([edge_path, f"--app=file:///{report_path}", "--no-first-run"])
+            browser_opened = True
+            
+    if not browser_opened:
         os.startfile(report_path)
 
 if __name__ == '__main__':

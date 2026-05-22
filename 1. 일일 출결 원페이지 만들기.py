@@ -82,18 +82,7 @@ def main():
 
     # 2. 날짜 자동 감지 및 입력
     today = datetime.date.today()
-    weekday = today.weekday()
-    
-    # 0:월, 1:화, 2:수, 3:목, 4:금, 5:토, 6:일
-    if weekday == 0:  # 월요일이면 지난주 금요일 야자
-        default_date = today - datetime.timedelta(days=3)
-    elif weekday == 6:  # 일요일이면 금요일 야자
-        default_date = today - datetime.timedelta(days=2)
-    elif weekday == 5:  # 토요일이면 금요일 야자
-        default_date = today - datetime.timedelta(days=1)
-    else:  # 화~금요일이면 어제 야자
-        default_date = today - datetime.timedelta(days=1)
-        
+    default_date = today - datetime.timedelta(days=1)
     default_date_str = default_date.strftime("%Y-%m-%d")
     
     print(f"\n기본 대상 날짜 (최근 야자일): {default_date_str}")
@@ -308,9 +297,16 @@ def main():
             position: relative;
         }}
         @media print {{
+            @page {{
+                size: A4 portrait;
+                margin: 15mm 15mm 15mm 15mm;
+            }}
             body {{
                 background: white;
                 padding: 0;
+                margin: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }}
             .class-page {{
                 margin: 0;
@@ -318,11 +314,13 @@ def main():
                 box-shadow: none;
                 border: none;
                 page-break-after: always;
+                display: block;
             }}
             .class-page:last-child {{
                 page-break-after: avoid;
             }}
         }}
+
         .header {{
             text-align: center;
             margin-bottom: 25px;
@@ -611,19 +609,34 @@ def main():
 </html>
 """
 
-    report_html_path = os.path.join(script_dir, 'yaja_report.html')
+    report_html_path = os.path.join(script_dir, '1. 일일 출결 원페이지 만들기.html')
     with open(report_html_path, 'w', encoding='utf-8') as f:
         f.write(html_output)
         
     print(f"\n[OK] 원페이퍼 출결 보고서 HTML 생성 성공: {report_html_path}")
     print("브라우저로 화면을 열어 시각적으로 확인합니다...")
     
-    # Edge 브라우저를 앱 모드로 열어서 사용자에게 보여줌
-    edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-    if os.path.exists(edge_path):
-        subprocess.Popen([edge_path, f"--app=file:///{report_html_path}", "--no-first-run"])
-    else:
-        # Edge 경로가 다른 경우 기본 브라우저로 엶
+    # 크롬 브라우저를 최우선으로 앱 모드로 열고, 없으면 엣지, 둘 다 없으면 기본 브라우저로 엶
+    chrome_paths = [
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        os.path.join(os.environ.get('LOCALAPPDATA', ''), r"Google\Chrome\Application\chrome.exe") if os.environ.get('LOCALAPPDATA') else ""
+    ]
+    
+    browser_opened = False
+    for chrome_path in chrome_paths:
+        if chrome_path and os.path.exists(chrome_path):
+            subprocess.Popen([chrome_path, f"--app=file:///{report_html_path}"])
+            browser_opened = True
+            break
+            
+    if not browser_opened:
+        edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        if os.path.exists(edge_path):
+            subprocess.Popen([edge_path, f"--app=file:///{report_html_path}", "--no-first-run"])
+            browser_opened = True
+            
+    if not browser_opened:
         os.startfile(report_html_path)
 
 if __name__ == '__main__':

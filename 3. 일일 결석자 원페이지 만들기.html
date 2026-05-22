@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>2026-05-21 야자 결석자 현황 보고서</title>
+    <!-- Pretendard font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --primary: #4361EE;
+            --primary-light: #EBF0FF;
+            --success-bg: #E6F4EA;
+            --success-text: #137333;
+            --danger-bg: #FCE8E6;
+            --danger-text: #C5221F;
+            --muted-bg: #F1F3F4;
+            --muted-text: #5F6368;
+            --border: #DADCE0;
+            --text-main: #202124;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #525659;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
+        }
+        .class-page {
+            background: white;
+            max-width: 850px;
+            margin: 0 auto 30px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            position: relative;
+            min-height: 297mm; /* A4 height guideline */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm 15mm 15mm 15mm;
+            }
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .class-page {
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border: none;
+                min-height: auto;
+                page-break-after: avoid;
+                display: block;
+            }
+        }
+        .content-wrap {
+            width: 100%;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 12px;
+        }
+        .header-title-section {
+            text-align: left;
+        }
+        .header-title-section h1 {
+            font-size: 1.7rem;
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-weight: 800;
+        }
+        .header-title-section .date-info {
+            font-size: 1rem;
+            color: #5F6368;
+            font-weight: 600;
+        }
+        .summary-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+        .summary-card {
+            flex: 1;
+            background: #F8F9FA;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .summary-card .title {
+            font-size: 0.8rem;
+            color: #5F6368;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .summary-card .value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .summary-card.active-card .value {
+            color: var(--primary);
+        }
+        .summary-card.present-card .value {
+            color: var(--success-text);
+        }
+        .summary-card.absent-card .value {
+            color: var(--danger-text);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+        }
+        thead {
+            display: table-header-group;
+        }
+        tr {
+            page-break-inside: avoid;
+        }
+        th {
+            background-color: #F1F3F4;
+            font-weight: 700;
+            border-top: 1px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            padding: 10px 5px;
+            text-align: center;
+            color: #3C4043;
+        }
+        td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 5px;
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .badge-present {
+            background-color: var(--success-bg);
+            color: var(--success-text);
+        }
+        .badge-absent {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+        }
+        .badge-none {
+            color: #9AA0A6;
+            font-weight: normal;
+        }
+        .badge-unchecked {
+            background-color: #FFF4E5;
+            color: #B06000;
+        }
+        .remark-text {
+            font-size: 0.8rem;
+            text-align: left;
+            padding-left: 8px;
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .signature-box {
+            border: 1px solid var(--border);
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
+            min-width: 140px;
+        }
+        .signature-title {
+            font-weight: bold;
+            color: #5F6368;
+            margin-bottom: 35px;
+        }
+        .signature-line {
+            border-bottom: 1px dashed #DADCE0;
+            width: 90px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="class-page">
+        <div class="content-wrap">
+            <table>
+                <thead>
+                    <!-- Row 1: Header title and signature -->
+                    <tr>
+                        <td colspan="8" style="padding: 0; border: none !important; text-align: left;">
+                            <div class="header-container" style="margin-top: 0;">
+                                <div class="header-title-section">
+                                    <h1>2학년 야간자율학습 결석자 현황 보고서</h1>
+                                    <div class="date-info">2026-05-21 (목요일) 야간자율학습</div>
+                                </div>
+                                <div class="signature-box" style="margin-bottom: 2px;">
+                                    <div class="signature-title">학년부장</div>
+                                    <div class="signature-line"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Row 2: Summary cards -->
+                    <tr>
+                        <td colspan="8" style="padding: 0; border: none !important;">
+                            <div class="summary-container" style="margin-top: 15px;">
+                                <div class="summary-card active-card">
+                                    <div class="title">야자 대상 총원</div>
+                                    <div class="value">55명</div>
+                                </div>
+                                <div class="summary-card present-card">
+                                    <div class="title">출석 총원</div>
+                                    <div class="value">35명</div>
+                                </div>
+                                <div class="summary-card absent-card">
+                                    <div class="title">결석 총원</div>
+                                    <div class="value">20명</div>
+                                </div>
+                                <div class="summary-card">
+                                    <div class="title">결석률</div>
+                                    <div class="value" style="color: #C5221F;">36.4%</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Row 3: Table Column Headers -->
+                    <tr>
+                        <th style="width: 8%;">연번</th>
+                        <th style="width: 12%;">학번</th>
+                        <th style="width: 12%;">이름</th>
+                        <th style="width: 12%;">소속 학급</th>
+                        <th style="width: 12%;">배정 자습실</th>
+                        <th style="width: 14%;">1교시 출결</th>
+                        <th style="width: 14%;">2교시 출결</th>
+                        <th style="width: 16%;">비고 (결석 사유)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td>01</td>
+            <td>20201</td>
+            <td style="font-weight: bold;">김도윤</td>
+            <td>2학년 2반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>02</td>
+            <td>20204</td>
+            <td style="font-weight: bold;">김환</td>
+            <td>2학년 2반</td>
+            <td>2-3실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>03</td>
+            <td>20210</td>
+            <td style="font-weight: bold;">송민서</td>
+            <td>2학년 2반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>04</td>
+            <td>20211</td>
+            <td style="font-weight: bold;">안준환</td>
+            <td>2학년 2반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>05</td>
+            <td>20301</td>
+            <td style="font-weight: bold;">강서윤</td>
+            <td>2학년 3반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>06</td>
+            <td>20306</td>
+            <td style="font-weight: bold;">남선우</td>
+            <td>2학년 3반</td>
+            <td>2-3실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>07</td>
+            <td>20401</td>
+            <td style="font-weight: bold;">김가온</td>
+            <td>2학년 4반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>08</td>
+            <td>20406</td>
+            <td style="font-weight: bold;">김효민</td>
+            <td>2학년 4반</td>
+            <td>2-3실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge badge-present">출석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>09</td>
+            <td>20427</td>
+            <td style="font-weight: bold;">한다인</td>
+            <td>2학년 4반</td>
+            <td>2-5실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>10</td>
+            <td>20523</td>
+            <td style="font-weight: bold;">정서연</td>
+            <td>2학년 5반</td>
+            <td>2-4실</td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>11</td>
+            <td>20602</td>
+            <td style="font-weight: bold;">길범렬</td>
+            <td>2학년 6반</td>
+            <td>2-6실</td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>12</td>
+            <td>20604</td>
+            <td style="font-weight: bold;">김아인</td>
+            <td>2학년 6반</td>
+            <td>2-6실</td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>13</td>
+            <td>20707</td>
+            <td style="font-weight: bold;">김태민</td>
+            <td>2학년 7반</td>
+            <td>2-6실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>14</td>
+            <td>20717</td>
+            <td style="font-weight: bold;">이재인</td>
+            <td>2학년 7반</td>
+            <td>2-6실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>15</td>
+            <td>20723</td>
+            <td style="font-weight: bold;">조문준</td>
+            <td>2학년 7반</td>
+            <td>2-6실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title="1교시: 병결석">1교시: 병결석</td>
+        </tr>
+        
+        <tr>
+            <td>16</td>
+            <td>20805</td>
+            <td style="font-weight: bold;">박유민</td>
+            <td>2학년 8반</td>
+            <td>2-4실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>17</td>
+            <td>20814</td>
+            <td style="font-weight: bold;">용나경</td>
+            <td>2학년 8반</td>
+            <td>2-6실</td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>18</td>
+            <td>20818</td>
+            <td style="font-weight: bold;">이하진</td>
+            <td>2학년 8반</td>
+            <td>2-6실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>19</td>
+            <td>20902</td>
+            <td style="font-weight: bold;">김규민</td>
+            <td>2학년 9반</td>
+            <td>2-6실</td>
+            <td><span class="badge-none">야자 없음</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+        <tr>
+            <td>20</td>
+            <td>20925</td>
+            <td style="font-weight: bold;">지연서</td>
+            <td>2학년 9반</td>
+            <td>2-4실</td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td><span class="badge badge-absent">결석</span></td>
+            <td class="remark-text" title=""></td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+        
+
+    </div>
+    
+</body>
+</html>

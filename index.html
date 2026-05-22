@@ -2440,7 +2440,7 @@
             teacherListPromise = (async () => {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
+                    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
 
                     const response = await fetch(`${gasUrl}?action=getTeachers`, { signal: controller.signal });
                     clearTimeout(timeoutId);
@@ -2514,7 +2514,7 @@
             studentListPromise = (async () => {
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
+                    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
 
                     const response = await fetch(`${gasUrl}?action=getStudents`, { signal: controller.signal });
                     clearTimeout(timeoutId);
@@ -2638,6 +2638,12 @@
                 if (stored) {
                     try {
                         this.queue = JSON.parse(stored);
+                        // 혹시 남아있을 수 있는 'processing' 상태를 'pending'으로 복구
+                        this.queue.forEach(item => {
+                            if (item.status === 'processing') {
+                                item.status = 'pending';
+                            }
+                        });
                         console.log("미전송 백그라운드 큐 로드 완료:", this.queue.length, "건");
                     } catch (e) {
                         localStorage.removeItem('yajaSyncQueue');
@@ -2683,8 +2689,8 @@
                     retries: 0
                 };
                 
-                // 동일 학급/교시의 대기 중인 이전 요청이 있다면 제거하고 최신 것으로 대체 (중복 전송 방지)
-                this.queue = this.queue.filter(q => !(q.roomName === roomName && q.payload.period === payload.period && q.status === 'pending'));
+                // 동일 학급/교시의 이전 요청이 있다면 상태에 관계없이 제거하고 최신 것으로 대체 (중복 전송 방지)
+                this.queue = this.queue.filter(q => !(q.roomName === roomName && q.payload.period === payload.period));
 
                 this.queue.push(item);
                 this.saveQueue();
@@ -2696,8 +2702,8 @@
                 if (this.isProcessing) return;
                 this.isProcessing = true;
 
-                while (this.queue.some(item => item.status === 'pending' || item.status === 'failed')) {
-                    const item = this.queue.find(item => item.status === 'pending' || item.status === 'failed');
+                while (this.queue.some(item => item.status === 'pending')) {
+                    const item = this.queue.find(item => item.status === 'pending');
                     if (!item) break;
 
                     item.status = 'processing';
@@ -2745,8 +2751,19 @@
                             this.saveQueue();
                             this.updateUI();
                             showAlert(`${item.roomName}반 출결 시트 전송에 실패했습니다.\n네트워크 연결을 확인한 후 다시 시도해 주세요.`);
-                            break;
+                            
+                            // 8초 후 큐에서 제거
+                            const toastId = item.id;
+                            setTimeout(() => {
+                                this.queue = this.queue.filter(q => q.id !== toastId);
+                                this.saveQueue();
+                                this.updateUI();
+                            }, 8000);
                         } else {
+                            // 대기 상태로 되돌려 다음 루프에서 재시도 하도록 유도
+                            item.status = 'pending';
+                            this.saveQueue();
+                            this.updateUI();
                             // 재시도 대기 (2초 후)
                             await new Promise(resolve => setTimeout(resolve, 2000));
                         }
@@ -2784,7 +2801,7 @@
                         textHtml = `<span class="text" style="color: #10B981;">${item.roomName}반 전송 완료!</span>`;
                     } else if (item.status === 'failed') {
                         iconHtml = '<span class="icon-error">✗</span>';
-                        textHtml = `<span class="text" style="color: #EF4444;">${item.roomName}반 전송 실패 (대기/재시도)</span>`;
+                        textHtml = `<span class="text" style="color: #EF4444;">${item.roomName}반 전송 실패 (다시 시도)</span>`;
                     }
 
                     toast.innerHTML = `${iconHtml}${textHtml}`;
@@ -3041,17 +3058,26 @@
 
             showLoading('upload', "과거 메모 일괄 전송 중...");
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
+
                 await fetch(gasUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
                 
+                clearTimeout(timeoutId);
                 showToast(`총 ${memosToSend.length}건의 과거 메모가 시트로 안전하게 전송되었습니다.`);
                 // 성공 후에도 로컬 데이터를 냅두어 시각적으로 유지되도록 함
             } catch (error) {
                 console.error(error);
-                showAlert("전송 중 오류가 발생했습니다.");
+                if (error.name === 'AbortError') {
+                    showAlert("과거 메모 전송 시간이 초과되었습니다. 네트워크 연결을 확인한 후 다시 시도해 주세요.");
+                } else {
+                    showAlert("전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
+                }
             } finally {
                 hideLoading();
             }
@@ -3476,7 +3502,7 @@
                 const url = `${gasUrl}${gasUrl.includes('?') ? '&' : '?'}date=${encodeURIComponent(dateStr)}&day=${encodeURIComponent(day)}&period=${encodeURIComponent(period + '교시')}&room=${encodeURIComponent(roomName)}`;
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 제한
+                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
 
                 const response = await fetch(url, { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -3535,6 +3561,13 @@
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
+                if (force) {
+                    if (error.name === 'AbortError') {
+                        showAlert(`${roomName}반 출결 조회 시간이 초과되었습니다. 네트워크 상태를 확인 후 다시 시도해 주세요.`);
+                    } else {
+                        showAlert(`${roomName}반 출결 정보를 가져오는 데 실패했습니다. 다시 시도해 주세요.`);
+                    }
+                }
             } finally {
                 fetchingRooms.delete(fetchId);
                 // 🟢 초록색 불러오는 중 표시 비활성화
