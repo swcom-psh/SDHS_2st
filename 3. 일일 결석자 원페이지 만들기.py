@@ -57,10 +57,34 @@ def main():
         input("엔터키를 누르면 종료됩니다...")
         sys.exit(1)
 
-    # 2. 날짜 자동 감지 및 입력
+    # 2. 날짜 자동 감지 및 입력 (주말 및 공휴일 제외)
     today = datetime.date.today()
+    
+    # 2026년 한국 법정 공휴일 및 대체공휴일 목록 (YYYY-MM-DD)
+    holidays = {
+        "2026-01-01", # 신정
+        "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", # 설날 연휴 및 대체공휴일
+        "2026-03-01", "2026-03-02", # 삼일절 및 대체공휴일
+        "2026-05-05", # 어린이날
+        "2026-05-24", "2026-05-25", # 부처님오신날 및 대체공휴일
+        "2026-06-06", # 현충일
+        "2026-08-15", "2026-08-17", # 광복절 및 대체공휴일
+        "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-28", # 추석 연휴 및 대체공휴일
+        "2026-10-03", "2026-10-05", # 개천절 및 대체공휴일
+        "2026-10-09", # 한글날
+        "2026-12-25"  # 성탄절
+    }
+    
+    # 오늘 이전의 날들 중 평일(월~금)이면서 공휴일이 아닌 가장 최근의 날 탐색
     default_date = today - datetime.timedelta(days=1)
-    default_date_str = default_date.strftime("%Y-%m-%d")
+    while True:
+        is_weekend = default_date.weekday() >= 5 # 5: 토요일, 6: 일요일
+        default_date_str = default_date.strftime("%Y-%m-%d")
+        is_holiday = default_date_str in holidays
+        
+        if not is_weekend and not is_holiday:
+            break
+        default_date -= datetime.timedelta(days=1)
     
     print(f"\n기본 대상 날짜 (최근 야자일): {default_date_str}")
     
@@ -601,6 +625,9 @@ def main():
     print(f"\n[OK] 결석자 현황 보고서 HTML 생성 성공: {report_html_path}")
     print("브라우저로 화면을 열어 시각적으로 확인합니다...")
     
+    # 공백 및 한글, 백슬래시 경로를 브라우저가 인식 가능한 URL로 인코딩
+    report_html_url = "file:" + urllib.request.pathname2url(report_html_path)
+    
     # 크롬 브라우저를 최우선으로 앱 모드로 열고, 없으면 엣지, 둘 다 없으면 기본 브라우저로 엶
     chrome_paths = [
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -611,14 +638,14 @@ def main():
     browser_opened = False
     for chrome_path in chrome_paths:
         if chrome_path and os.path.exists(chrome_path):
-            subprocess.Popen([chrome_path, f"--app=file:///{report_html_path}"])
+            subprocess.Popen([chrome_path, f"--app={report_html_url}"])
             browser_opened = True
             break
             
     if not browser_opened:
         edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
         if os.path.exists(edge_path):
-            subprocess.Popen([edge_path, f"--app=file:///{report_html_path}", "--no-first-run"])
+            subprocess.Popen([edge_path, f"--app={report_html_url}", "--no-first-run"])
             browser_opened = True
             
     if not browser_opened:

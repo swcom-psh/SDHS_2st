@@ -534,6 +534,9 @@ def main():
     print(f"\n[OK] 주간 출결 보고서 HTML 생성 성공: {report_path}")
     print("브라우저로 화면을 열어 시각적으로 확인합니다...")
 
+    # 공백 및 한글, 백슬래시 경로를 브라우저가 인식 가능한 URL로 인코딩
+    report_url_encoded = "file:" + urllib.request.pathname2url(report_path)
+
     # 크롬 브라우저를 최우선으로 앱 모드로 열고, 없으면 엣지, 둘 다 없으면 기본 브라우저로 엶
     chrome_paths = [
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -544,14 +547,14 @@ def main():
     browser_opened = False
     for chrome_path in chrome_paths:
         if chrome_path and os.path.exists(chrome_path):
-            subprocess.Popen([chrome_path, f"--app=file:///{report_path}"])
+            subprocess.Popen([chrome_path, f"--app={report_url_encoded}"])
             browser_opened = True
             break
             
     if not browser_opened:
         edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
         if os.path.exists(edge_path):
-            subprocess.Popen([edge_path, f"--app=file:///{report_path}", "--no-first-run"])
+            subprocess.Popen([edge_path, f"--app={report_url_encoded}", "--no-first-run"])
             browser_opened = True
             
     if not browser_opened:
