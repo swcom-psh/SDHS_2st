@@ -13,16 +13,23 @@
     <style>
         :root {
             /* 🌊 Summer Ocean Color Theme */
-            --primary: #0077b6;      /* Deep Ocean Blue */
-            --primary-dark: #03045e; /* Navy Sea */
-            --secondary: #e0f2fe;    /* Foam Blue */
+            --primary: #0077b6;
+            /* Deep Ocean Blue */
+            --primary-dark: #03045e;
+            /* Navy Sea */
+            --secondary: #e0f2fe;
+            /* Foam Blue */
 
             --bg-canvas: #e0f2fe;
-            --card-bg: rgba(255, 255, 255, 0.7); /* Glassmorphism translucent */
+            --card-bg: rgba(255, 255, 255, 0.7);
+            /* Glassmorphism translucent */
 
-            --text-main: #0f172a;    /* Dark slate */
-            --text-sub: #334155;     /* Slate 700 */
-            --text-muted: #64748b;   /* Slate 500 */
+            --text-main: #0f172a;
+            /* Dark slate */
+            --text-sub: #334155;
+            /* Slate 700 */
+            --text-muted: #64748b;
+            /* Slate 500 */
 
             --border: rgba(255, 255, 255, 0.4);
             --border-focus: #0284c7;
@@ -34,10 +41,14 @@
             --drag-over: rgba(224, 242, 254, 0.8);
 
             /* Room Summer point colors */
-            --room-2-3: #0096c7;     /* Ocean Blue */
-            --room-2-4: #ee9b00;     /* Sand Gold */
-            --room-2-5: #ca6702;     /* Coral Orange/Pink */
-            --room-2-6: #0a9396;     /* Bright Mint */
+            --room-2-3: #0096c7;
+            /* Ocean Blue */
+            --room-2-4: #ee9b00;
+            /* Sand Gold */
+            --room-2-5: #ca6702;
+            /* Coral Orange/Pink */
+            --room-2-6: #0a9396;
+            /* Bright Mint */
         }
 
         * {
@@ -63,9 +74,11 @@
             0% {
                 background-position: 0% 50%;
             }
+
             50% {
                 background-position: 100% 50%;
             }
+
             100% {
                 background-position: 0% 50%;
             }
@@ -1322,7 +1335,7 @@
                 border-radius: 12px;
             }
 
-            .info-text > div {
+            .info-text>div {
                 width: 100%;
                 justify-content: space-between;
             }
@@ -1385,12 +1398,15 @@
                 transform: translateY(0) translateX(0);
                 opacity: 0;
             }
+
             10% {
                 opacity: 0.6;
             }
+
             90% {
                 opacity: 0.6;
             }
+
             100% {
                 transform: translateY(-110vh) translateX(100px);
                 opacity: 0;
@@ -2213,8 +2229,11 @@
                 <span class="memo-student-id" id="memoStudentId"></span>
             </div>
             <div id="memoDateContainer" style="display: none; margin-bottom: 10px; width: 100%;">
-                <label for="memoDatePicker" style="font-size: 0.85rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; display: block;">과거 메모 날짜 선택 (구글 시트 기록용)</label>
-                <input type="date" id="memoDatePicker" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 1rem; color: var(--text-main);">
+                <label for="memoDatePicker"
+                    style="font-size: 0.85rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; display: block;">과거
+                    메모 날짜 선택 (구글 시트 기록용)</label>
+                <input type="date" id="memoDatePicker"
+                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 1rem; color: var(--text-main);">
             </div>
             <textarea class="memo-textarea" id="memoTextarea" placeholder="결석 사유를 입력하세요 (예: 체험학습, 병결 등)"></textarea>
             <div class="memo-modal-btns">
@@ -2239,39 +2258,39 @@
                     <button class="btn day-btn" data-day="금">금요일</button>
                 </div>
                 <div class="btn-group" id="periodButtons">
-                        <button class="btn day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
-                        <button class="btn day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="downloadPDF()">📄 PDF 저장하기</button>
-                        <!-- 배치 및 출석 초기화 버튼 제거됨 (사용자 요청) -->
-                    </div>
+                    <button class="btn day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
+                    <button class="btn day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="downloadPDF()">📄 PDF 저장하기</button>
+                    <!-- 배치 및 출석 초기화 버튼 제거됨 (사용자 요청) -->
+                </div>
 
-                    <input type="hidden" id="gasUrl"
-                        value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
-                    <input type="hidden" id="gasBackupUrl"
-                        value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
-                    <div class="info-text"
-                        style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
-                        <div style="display: flex; gap: 8px;">
-                            <span>💡</span>
-                            <span>학생 출결 체크 후 반드시 '출결 결과 시트 전송' 버튼을 눌러주세요.</span>
-                            <button class="btn"
-                                style="padding:4px 12px; font-size:0.8rem; height: 28px; line-height: 1;"
-                                onclick="refreshStudentList()">명단 갱신</button>
-                        </div>
-                        <div
-                            style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-left: auto;">
-                            👤 <span id="displaySupervisorName"></span> 선생님
-                            <button onclick="handleLogout()"
-                                style="background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.2s;">로그아웃</button>
-                        </div>
+                <input type="hidden" id="gasUrl"
+                    value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
+                <input type="hidden" id="gasBackupUrl"
+                    value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
+                <div class="info-text"
+                    style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; gap: 8px;">
+                        <span>💡</span>
+                        <span>학생 출결 체크 후 반드시 '출결 결과 시트 전송' 버튼을 눌러주세요.</span>
+                        <span>학생을 선택하는 것이 출석입니다</span>
+                        <button class="btn" style="padding:4px 12px; font-size:0.8rem; height: 28px; line-height: 1;"
+                            onclick="refreshStudentList()">명단 갱신</button>
+                    </div>
+                    <div
+                        style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                        👤 <span id="displaySupervisorName"></span> 선생님
+                        <button onclick="handleLogout()"
+                            style="background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.2s;">로그아웃</button>
                     </div>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <div class="seating-container active" id="seatingDisplay"></div>
-            <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
+        <div class="seating-container active" id="seatingDisplay"></div>
+        <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
     </div> <!-- Close mainApp -->
 
     <div id="loadingOverlay">
@@ -2649,7 +2668,7 @@
                         localStorage.removeItem('yajaSyncQueue');
                     }
                 }
-                
+
                 // 2. UI 초기화 및 프로세스 시작
                 this.updateUI();
                 if (this.queue.length > 0) {
@@ -2688,7 +2707,7 @@
                     status: 'pending',
                     retries: 0
                 };
-                
+
                 // 동일 학급/교시의 이전 요청이 있다면 상태에 관계없이 제거하고 최신 것으로 대체 (중복 전송 방지)
                 this.queue = this.queue.filter(q => !(q.roomName === roomName && q.payload.period === payload.period));
 
@@ -2751,7 +2770,7 @@
                             this.saveQueue();
                             this.updateUI();
                             showAlert(`${item.roomName}반 출결 시트 전송에 실패했습니다.\n네트워크 연결을 확인한 후 다시 시도해 주세요.`);
-                            
+
                             // 8초 후 큐에서 제거
                             const toastId = item.id;
                             setTimeout(() => {
@@ -2783,7 +2802,7 @@
                 }
 
                 const activeItems = this.queue.filter(item => ['pending', 'processing', 'success', 'failed'].includes(item.status));
-                
+
                 container.innerHTML = '';
                 activeItems.forEach(item => {
                     const toast = document.createElement('div');
@@ -3001,20 +3020,20 @@
             const dMap = ['일', '월', '화', '수', '목', '금', '토'];
             const actualToday = dMap[new Date().getDay()];
             if (currentDay === actualToday) return;
-            
+
             const dateStr = getTodayDateString();
             const prefix = `rem_${dateStr}_${currentDay}_${currentPeriod}_`;
             const datePrefix = `past_date_${currentDay}_${currentPeriod}_`;
-            
+
             const memosToSend = [];
-            
+
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key && key.startsWith(prefix)) {
                     const studentId = key.split('_').pop();
                     const text = localStorage.getItem(key);
                     const pastDate = localStorage.getItem(datePrefix + studentId);
-                    
+
                     if (text && pastDate) {
                         const studentObj = globalData.find(s => String(s['학번']) === String(studentId));
                         if (!studentObj) continue;
@@ -3067,7 +3086,7 @@
                     body: JSON.stringify(payload),
                     signal: controller.signal
                 });
-                
+
                 clearTimeout(timeoutId);
                 showToast(`총 ${memosToSend.length}건의 과거 메모가 시트로 안전하게 전송되었습니다.`);
                 // 성공 후에도 로컬 데이터를 냅두어 시각적으로 유지되도록 함
@@ -3637,19 +3656,19 @@
             for (let i = 0; i < bubbleCount; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
-                
+
                 // Randomize bubble size (5px to 20px)
                 const size = Math.random() * 15 + 5;
                 bubble.style.width = `${size}px`;
                 bubble.style.height = `${size}px`;
-                
+
                 // Randomize horizontal position
                 bubble.style.left = `${Math.random() * 100}vw`;
-                
+
                 // Randomize animation delay and duration
                 bubble.style.animationDelay = `${Math.random() * 8}s`;
                 bubble.style.animationDuration = `${Math.random() * 12 + 8}s`; // 8s to 20s
-                
+
                 container.appendChild(bubble);
             }
         }
