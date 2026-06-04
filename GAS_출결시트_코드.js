@@ -10,20 +10,23 @@
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
+  if (!lock.tryLock(10000)) {
+    return ContentService.createTextOutput(JSON.stringify({ "result": "error", "message": "서버가 바쁩니다. 잠시 후 다시 시도해주세요." }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
   try {
     var data = JSON.parse(e.postData.contents);
     var sheetName = "Attendance_Log";
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(sheetName);
-    
+
     if (!sheet) {
       sheet = ss.insertSheet(sheetName);
       sheet.appendRow(["체크시간", "감독교사", "날짜", "요일", "교시", "반", "학번", "이름", "상태", "비고"]);
     }
 
     var timestamp = new Date();
-    
+
     // --- [과거 메모 일괄 전송 처리 (배열 형태)] ---
     if (data.type === "past_memos") {
       var memos = data.memos;
@@ -31,19 +34,19 @@ function doPost(e) {
       var allValues = dataRange.getValues();
       var displayValues = dataRange.getDisplayValues();
       var newRows = [];
-      
-      memos.forEach(function(m) {
+
+      memos.forEach(function (m) {
         var s = m.student;
         var found = false;
-        
+
         for (var i = 1; i < displayValues.length; i++) {
           var r = displayValues[i];
-          if (cleanDate(r[2]) === cleanDate(m.date) && 
-              r[3].toString().trim() === m.day.trim() && 
-              r[4].toString().trim() === m.period.trim() && 
-              r[5].toString().trim() === m.room.trim() && 
-              cleanId(r[6]) === cleanId(s.id)) {
-              
+          if (cleanDate(r[2]) === cleanDate(m.date) &&
+            r[3].toString().trim() === m.day.trim() &&
+            r[4].toString().trim() === m.period.trim() &&
+            r[5].toString().trim() === m.room.trim() &&
+            cleanId(r[6]) === cleanId(s.id)) {
+
             // 기존 데이터가 있으면 '비고'와 '체크시간'만 업데이트 (출결 및 감독교사 철저히 보존)
             allValues[i][0] = timestamp;
             allValues[i][9] = s.remark;
@@ -51,31 +54,27 @@ function doPost(e) {
             break;
           }
         }
-        
+
         if (!found) {
           // 아예 빈 기록이었다면 "결석" 처리와 함께 메모를 추가
           newRows.push([
-            timestamp, m.supervisor || "", m.date, m.day, m.period, m.room, 
+            timestamp, m.supervisor || "", m.date, m.day, m.period, m.room,
             s.id, s.name, "결석", s.remark
           ]);
         }
       });
-      
+
       // 변경된 기존 배열 쓰기
       dataRange.setValues(allValues);
-      
+
       // [변경 사항] 새로 추가된 행이 있다면 최상단(헤더 바로 아래인 2행)에 삽입
       if (newRows.length > 0) {
         sheet.insertRowsBefore(2, newRows.length);
         sheet.getRange(2, 1, newRows.length, newRows[0].length).setValues(newRows);
       }
-      
+
       return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
-                           .setMimeType(ContentService.MimeType.JSON)
-                           .setHeaders({
-                             "Access-Control-Allow-Origin": "*",
-                             "Access-Control-Allow-Methods": "POST, GET, OPTIONS"
-                           });
+        .setMimeType(ContentService.MimeType.JSON);
     }
     // ----------------------------------------------------
 
@@ -83,7 +82,7 @@ function doPost(e) {
     var incomingStudents = (data.type === "single") ? [data.student] : data.students;
 
     var incomingMap = {};
-    incomingStudents.forEach(function(s) {
+    incomingStudents.forEach(function (s) {
       var statusText = s.status ? "출석" : "결석";
       var key = cleanId(s.id) + "_" + (s.name || "").toString().trim();
       incomingMap[key] = {
@@ -95,28 +94,28 @@ function doPost(e) {
     });
 
     var dataRange = sheet.getDataRange();
-    var allValues = dataRange.getValues(); 
-    var displayValues = dataRange.getDisplayValues(); 
-    
+    var allValues = dataRange.getValues();
+    var displayValues = dataRange.getDisplayValues();
+
     var anyStatusChanged = false;
     var matchingRowIndices = [];
-    
+
     for (var i = 1; i < displayValues.length; i++) {
       var row = displayValues[i];
-      var key = cleanId(row[6]) + "_" + row[7].toString().trim(); 
+      var key = cleanId(row[6]) + "_" + row[7].toString().trim();
 
-      if (cleanDate(row[2]) === cleanDate(data.date) && 
-          row[3].toString().trim() === data.day.trim() && 
-          row[4].toString().trim() === data.period.trim() && 
-          row[5].toString().trim() === data.room.trim() && 
-          incomingMap[key]) {
-          
+      if (cleanDate(row[2]) === cleanDate(data.date) &&
+        row[3].toString().trim() === data.day.trim() &&
+        row[4].toString().trim() === data.period.trim() &&
+        row[5].toString().trim() === data.room.trim() &&
+        incomingMap[key]) {
+
         var incoming = incomingMap[key];
         matchingRowIndices.push({
           index: i,
           incoming: incoming
         });
-        
+
         if (row[8].toString().trim() !== incoming.status) {
           anyStatusChanged = true;
         }
@@ -125,12 +124,12 @@ function doPost(e) {
 
     var isDataModified = false;
 
-    matchingRowIndices.forEach(function(match) {
+    matchingRowIndices.forEach(function (match) {
       var idx = match.index;
       var incoming = match.incoming;
       var row = displayValues[idx];
       incoming.handled = true;
-      
+
       if (anyStatusChanged) {
         allValues[idx][0] = timestamp;
         var finalSupervisor = (incoming.student && incoming.student.supervisor) ? incoming.student.supervisor : (data.supervisor || "");
@@ -152,12 +151,12 @@ function doPost(e) {
     }
 
     var newRows = [];
-    incomingStudents.forEach(function(s) {
+    incomingStudents.forEach(function (s) {
       var key = cleanId(s.id) + "_" + (s.name || "").toString().trim();
       if (!incomingMap[key].handled) {
         var finalSupervisor = s.supervisor || data.supervisor || "";
         newRows.push([
-          timestamp, finalSupervisor, data.date, data.day, data.period, data.room, 
+          timestamp, finalSupervisor, data.date, data.day, data.period, data.room,
           s.id, s.name, (s.status ? "출석" : "결석"), s.remark || ""
         ]);
       }
@@ -170,18 +169,10 @@ function doPost(e) {
     }
 
     return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
-                         .setMimeType(ContentService.MimeType.JSON)
-                         .setHeaders({
-                           "Access-Control-Allow-Origin": "*",
-                           "Access-Control-Allow-Methods": "POST, GET, OPTIONS"
-                         });
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ "result": "error", "message": err.toString() }))
-                         .setMimeType(ContentService.MimeType.JSON)
-                         .setHeaders({
-                           "Access-Control-Allow-Origin": "*",
-                           "Access-Control-Allow-Methods": "POST, GET, OPTIONS"
-                         });
+      .setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
@@ -207,9 +198,9 @@ function doGet(e) {
     if (!studentSheet) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
     var values = studentSheet.getDataRange().getDisplayValues();
     var headers = values[0];
-    var jsonArray = values.slice(1).map(function(row) {
+    var jsonArray = values.slice(1).map(function (row) {
       var obj = {};
-      headers.forEach(function(header, j) { obj[header] = row[j]; });
+      headers.forEach(function (header, j) { obj[header] = row[j]; });
       return obj;
     });
     return ContentService.createTextOutput(JSON.stringify(jsonArray)).setMimeType(ContentService.MimeType.JSON);
@@ -221,11 +212,11 @@ function doGet(e) {
   var results = {};
   for (var i = 1; i < displayValues.length; i++) {
     var row = displayValues[i];
-    if (cleanDate(row[2]) === cleanDate(e.parameter.date) && 
-        row[3].toString().trim() === e.parameter.day.toString().trim() && 
-        row[4].toString().trim() === e.parameter.period.toString().trim() && 
-        row[5].toString().trim() === e.parameter.room.toString().trim()) {
-      
+    if (cleanDate(row[2]) === cleanDate(e.parameter.date) &&
+      row[3].toString().trim() === e.parameter.day.toString().trim() &&
+      row[4].toString().trim() === e.parameter.period.toString().trim() &&
+      row[5].toString().trim() === e.parameter.room.toString().trim()) {
+
       var studentId = cleanId(row[6]);
       // 최신 기록이 최상단에 기록되므로, 동일 날짜/교시에 중복된 학생 기록이 존재할 경우
       // 이미 담긴 데이터(가장 최근 데이터)를 유지하고, 더 아래에 위치한 이전 기록으로 덮어쓰지 않습니다.
