@@ -1177,13 +1177,14 @@
             }
 
             .grid-6x5 {
-                grid-template-columns: repeat(6, 1fr);
+                grid-template-columns: 1fr 1fr 4px 1fr 1fr 4px 1fr 1fr;
                 gap: 5px;
                 margin: 15px 0;
             }
 
             .grid-6x5 .spacer {
-                display: none;
+                display: block;
+                min-width: 4px;
             }
 
             .seat {

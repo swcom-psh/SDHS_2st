@@ -8,39 +8,57 @@ import urllib.request
 import urllib.parse
 import subprocess
 
-# Windows console input with timeout using msvcrt
-def input_with_timeout(prompt, timeout=3.0):
-    if not sys.stdin.isatty():
-        print(prompt + " [Non-interactive: using default]")
-        return None
-        
-    try:
-        import msvcrt
-        print(prompt, end="", flush=True)
-        start_time = time.time()
-        input_chars = []
-        while True:
-            if msvcrt.kbhit():
-                # Once a key is pressed, disable timeout and get the rest of the input
-                while True:
-                    char = msvcrt.getwche()
-                    if char in ('\r', '\n'):
-                        print()
-                        return "".join(input_chars)
-                    elif char == '\b':
-                        if input_chars:
-                            input_chars.pop()
-                            print('\b \b', end="", flush=True)
-                    else:
-                        input_chars.append(char)
-            if time.time() - start_time > timeout:
-                print()
-                return None
-            time.sleep(0.05)
-    except ImportError:
-        # Fallback for non-Windows or standard systems if msvcrt is not available
-        print(prompt)
-        return None
+def get_korean_holidays(year):
+    """해당 연도의 한국 법정 공휴일 목록을 반환 (고정 공휴일 + 음력 기반 공휴일)"""
+    holidays = set()
+    
+    # 고정 공휴일
+    fixed = [
+        (1, 1),   # 신정
+        (3, 1),   # 삼일절
+        (5, 5),   # 어린이날
+        (6, 6),   # 현충일
+        (8, 15),  # 광복절
+        (10, 3),  # 개천절
+        (10, 9),  # 한글날
+        (12, 25), # 성탄절
+    ]
+    for m, d in fixed:
+        holidays.add(f"{year}-{m:02d}-{d:02d}")
+    
+    # 음력 기반 공휴일 (설날·추석·부처님오신날)은 미리 계산된 테이블 사용
+    # 각 연도별 (설날 당일, 추석 당일, 부처님오신날) 양력 날짜
+    lunar_dates = {
+        2025: {"seol": "2025-01-29", "chuseok": "2025-10-06", "buddha": "2025-05-05"},
+        2026: {"seol": "2026-02-17", "chuseok": "2026-09-25", "buddha": "2026-05-24"},
+        2027: {"seol": "2027-02-06", "chuseok": "2027-09-15", "buddha": "2027-05-13"},
+        2028: {"seol": "2028-01-26", "chuseok": "2028-10-03", "buddha": "2028-05-02"},
+        2029: {"seol": "2029-02-13", "chuseok": "2029-09-22", "buddha": "2029-05-20"},
+        2030: {"seol": "2030-02-03", "chuseok": "2030-09-12", "buddha": "2030-05-09"},
+    }
+    
+    if year in lunar_dates:
+        ld = lunar_dates[year]
+        # 설날 연휴 (전날, 당일, 다음날)
+        seol = datetime.datetime.strptime(ld["seol"], "%Y-%m-%d").date()
+        for delta in [-1, 0, 1]:
+            holidays.add((seol + datetime.timedelta(days=delta)).strftime("%Y-%m-%d"))
+        # 추석 연휴 (전날, 당일, 다음날)
+        chuseok = datetime.datetime.strptime(ld["chuseok"], "%Y-%m-%d").date()
+        for delta in [-1, 0, 1]:
+            holidays.add((chuseok + datetime.timedelta(days=delta)).strftime("%Y-%m-%d"))
+        # 부처님오신날
+        holidays.add(ld["buddha"])
+    
+    # 대체공휴일: 공휴일이 일요일이면 다음 월요일 추가
+    extra = set()
+    for h_str in holidays:
+        h_date = datetime.datetime.strptime(h_str, "%Y-%m-%d").date()
+        if h_date.weekday() == 6:  # 일요일
+            extra.add((h_date + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+    holidays.update(extra)
+    
+    return holidays
 
 def main():
     print("=" * 60)
@@ -65,8 +83,8 @@ def main():
         if not match:
             match = re.search(r'value=["\'](https://script\.google\.com/macros/s/[^"\']+/exec)["\'][\s\S]*?id=["\']gasUrl["\']', html_content)
         if not match:
-            # 최종 예비 수단
-            match = re.search(r'(https://script\.google\.com/macros/s/[a-zA-Z0-9_-]+/exec)', html_content)
+            # 최종 예비 수단: <input 태그 내부의 GAS URL만 매칭
+            match = re.search(r'<input[^>]*value=["\'](https://script\.google\.com/macros/s/[a-zA-Z0-9_-]+/exec)["\']', html_content)
             
         if not match:
             print("[오류] index.html에서 구글 앱스 스크립트(GAS) URL을 추출하지 못했습니다.")
@@ -83,20 +101,8 @@ def main():
     # 2. 날짜 자동 감지 및 입력 (주말 및 공휴일 제외)
     today = datetime.date.today()
     
-    # 2026년 한국 법정 공휴일 및 대체공휴일 목록 (YYYY-MM-DD)
-    holidays = {
-        "2026-01-01", # 신정
-        "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", # 설날 연휴 및 대체공휴일
-        "2026-03-01", "2026-03-02", # 삼일절 및 대체공휴일
-        "2026-05-05", # 어린이날
-        "2026-05-24", "2026-05-25", # 부처님오신날 및 대체공휴일
-        "2026-06-06", # 현충일
-        "2026-08-15", "2026-08-17", # 광복절 및 대체공휴일
-        "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-28", # 추석 연휴 및 대체공휴일
-        "2026-10-03", "2026-10-05", # 개천절 및 대체공휴일
-        "2026-10-09", # 한글날
-        "2026-12-25"  # 성탄절
-    }
+    # 연도별 공휴일 자동 생성
+    holidays = get_korean_holidays(today.year)
     
     # 오늘 이전의 날들 중 평일(월~금)이면서 공휴일이 아닌 가장 최근의 날 탐색
     default_date = today - datetime.timedelta(days=1)
@@ -140,6 +146,8 @@ def main():
         req = urllib.request.Request(student_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req) as res:
             students = json.loads(res.read().decode('utf-8'))
+        if not isinstance(students, list):
+            raise Exception(f"API 응답이 학생 목록(list)이 아닙니다. 응답 타입: {type(students).__name__}")
         print(f"[OK] 학생 {len(students)}명 명단 로드 성공")
     except Exception as e:
         print(f"[오류] 학생 명단을 가져오는 데 실패했습니다: {e}")

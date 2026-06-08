@@ -7,6 +7,7 @@ import datetime
 import urllib.request
 import urllib.parse
 import subprocess
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ────────────────────────────────────────────────
@@ -25,35 +26,6 @@ def fetch_with_retry(url, max_retries=3):
                 time.sleep(2 * attempt)
     return None
 
-def input_with_timeout(prompt, timeout=5.0):
-    if not sys.stdin.isatty():
-        print(prompt + " [Non-interactive: using default]")
-        return None
-    try:
-        import msvcrt
-        print(prompt, end="", flush=True)
-        start_time = time.time()
-        input_chars = []
-        while True:
-            if msvcrt.kbhit():
-                while True:
-                    char = msvcrt.getwche()
-                    if char in ('\r', '\n'):
-                        print()
-                        return "".join(input_chars)
-                    elif char == '\b':
-                        if input_chars:
-                            input_chars.pop()
-                            print('\b \b', end="", flush=True)
-                    else:
-                        input_chars.append(char)
-            if time.time() - start_time > timeout:
-                print()
-                return None
-            time.sleep(0.05)
-    except ImportError:
-        print(prompt)
-        return None
 
 # ────────────────────────────────────────────────
 # 메인 로직
@@ -164,15 +136,19 @@ def main():
 
     # 결과 저장: attendance_weekly[student_id][day_name + period_num] = status_str
     attendance_weekly = {}
+    counter_lock = threading.Lock()
     completed = [0]
     failed_count = [0]
 
     def do_fetch(params):
         url = gas_url + '?' + urllib.parse.urlencode(params)
+        time.sleep(0.3)  # GAS rate limit 회피를 위한 요청 간 딜레이
         data = fetch_with_retry(url, max_retries=3)
-        completed[0] += 1
-        if completed[0] % 8 == 0 or completed[0] == total:
-            print(f"   -> 진행률: {completed[0]}/{total}")
+        with counter_lock:
+            completed[0] += 1
+            current = completed[0]
+        if current % 8 == 0 or current == total:
+            print(f"   -> 진행률: {current}/{total}")
         return (params['day'], params['period'], data)
 
     with ThreadPoolExecutor(max_workers=4) as executor:

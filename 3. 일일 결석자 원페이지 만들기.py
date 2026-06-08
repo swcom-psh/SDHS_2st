@@ -3,11 +3,60 @@ import re
 import sys
 import json
 import time
+import html as html_module
 import datetime
 import urllib.request
 import urllib.parse
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def get_korean_holidays(year):
+    """해당 연도의 한국 법정 공휴일 목록을 반환 (고정 공휴일 + 음력 기반 공휴일)"""
+    holidays = set()
+    
+    # 고정 공휴일
+    fixed = [
+        (1, 1),   # 신정
+        (3, 1),   # 삼일절
+        (5, 5),   # 어린이날
+        (6, 6),   # 현충일
+        (8, 15),  # 광복절
+        (10, 3),  # 개천절
+        (10, 9),  # 한글날
+        (12, 25), # 성탄절
+    ]
+    for m, d in fixed:
+        holidays.add(f"{year}-{m:02d}-{d:02d}")
+    
+    # 음력 기반 공휴일 (설날·추석·부처님오신날)은 미리 계산된 테이블 사용
+    lunar_dates = {
+        2025: {"seol": "2025-01-29", "chuseok": "2025-10-06", "buddha": "2025-05-05"},
+        2026: {"seol": "2026-02-17", "chuseok": "2026-09-25", "buddha": "2026-05-24"},
+        2027: {"seol": "2027-02-06", "chuseok": "2027-09-15", "buddha": "2027-05-13"},
+        2028: {"seol": "2028-01-26", "chuseok": "2028-10-03", "buddha": "2028-05-02"},
+        2029: {"seol": "2029-02-13", "chuseok": "2029-09-22", "buddha": "2029-05-20"},
+        2030: {"seol": "2030-02-03", "chuseok": "2030-09-12", "buddha": "2030-05-09"},
+    }
+    
+    if year in lunar_dates:
+        ld = lunar_dates[year]
+        seol = datetime.datetime.strptime(ld["seol"], "%Y-%m-%d").date()
+        for delta in [-1, 0, 1]:
+            holidays.add((seol + datetime.timedelta(days=delta)).strftime("%Y-%m-%d"))
+        chuseok = datetime.datetime.strptime(ld["chuseok"], "%Y-%m-%d").date()
+        for delta in [-1, 0, 1]:
+            holidays.add((chuseok + datetime.timedelta(days=delta)).strftime("%Y-%m-%d"))
+        holidays.add(ld["buddha"])
+    
+    # 대체공휴일: 공휴일이 일요일이면 다음 월요일 추가
+    extra = set()
+    for h_str in holidays:
+        h_date = datetime.datetime.strptime(h_str, "%Y-%m-%d").date()
+        if h_date.weekday() == 6:
+            extra.add((h_date + datetime.timedelta(days=1)).strftime("%Y-%m-%d"))
+    holidays.update(extra)
+    
+    return holidays
 
 def fetch_with_retry(url, max_retries=3):
     """Fetch JSON from URL with retry on failure."""
@@ -60,20 +109,8 @@ def main():
     # 2. 날짜 자동 감지 및 입력 (주말 및 공휴일 제외)
     today = datetime.date.today()
     
-    # 2026년 한국 법정 공휴일 및 대체공휴일 목록 (YYYY-MM-DD)
-    holidays = {
-        "2026-01-01", # 신정
-        "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", # 설날 연휴 및 대체공휴일
-        "2026-03-01", "2026-03-02", # 삼일절 및 대체공휴일
-        "2026-05-05", # 어린이날
-        "2026-05-24", "2026-05-25", # 부처님오신날 및 대체공휴일
-        "2026-06-06", # 현충일
-        "2026-08-15", "2026-08-17", # 광복절 및 대체공휴일
-        "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-28", # 추석 연휴 및 대체공휴일
-        "2026-10-03", "2026-10-05", # 개천절 및 대체공휴일
-        "2026-10-09", # 한글날
-        "2026-12-25"  # 성탄절
-    }
+    # 연도별 공휴일 자동 생성
+    holidays = get_korean_holidays(today.year)
     
     # 오늘 이전의 날들 중 평일(월~금)이면서 공휴일이 아닌 가장 최근의 날 탐색
     default_date = today - datetime.timedelta(days=1)
@@ -318,7 +355,22 @@ def main():
     absentees_list.sort(key=lambda x: int(x['id']))
     
     absent_total_count = len(absentees_list)
-    present_total_count = scheduled_total_count - absent_total_count
+    
+    # 미체크 학생 카운트: 야자 배정되었으나 출결 데이터가 없는 학생
+    unchecked_count = 0
+    for s in valid_students:
+        s_id = str(s.get('학번', '')).strip()
+        if s_id not in assigned_rooms:
+            continue
+        has_p1_sched = s.get(col1, '').strip() != ''
+        has_p2_sched = s.get(col2, '').strip() != ''
+        if has_p1_sched or has_p2_sched:
+            p1_unchecked = has_p1_sched and (s_id not in attendance_data or attendance_data[s_id]['p1_status'] is None)
+            p2_unchecked = has_p2_sched and (s_id not in attendance_data or attendance_data[s_id]['p2_status'] is None)
+            if p1_unchecked or p2_unchecked:
+                unchecked_count += 1
+    
+    present_total_count = scheduled_total_count - absent_total_count - unchecked_count
     absent_rate = (absent_total_count / scheduled_total_count * 100) if scheduled_total_count > 0 else 0
 
     # 7. HTML 보고서 렌더링
@@ -334,7 +386,7 @@ def main():
             <td>{item['room']}실</td>
             <td>{item['p1_badge']}</td>
             <td>{item['p2_badge']}</td>
-            <td class="remark-text" title="{item['remark']}">{item['remark']}</td>
+            <td class="remark-text" title="{html_module.escape(item['remark'])}">{html_module.escape(item['remark'])}</td>
         </tr>
         """
         
