@@ -248,7 +248,7 @@
 
         .grid-6x5 {
             display: grid;
-            grid-template-columns: 1fr 1fr 40px 1fr 1fr 40px 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px minmax(0, 1fr) minmax(0, 1fr) 40px minmax(0, 1fr) minmax(0, 1fr);
             row-gap: 14px;
             margin: 28px 0;
         }
@@ -261,13 +261,15 @@
             }
 
             .grid-6x5 {
-                grid-template-columns: 1fr 1fr 15px 1fr 1fr 15px 1fr 1fr;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 15px minmax(0, 1fr) minmax(0, 1fr) 15px minmax(0, 1fr) minmax(0, 1fr);
                 row-gap: 8px;
             }
 
             .seat {
                 border-radius: 12px;
                 font-size: 0.75rem;
+                min-width: 0;
+                overflow: hidden;
             }
 
             .student-id {
@@ -291,12 +293,14 @@
 
         @media (max-width: 480px) {
             .grid-6x5 {
-                grid-template-columns: 1fr 1fr 8px 1fr 1fr 8px 1fr 1fr;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8px minmax(0, 1fr) minmax(0, 1fr) 8px minmax(0, 1fr) minmax(0, 1fr);
                 row-gap: 6px;
             }
 
             .seat {
                 border-radius: 8px;
+                min-width: 0;
+                overflow: hidden;
             }
         }
 
@@ -315,6 +319,8 @@
             transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
             box-shadow: 0 4px 10px rgba(3, 4, 94, 0.02);
+            min-width: 0;
+            overflow: hidden;
         }
 
         .seat:not(.empty):hover {
@@ -1148,6 +1154,15 @@
 
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+
             body {
                 padding: 15px 10px;
                 background-size: 16px 16px;
@@ -1177,7 +1192,7 @@
             }
 
             .grid-6x5 {
-                grid-template-columns: 1fr 1fr 4px 1fr 1fr 4px 1fr 1fr;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 4px minmax(0, 1fr) minmax(0, 1fr) 4px minmax(0, 1fr) minmax(0, 1fr);
                 gap: 5px;
                 margin: 15px 0;
             }
@@ -1191,6 +1206,8 @@
                 border-radius: 8px;
                 font-size: 0.75rem;
                 aspect-ratio: 1 / 1.2;
+                min-width: 0;
+                overflow: hidden;
             }
 
             .student-name {
@@ -1260,7 +1277,7 @@
             }
 
             .attendance-remark {
-                font-size: 0.8rem;
+                font-size: 16px;
                 padding: 5px;
             }
 
@@ -2077,7 +2094,7 @@
 
             .memo-textarea {
                 min-height: 80px;
-                font-size: 0.95rem;
+                font-size: 16px;
             }
         }
 
