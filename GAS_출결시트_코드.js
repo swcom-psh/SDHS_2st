@@ -16,7 +16,7 @@ function doPost(e) {
   }
   try {
     var data = JSON.parse(e.postData.contents);
-    var sheetName = "Attendance_Log";
+    var sheetName = (data.sheetTarget === "summer") ? "하계 야자 출석" : "Attendance_Log";
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(sheetName);
 
@@ -206,16 +206,33 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify(jsonArray)).setMimeType(ContentService.MimeType.JSON);
   }
 
-  var sheet = ss.getSheetByName("Attendance_Log");
+  if (action === 'getSummerStudents') {
+    var summerSheet = ss.getSheetByName("하계 학생명단");
+    if (!summerSheet) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
+    var sValues = summerSheet.getDataRange().getDisplayValues();
+    var sHeaders = sValues[0];
+    var sJsonArray = sValues.slice(1)
+      .filter(function (row) { return row[1] && row[1].toString().trim() !== ""; }) // 학번이 있는 행만
+      .map(function (row) {
+        var obj = {};
+        sHeaders.forEach(function (header, j) { obj[header.toString().trim()] = row[j]; });
+        return obj;
+      });
+    return ContentService.createTextOutput(JSON.stringify(sJsonArray)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var sheetName = (e.parameter.sheetTarget === "summer") ? "하계 야자 출석" : "Attendance_Log";
+  var sheet = ss.getSheetByName(sheetName);
   if (!sheet) return ContentService.createTextOutput("{}").setMimeType(ContentService.MimeType.JSON);
   var displayValues = sheet.getDataRange().getDisplayValues();
   var results = {};
+  var roomFilter = e.parameter.room ? e.parameter.room.toString().trim() : null;
   for (var i = 1; i < displayValues.length; i++) {
     var row = displayValues[i];
     if (cleanDate(row[2]) === cleanDate(e.parameter.date) &&
       row[3].toString().trim() === e.parameter.day.toString().trim() &&
       row[4].toString().trim() === e.parameter.period.toString().trim() &&
-      row[5].toString().trim() === e.parameter.room.toString().trim()) {
+      (!roomFilter || row[5].toString().trim() === roomFilter)) {
 
       var studentId = cleanId(row[6]);
       // 최신 기록이 최상단에 기록되므로, 동일 날짜/교시에 중복된 학생 기록이 존재할 경우
