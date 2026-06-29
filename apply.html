@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2학기 야자 신청</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 16px;
+    color: #222;
+  }
+  .card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #666; font-size: 13px; margin-bottom: 16px; }
+  .info-box {
+    background: #f0f4ff;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+  .closed-box {
+    background: #fff3f0;
+    border: 1px solid #ffccc0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    color: #b3402a;
+  }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th, td { text-align: center; padding: 8px 4px; font-size: 14px; border-bottom: 1px solid #eee; }
+  th { color: #555; font-weight: 600; }
+  input[type=checkbox] { width: 20px; height: 20px; }
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background: #3b6fe0;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { background: #bbb; cursor: not-allowed; }
+  #msg { margin-top: 12px; font-size: 13px; text-align: center; min-height: 18px; }
+  #msg.error { color: #c0392b; }
+  #msg.ok { color: #1d8a4c; }
+  #loginBox { text-align: center; padding: 30px 0; }
+  #gsiBtn { display: flex; justify-content: center; margin-top: 12px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>2학기 야자 신청</h1>
+
+    <div id="loginBox">
+      <div class="sub">학교 구글 계정으로 로그인해주세요.</div>
+      <div id="gsiBtn"></div>
+      <div id="loginMsg" style="margin-top:10px; font-size:13px; color:#c0392b;"></div>
+    </div>
+
+    <div id="content" class="hidden">
+      <div class="sub" id="who"></div>
+      <div id="periodBox"></div>
+
+      <table>
+        <thead>
+          <tr><th>요일</th><th>1교시</th><th>2교시</th></tr>
+        </thead>
+        <tbody id="dayRows"></tbody>
+      </table>
+
+      <button id="submitBtn">신청 내용 저장</button>
+      <div id="msg"></div>
+    </div>
+  </div>
+
+<script>
+  // ===== 아래 두 값을 실제 값으로 교체하세요 =====
+  var GOOGLE_CLIENT_ID = "783955617247-32toh8t2khrb9l1qj1sbhl5t4it7au54.apps.googleusercontent.com";
+  var GAS_URL = "여기에_Apps_Script_웹앱_URL";
+  // ================================================
+
+  var DAYS = ["월", "화", "수", "목", "금"];
+  var isOpen = false;
+  var idToken = null;
+
+  function onGoogleLogin(response) {
+    idToken = response.credential;
+    document.getElementById('loginMsg').textContent = '';
+    loadStatus();
+  }
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: onGoogleLogin
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('gsiBtn'),
+      { theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill' }
+    );
+  };
+
+  function callApi(payload) {
+    return fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }).then(function (res) { return res.json(); });
+  }
+
+  function renderRows(selection) {
+    var tbody = document.getElementById('dayRows');
+    tbody.innerHTML = '';
+    DAYS.forEach(function (day) {
+      var sel = selection[day] || { p1: false, p2: false };
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + day + '</td>' +
+        '<td><input type="checkbox" data-day="' + day + '" data-period="p1" ' + (sel.p1 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '></td>' +
+        '<td><input type="checkbox" data-day="' + day + '" data-period="p2" ' + (sel.p2 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '></td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  function loadStatus() {
+    document.getElementById('loginMsg').textContent = '확인 중...';
+    callApi({ type: 'apply_status', idToken: idToken })
+      .then(function (data) {
+        if (data.result !== 'success') {
+          document.getElementById('loginMsg').textContent = data.message || '오류가 발생했습니다.';
+          return;
+        }
+        isOpen = data.isOpen;
+
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('content').classList.remove('hidden');
+        document.getElementById('who').textContent = data.studentId + ' ' + data.name + ' 학생';
+
+        var periodBox = document.getElementById('periodBox');
+        if (isOpen) {
+          periodBox.innerHTML =
+            '<div class="info-box">신청 기간: ' + data.periodText + '<br>신청 기간 내에는 자유롭게 수정/취소할 수 있습니다.</div>';
+        } else {
+          periodBox.innerHTML =
+            '<div class="closed-box">신청 기간(' + data.periodText + ')이 아니므로 신청 내용을 변경할 수 없습니다. 아래는 신청 결과 조회입니다.</div>';
+          document.getElementById('submitBtn').style.display = 'none';
+        }
+
+        renderRows(data.selection);
+      })
+      .catch(function (err) {
+        document.getElementById('loginMsg').textContent = '서버 연결에 실패했습니다: ' + err;
+      });
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', function () {
+    var btn = this;
+    var msg = document.getElementById('msg');
+    var selection = {};
+    DAYS.forEach(function (day) { selection[day] = { p1: false, p2: false }; });
+
+    document.querySelectorAll('#dayRows input[type=checkbox]').forEach(function (cb) {
+      selection[cb.getAttribute('data-day')][cb.getAttribute('data-period')] = cb.checked;
+    });
+
+    btn.disabled = true;
+    msg.className = '';
+    msg.textContent = '저장 중...';
+
+    callApi({ type: 'apply_submit', idToken: idToken, selection: selection })
+      .then(function (data) {
+        btn.disabled = false;
+        if (data.result === 'success') {
+          msg.className = 'ok';
+          msg.textContent = '저장되었습니다.';
+        } else {
+          msg.className = 'error';
+          msg.textContent = data.message || '오류가 발생했습니다.';
+        }
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        msg.className = 'error';
+        msg.textContent = '서버 연결에 실패했습니다: ' + err;
+      });
+  });
+</script>
+</body>
+</html>
