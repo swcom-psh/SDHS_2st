@@ -281,6 +281,25 @@
   }
   .modal-cancel:disabled { color: #bbb; cursor: not-allowed; text-decoration: none; }
 
+  /* ── 인앱 브라우저 안내 ── */
+  .inapp-lock {
+    width: 60px; height: 60px; margin: 0 auto 16px; border-radius: 50%;
+    background: #fbf0dc; display: flex; align-items: center; justify-content: center;
+  }
+  .inapp-lock svg { width: 30px; height: 30px; color: var(--amber); }
+  .inapp-manual { margin-top: 18px; font-size: 12.5px; color: var(--muted); line-height: 1.75; }
+  .inapp-manual b { color: var(--ink); }
+  .inapp-url {
+    display: block; margin-top: 10px; word-break: break-all;
+    font-size: 11.5px; color: #7a7a7a; background: #f3efe6;
+    border-radius: 8px; padding: 9px 10px;
+  }
+  .inapp-copy {
+    margin-top: 8px; padding: 8px 14px; border: 1px solid var(--line);
+    background: #fff; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+    color: var(--navy); cursor: pointer; font-family: inherit;
+  }
+
   @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
   @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -348,6 +367,25 @@
     </div>
   </div>
 
+  <div id="inappGuide" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="inapp-lock">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <h2 class="modal-title">외부 브라우저로 열어주세요</h2>
+      <p class="modal-sub">카카오톡 안에서는 구글 로그인이 막혀 있어요.<br>크롬/Safari로 열면 정상적으로 로그인돼요.</p>
+      <button id="openExternalBtn" class="modal-btn">외부 브라우저로 열기</button>
+      <div class="inapp-manual">
+        버튼이 안 되면 → 우측 상단 <b>⋮ (더보기)</b> → <b>다른 브라우저로 열기</b>
+        <span class="inapp-url" id="inappUrl"></span>
+        <button id="copyUrlBtn" class="inapp-copy">주소 복사하기</button>
+      </div>
+    </div>
+  </div>
+
 <script>
   // ===== 아래 두 값을 실제 값으로 교체하세요 =====
   var GOOGLE_CLIENT_ID = "783955617247-32toh8t2khrb9l1qj1sbhl5t4it7au54.apps.googleusercontent.com";
@@ -357,6 +395,44 @@
   var DAYS = ["월", "화", "수", "목", "금"];
   var isOpen = false;
   var idToken = null;
+
+  // ===== 인앱 브라우저(카카오톡 등) 감지 및 외부 브라우저 유도 =====
+  function detectInApp() {
+    var ua = (navigator.userAgent || '').toLowerCase();
+    if (ua.indexOf('kakaotalk') > -1) return 'kakao';
+    if (ua.indexOf('naver') > -1) return 'naver';
+    if (ua.indexOf('instagram') > -1) return 'instagram';
+    if (ua.indexOf('fban') > -1 || ua.indexOf('fbav') > -1) return 'facebook';
+    if (ua.indexOf('line/') > -1) return 'line';
+    if (ua.indexOf('daumapps') > -1) return 'daum';
+    return null;
+  }
+
+  function openExternalBrowser() {
+    var url = location.href;
+    var ua = (navigator.userAgent || '').toLowerCase();
+    var app = detectInApp();
+
+    if (app === 'kakao') {
+      // 카카오톡 전용 딥링크 (안드로이드/아이폰 모두 기본 브라우저로 열림)
+      location.href = 'kakaotalk://web/openExternal?url=' + encodeURIComponent(url);
+    } else if (app === 'line') {
+      location.href = url + (url.indexOf('?') > -1 ? '&' : '?') + 'openExternalBrowser=1';
+    } else if (ua.indexOf('android') > -1) {
+      // 안드로이드 기타 인앱 → 크롬 인텐트로 강제 오픈
+      location.href = 'intent://' + url.replace(/^https?:\/\//, '') + '#Intent;scheme=https;package=com.android.chrome;end';
+    }
+    // iOS 기타 인앱은 자동 탈출 불가 → 아래 수동 안내(주소 복사)로 처리
+  }
+
+  function initInAppGuard() {
+    if (!detectInApp()) return false;
+    var urlEl = document.getElementById('inappUrl');
+    if (urlEl) urlEl.textContent = location.href;
+    document.getElementById('inappGuide').classList.remove('hidden');
+    if (detectInApp() === 'kakao') openExternalBrowser(); // 카카오톡은 자동으로 열기 시도
+    return true;
+  }
 
   function onGoogleLogin(response) {
     idToken = response.credential;
@@ -410,6 +486,26 @@
 
   // 스크립트가 이미 로드된 상태(캐시 등)에서 onload가 안 불릴 경우 대비
   window.addEventListener('load', initGsi);
+
+  // 인앱 안내 버튼
+  document.getElementById('openExternalBtn').addEventListener('click', openExternalBrowser);
+  document.getElementById('copyUrlBtn').addEventListener('click', function () {
+    var btn = this;
+    function done() { btn.textContent = '복사됨!'; setTimeout(function () { btn.textContent = '주소 복사하기'; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(location.href).then(done, function () { fallbackCopy(location.href); done(); });
+    } else { fallbackCopy(location.href); done(); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  // 카카오톡 등 인앱 브라우저면 안내 오버레이 표시 (즉시 실행)
+  initInAppGuard();
 
   function callApi(payload) {
     return fetch(GAS_URL, {
