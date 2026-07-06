@@ -2,92 +2,256 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>2학기 야자 신청</title>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    background: #f4f6f8;
-    margin: 0;
-    padding: 16px;
-    color: #222;
+  :root {
+    --ink:      #1c2130;   /* 본문 텍스트 */
+    --navy:     #202a44;   /* 헤더 남색 (밤) */
+    --amber:    #e79429;   /* 등불 앰버 */
+    --paper:    #f3efe6;   /* 따뜻한 종이 배경 */
+    --line:     #e4ddcf;
+    --muted:    #6d7280;
   }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body { height: 100%; }
+  body {
+    font-family: "Pretendard", -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background:
+      radial-gradient(120% 80% at 85% -10%, #fff6e6 0%, rgba(255,246,230,0) 55%),
+      var(--paper);
+    margin: 0;
+    padding: 20px 14px calc(28px + env(safe-area-inset-bottom));
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
   .card {
-    max-width: 480px;
+    max-width: 460px;
     margin: 0 auto;
     background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 18px 40px -24px rgba(32,42,68,0.45);
   }
-  h1 { font-size: 20px; margin: 0 0 4px; }
-  .sub { color: #666; font-size: 13px; margin-bottom: 16px; }
-  .info-box {
-    background: #f0f4ff;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 13px;
+
+  /* ── 헤더: 밤 하늘 + 등불 ── */
+  .head {
+    position: relative;
+    background:
+      radial-gradient(90px 90px at 84% 26%, rgba(231,148,41,0.28), rgba(231,148,41,0) 70%),
+      linear-gradient(160deg, var(--navy) 0%, #161d30 100%);
+    color: #fff;
+    padding: 22px 22px 20px;
+  }
+  .head .kicker {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 12px; font-weight: 600; letter-spacing: .04em;
+    color: #b9c2dd; margin-bottom: 8px;
+  }
+  .head .kicker .moon {
+    width: 15px; height: 15px; display: inline-block;
+    color: var(--amber);
+  }
+  .head h1 {
+    font-size: 22px; font-weight: 800; margin: 0;
+    letter-spacing: -0.02em;
+  }
+  .head .lamp {
+    position: absolute; right: 20px; top: 18px;
+    width: 40px; height: 40px; opacity: .9;
+  }
+  .head::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--amber) 0%, #f0b45a 100%);
+  }
+
+  .body { padding: 20px 22px 24px; }
+
+  .sub { color: var(--muted); font-size: 14px; }
+
+  /* ── 로그인 ── */
+  #loginBox { text-align: center; padding: 22px 0 10px; }
+  #loginBox .sub { margin-bottom: 18px; }
+  #gsiBtn { display: flex; justify-content: center; }
+  #loginMsg { margin-top: 14px; font-size: 13px; color: #c0392b; min-height: 16px; }
+
+  /* ── 로그인 후 사용자 ── */
+  #who {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--ink);
+    background: #f6f2ea; border: 1px solid var(--line);
+    padding: 7px 13px; border-radius: 999px;
     margin-bottom: 16px;
-    line-height: 1.6;
+  }
+  #who::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: #2ea36a; box-shadow: 0 0 0 3px rgba(46,163,106,0.18);
+  }
+
+  /* ── 안내 박스 ── */
+  .info-box, .closed-box {
+    border-radius: 12px;
+    padding: 13px 14px 13px 16px;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+    line-height: 1.65;
+    border-left: 4px solid;
+  }
+  .info-box {
+    background: #fbf3e3;
+    border-left-color: var(--amber);
+    color: #7a5417;
   }
   .closed-box {
-    background: #fff3f0;
-    border: 1px solid #ffccc0;
-    border-radius: 8px;
-    padding: 12px;
-    font-size: 13px;
-    margin-bottom: 16px;
-    color: #b3402a;
+    background: #fdeeea;
+    border-left-color: #e0603f;
+    color: #a83b23;
   }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-  th, td { text-align: center; padding: 8px 4px; font-size: 14px; border-bottom: 1px solid #eee; }
-  th { color: #555; font-weight: 600; }
-  input[type=checkbox] { width: 20px; height: 20px; }
-  button {
+
+  /* ── 신청 테이블 ── */
+  table {
     width: 100%;
-    padding: 14px;
-    border: none;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  thead th {
+    background: #f7f4ee;
+    color: #545a6b;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: .02em;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody td {
+    padding: 0;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child {
+    font-weight: 700;
+    color: var(--ink);
+    background: #fbfaf7;
+    width: 34%;
+  }
+  tbody tr:hover td:first-child { background: #f7f4ee; }
+
+  /* 커스텀 체크박스 (탭 영역 크게) */
+  .chk {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 15px 0; cursor: pointer;
+  }
+  .chk input {
+    position: absolute; opacity: 0; width: 1px; height: 1px;
+  }
+  .chk span {
+    width: 26px; height: 26px;
+    border: 2px solid #cbd0dc;
     border-radius: 8px;
-    background: #3b6fe0;
+    background: #fff;
+    position: relative;
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .chk:active span { transform: scale(0.9); }
+  .chk input:checked + span {
+    background: var(--amber);
+    border-color: var(--amber);
+    box-shadow: 0 4px 10px -4px rgba(231,148,41,0.7);
+  }
+  .chk input:checked + span::after {
+    content: ""; position: absolute;
+    left: 8px; top: 3px; width: 6px; height: 12px;
+    border: solid #fff; border-width: 0 3px 3px 0;
+    transform: rotate(43deg);
+  }
+  .chk input:disabled + span {
+    background: #f1f0ec; border-color: #e3e1da;
+  }
+  .chk input:disabled:checked + span {
+    background: #d9b98a; border-color: #d9b98a; box-shadow: none; opacity: .85;
+  }
+
+  /* ── 저장 버튼 ── */
+  button#submitBtn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 13px;
+    background: linear-gradient(180deg, #263252 0%, var(--navy) 100%);
     color: #fff;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: inherit;
+    letter-spacing: -0.01em;
     cursor: pointer;
+    transition: transform .1s ease, box-shadow .2s ease, opacity .2s;
+    box-shadow: 0 10px 22px -12px rgba(32,42,68,0.9);
   }
-  button:disabled { background: #bbb; cursor: not-allowed; }
-  #msg { margin-top: 12px; font-size: 13px; text-align: center; min-height: 18px; }
+  button#submitBtn:active { transform: translateY(1px); }
+  button#submitBtn:disabled {
+    background: #b9bcc6; box-shadow: none; cursor: not-allowed;
+  }
+
+  #msg { margin-top: 14px; font-size: 13.5px; text-align: center; min-height: 18px; font-weight: 500; }
   #msg.error { color: #c0392b; }
   #msg.ok { color: #1d8a4c; }
-  #loginBox { text-align: center; padding: 30px 0; }
-  #gsiBtn { display: flex; justify-content: center; margin-top: 12px; }
+
   .hidden { display: none; }
 </style>
 </head>
 <body>
   <div class="card">
-    <h1>2학기 야자 신청</h1>
+    <header class="head">
+      <span class="kicker">
+        <svg class="moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M20.7 14.9A8.5 8.5 0 1 1 9.1 3.3a7 7 0 1 0 11.6 11.6Z"/>
+        </svg>
+        야간 자율학습
+      </span>
+      <h1>2학기 야자 신청</h1>
+      <svg class="lamp" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M14 10h20l-4 12H18L14 10Z" fill="#e79429"/>
+        <path d="M24 22v14" stroke="#c9d0e6" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M16 40h16" stroke="#c9d0e6" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="24" cy="27" r="2.4" fill="#ffd98a"/>
+      </svg>
+    </header>
 
-    <div id="loginBox">
-      <div class="sub">학교 구글 계정으로 로그인해주세요.</div>
-      <div id="gsiBtn"></div>
-      <div id="loginMsg" style="margin-top:10px; font-size:13px; color:#c0392b;"></div>
-    </div>
+    <div class="body">
+      <div id="loginBox">
+        <div class="sub">학교 구글 계정으로 로그인해 주세요.</div>
+        <div id="gsiBtn"></div>
+        <div id="loginMsg"></div>
+      </div>
 
-    <div id="content" class="hidden">
-      <div class="sub" id="who"></div>
-      <div id="periodBox"></div>
+      <div id="content" class="hidden">
+        <div id="who"></div>
+        <div id="periodBox"></div>
 
-      <table>
-        <thead>
-          <tr><th>요일</th><th>1교시</th><th>2교시</th></tr>
-        </thead>
-        <tbody id="dayRows"></tbody>
-      </table>
+        <table>
+          <thead>
+            <tr><th>요일</th><th>1교시</th><th>2교시</th></tr>
+          </thead>
+          <tbody id="dayRows"></tbody>
+        </table>
 
-      <button id="submitBtn">신청 내용 저장</button>
-      <div id="msg"></div>
+        <button id="submitBtn">신청 내용 저장</button>
+        <div id="msg"></div>
+      </div>
     </div>
   </div>
 
@@ -132,9 +296,9 @@
       var sel = selection[day] || { p1: false, p2: false };
       var tr = document.createElement('tr');
       tr.innerHTML =
-        '<td>' + day + '</td>' +
-        '<td><input type="checkbox" data-day="' + day + '" data-period="p1" ' + (sel.p1 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '></td>' +
-        '<td><input type="checkbox" data-day="' + day + '" data-period="p2" ' + (sel.p2 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '></td>';
+        '<td>' + day + '요일</td>' +
+        '<td><label class="chk"><input type="checkbox" data-day="' + day + '" data-period="p1" ' + (sel.p1 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '><span></span></label></td>' +
+        '<td><label class="chk"><input type="checkbox" data-day="' + day + '" data-period="p2" ' + (sel.p2 ? 'checked' : '') + (isOpen ? '' : ' disabled') + '><span></span></label></td>';
       tbody.appendChild(tr);
     });
   }

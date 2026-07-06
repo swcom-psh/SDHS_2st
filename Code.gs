@@ -406,11 +406,29 @@ function verifyGoogleIdToken_(idToken) {
   return info.email;
 }
 
+// 테스트/관리자 계정: 이 이메일로 로그인하면 학번 형식 검사를 건너뛰고
+// "2학기 학생명단" 시트의 첫 번째 학생 행을 빌려서 신청 흐름을 테스트할 수 있습니다.
+// 운영 전환 시 빈 배열로 비워두세요.
+var TEST_OVERRIDE_EMAILS = ["pshyun1109@sdhs.gwe.hs.kr"];
+
+/** 테스트 계정이면 시트의 첫 번째 학생 학번을 반환, 아니면 null */
+function getTestOverrideStudentId_(email) {
+  if (TEST_OVERRIDE_EMAILS.indexOf(email) === -1) return null;
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(APPLY_SHEET_NAME);
+  if (!sheet) return null;
+  var values = sheet.getDataRange().getDisplayValues();
+  for (var i = 1; i < values.length; i++) {
+    if (cleanId(values[i][1])) return cleanId(values[i][1]);
+  }
+  return null;
+}
+
 /** doPost에서 apply_status / apply_submit 요청을 처리 */
 function handleApplyRequest_(data) {
   try {
     var email = verifyGoogleIdToken_(data.idToken);
-    var studentId = getStudentIdFromEmail_(email);
+    var studentId = getTestOverrideStudentId_(email) || getStudentIdFromEmail_(email);
     if (!studentId) {
       throw new Error("계정 형식에서 학번을 확인할 수 없습니다. 담당 선생님께 문의하세요. (" + email + ")");
     }
