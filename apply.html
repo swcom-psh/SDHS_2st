@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>2학기 야자 신청</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="onGsiScriptLoad()" onerror="onGsiScriptError()"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
   :root {
@@ -267,6 +267,19 @@
     cursor: pointer;
   }
   .modal-btn:active { transform: translateY(1px); }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions .modal-btn { flex: 1; padding: 13px; font-size: 15px; }
+  .modal-btn.ghost {
+    background: #fff; color: var(--navy);
+    border: 1.5px solid var(--line);
+  }
+  .modal-cancel {
+    width: 100%; margin-top: 10px; padding: 9px;
+    background: none; border: none; cursor: pointer;
+    color: #c0392b; font-size: 13px; font-weight: 600; font-family: inherit;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .modal-cancel:disabled { color: #bbb; cursor: not-allowed; text-decoration: none; }
 
   @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes popIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
@@ -327,7 +340,11 @@
       <h2 class="modal-title">신청 완료!</h2>
       <p class="modal-sub" id="doneSub"></p>
       <div class="summary" id="doneSummary"></div>
-      <button id="doneCloseBtn" class="modal-btn">확인</button>
+      <div class="modal-actions">
+        <button id="doneEditBtn" class="modal-btn ghost">수정하기</button>
+        <button id="doneCloseBtn" class="modal-btn">확인</button>
+      </div>
+      <button id="doneCancelBtn" class="modal-cancel">신청 전체 취소</button>
     </div>
   </div>
 
@@ -347,16 +364,52 @@
     loadStatus();
   }
 
-  window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: onGoogleLogin
-    });
-    google.accounts.id.renderButton(
-      document.getElementById('gsiBtn'),
-      { theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill' }
-    );
-  };
+  var gsiInited = false;
+
+  function showLoginMsg(text) {
+    var el = document.getElementById('loginMsg');
+    if (el) el.textContent = text;
+  }
+
+  // GSI 스크립트가 로드되면 호출 (모바일에서 window.onload 타이밍보다 안전)
+  function onGsiScriptLoad() { initGsi(); }
+
+  // GSI 스크립트 자체를 못 불러온 경우 (네트워크 차단/광고차단 등)
+  function onGsiScriptError() {
+    showLoginMsg('구글 로그인을 불러오지 못했어요. 인터넷 연결을 확인하거나 크롬 앱으로 열어주세요.');
+  }
+
+  function initGsi() {
+    if (gsiInited) return;
+    if (!(window.google && google.accounts && google.accounts.id)) return; // 아직 로드 전
+    gsiInited = true;
+
+    try {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: onGoogleLogin
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('gsiBtn'),
+        { theme: 'outline', size: 'large', text: 'signin_with', shape: 'pill', width: 240 }
+      );
+    } catch (e) {
+      showLoginMsg('구글 로그인 버튼을 표시하지 못했어요: ' + (e && e.message ? e.message : e));
+      return;
+    }
+
+    // 버튼이 실제로 그려졌는지 확인. 모바일(특히 iOS Safari 추적방지)에서
+    // accounts.google.com iframe이 차단되면 버튼이 빈 공간으로 남는다.
+    setTimeout(function () {
+      var box = document.getElementById('gsiBtn');
+      if (!box || box.offsetHeight < 10) {
+        showLoginMsg('이 브라우저가 구글 로그인을 차단하고 있어요. iPhone이면 [설정 > Safari > 사이트 간 추적 방지]를 끄거나, 크롬 앱으로 열어 다시 시도해 주세요.');
+      }
+    }, 2500);
+  }
+
+  // 스크립트가 이미 로드된 상태(캐시 등)에서 onload가 안 불릴 경우 대비
+  window.addEventListener('load', initGsi);
 
   function callApi(payload) {
     return fetch(GAS_URL, {
@@ -479,8 +532,41 @@
   }
 
   document.getElementById('doneCloseBtn').addEventListener('click', hideDoneModal);
+  // 수정하기: 팝업 닫고 폼으로 돌아가 다시 선택/저장
+  document.getElementById('doneEditBtn').addEventListener('click', hideDoneModal);
   document.getElementById('doneModal').addEventListener('click', function (e) {
     if (e.target === this) hideDoneModal(); // 바깥 배경 클릭 시 닫기
+  });
+
+  // 신청 전체 취소: 재확인 후 빈 신청으로 저장해 철회
+  document.getElementById('doneCancelBtn').addEventListener('click', function () {
+    if (!confirm('정말 신청을 전체 취소할까요?\n저장된 야자 신청이 모두 해제됩니다.')) return;
+    var cancelBtn = this;
+    cancelBtn.disabled = true;
+    cancelBtn.textContent = '취소 중...';
+
+    var empty = {};
+    DAYS.forEach(function (day) { empty[day] = { p1: false, p2: false }; });
+
+    callApi({ type: 'apply_submit', idToken: idToken, selection: empty })
+      .then(function (data) {
+        cancelBtn.disabled = false;
+        cancelBtn.textContent = '신청 전체 취소';
+        if (data.result === 'success') {
+          document.querySelectorAll('#dayRows input[type=checkbox]').forEach(function (cb) { cb.checked = false; });
+          hideDoneModal();
+          var msg = document.getElementById('msg');
+          msg.className = 'ok';
+          msg.textContent = '신청이 취소되었습니다.';
+        } else {
+          alert(data.message || '취소 중 오류가 발생했습니다.');
+        }
+      })
+      .catch(function (err) {
+        cancelBtn.disabled = false;
+        cancelBtn.textContent = '신청 전체 취소';
+        alert('서버 연결에 실패했습니다: ' + err);
+      });
   });
 </script>
 </body>
