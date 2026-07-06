@@ -379,8 +379,9 @@ function findStudentRow_(sheet, studentId) {
 }
 
 /**
- * 구글 ID 토큰(JWT)을 구글 서버에 직접 검증 요청하여 신뢰할 수 있는 이메일을 얻어냄.
+ * 구글 ID 토큰(JWT)을 구글 서버에 직접 검증 요청하여 신뢰할 수 있는 이메일/이름을 얻어냄.
  * - aud(클라이언트 ID 일치), hd(학교 도메인 일치), email_verified 를 모두 확인합니다.
+ * - 반환: { email, name } (name은 구글 프로필 이름; 없으면 이메일 아이디로 대체)
  */
 function verifyGoogleIdToken_(idToken) {
   if (!idToken) throw new Error("로그인 토큰이 없습니다. 다시 로그인해주세요.");
@@ -403,38 +404,66 @@ function verifyGoogleIdToken_(idToken) {
     throw new Error("학교 계정(@" + ALLOWED_DOMAIN + ")으로 로그인해야 합니다.");
   }
 
-  return info.email;
+  var name = (info.name || "").toString().trim();
+  if (!name) name = info.email.split('@')[0];
+  return { email: info.email, name: name };
 }
 
-// 테스트/관리자 계정: 이 이메일로 로그인하면 학번 형식 검사를 건너뛰고
-// "2학기 학생명단" 시트의 첫 번째 학생 행을 빌려서 신청 흐름을 테스트할 수 있습니다.
-// 운영 전환 시 빈 배열로 비워두세요.
+// 학번 형식(8자리 숫자)이 아닌 계정도 로그인/테스트를 허용할 이메일 목록.
+// 이 계정들은 이메일 아이디(@ 앞부분)를 학번 대용으로 사용합니다.
+// 운영 전환 시 빈 배열로 비워두면, 정상 학번 형식 계정만 신청할 수 있습니다.
 var TEST_OVERRIDE_EMAILS = ["pshyun1109@sdhs.gwe.hs.kr"];
 
-/** 테스트 계정이면 시트의 첫 번째 학생 학번을 반환, 아니면 null */
-function getTestOverrideStudentId_(email) {
-  if (TEST_OVERRIDE_EMAILS.indexOf(email) === -1) return null;
+// 명단 시트 헤더 (시트가 없거나 비어 있을 때 자동으로 생성)
+var APPLY_HEADERS = [
+  "순번", "학번", "이름", "신청시간", "참여시간",
+  "월_배정", "화_배정", "수_배정", "목_배정", "금_배정", "참여횟수",
+  "월1", "월2", "화1", "화2", "수1", "수2", "목1", "목2", "금1", "금2"
+];
+
+/** 명단 시트를 반환. 없으면 생성하고, 비어 있으면 헤더를 채운다. */
+function getApplySheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(APPLY_SHEET_NAME);
-  if (!sheet) return null;
-  var values = sheet.getDataRange().getDisplayValues();
-  for (var i = 1; i < values.length; i++) {
-    if (cleanId(values[i][1])) return cleanId(values[i][1]);
-  }
-  return null;
+  if (!sheet) sheet = ss.insertSheet(APPLY_SHEET_NAME);
+  if (sheet.getLastRow() === 0) sheet.appendRow(APPLY_HEADERS);
+  return sheet;
+}
+
+/** 학번으로 행을 찾고, 없으면 새 행(순번/학번/이름)을 추가한 뒤 그 행 정보를 반환. */
+function findOrCreateStudentRow_(sheet, studentId, name) {
+  var found = findStudentRow_(sheet, studentId);
+  if (found) return found;
+
+  var newIndex = sheet.getLastRow() + 1;
+  var row = new Array(APPLY_HEADERS.length).fill("");
+  row[0] = Math.max(0, sheet.getLastRow() - 1) + 1; // A: 순번(헤더 제외)
+  row[1] = studentId;                                // B: 학번
+  row[2] = name || "";                               // C: 이름
+
+  // 학번 칸은 텍스트로 고정 -> "0101" 같은 앞자리 0 학번이 숫자로 바뀌지 않게
+  sheet.getRange(newIndex, 2).setNumberFormat("@");
+  sheet.getRange(newIndex, 1, 1, row.length).setValues([row]);
+
+  return { rowIndex: newIndex, row: row };
 }
 
 /** doPost에서 apply_status / apply_submit 요청을 처리 */
 function handleApplyRequest_(data) {
   try {
-    var email = verifyGoogleIdToken_(data.idToken);
-    var studentId = getTestOverrideStudentId_(email) || getStudentIdFromEmail_(email);
+    var auth = verifyGoogleIdToken_(data.idToken);
+    var studentId = getStudentIdFromEmail_(auth.email);
     if (!studentId) {
-      throw new Error("계정 형식에서 학번을 확인할 수 없습니다. 담당 선생님께 문의하세요. (" + email + ")");
+      // 학번 형식이 아니면, 허용된 테스트 계정에 한해 이메일 아이디를 학번 대용으로 사용
+      if (TEST_OVERRIDE_EMAILS.indexOf(auth.email) !== -1) {
+        studentId = auth.email.split('@')[0];
+      } else {
+        throw new Error("계정 형식에서 학번을 확인할 수 없습니다. 담당 선생님께 문의하세요. (" + auth.email + ")");
+      }
     }
 
     if (data.type === "apply_status") {
-      return ContentService.createTextOutput(JSON.stringify(getMyApplicationData_(studentId)))
+      return ContentService.createTextOutput(JSON.stringify(getMyApplicationData_(studentId, auth.name)))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -444,7 +473,7 @@ function handleApplyRequest_(data) {
       throw new Error("서버가 바쁩니다. 잠시 후 다시 시도해주세요.");
     }
     try {
-      var result = submitApplication_(studentId, data.selection || {});
+      var result = submitApplication_(studentId, data.selection || {}, auth.name);
       return ContentService.createTextOutput(JSON.stringify(result))
         .setMimeType(ContentService.MimeType.JSON);
     } finally {
@@ -456,19 +485,35 @@ function handleApplyRequest_(data) {
   }
 }
 
-/** 본인 정보 + 기존 신청 내용 + 신청 가능 여부를 반환 */
-function getMyApplicationData_(studentId) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(APPLY_SHEET_NAME);
-  if (!sheet) throw new Error("'" + APPLY_SHEET_NAME + "' 시트를 찾을 수 없습니다.");
+/**
+ * 본인 정보 + 기존 신청 내용 + 신청 가능 여부를 반환.
+ * 아직 신청 행이 없는(최초 로그인) 학생은 빈 신청 폼을 돌려준다. (행은 저장 시 생성)
+ * profileName: 구글 프로필 이름 (행이 아직 없을 때 화면에 표시할 이름)
+ */
+function getMyApplicationData_(studentId, profileName) {
+  var sheet = getApplySheet_();
 
   var found = findStudentRow_(sheet, studentId);
+  var period = getApplyPeriod_();
+
   if (!found) {
-    throw new Error("학번 " + studentId + " 에 해당하는 학생을 명단에서 찾을 수 없습니다. 담당 선생님께 문의하세요.");
+    // 최초 로그인: 저장 전이라 행이 없음 -> 빈 폼 반환
+    var emptySelection = {};
+    APPLY_DAYS.forEach(function (d) { emptySelection[d.key] = { p1: false, p2: false }; });
+    return {
+      result: "success",
+      studentId: studentId,
+      name: profileName || "",
+      applyTime: "",
+      updateTime: "",
+      selection: emptySelection,
+      isOpen: isApplyOpen_(),
+      periodText: formatPeriodText_(period.start) + " ~ " + formatPeriodText_(period.end)
+    };
   }
 
   var row = found.row;
-  var name = row[2] || "";
+  var name = row[2] || profileName || "";
   var applyTime = row[3] || "";
   var updateTime = row[4] || "";
 
@@ -480,8 +525,6 @@ function getMyApplicationData_(studentId) {
       p2: row[colIdx[d.p2Col] - 1] === "참여"
     };
   });
-
-  var period = getApplyPeriod_();
 
   return {
     result: "success",
@@ -499,18 +542,15 @@ function getMyApplicationData_(studentId) {
  * 신청/수정 제출. selection: { "월": {p1:bool, p2:bool}, "화": {...}, ... }
  * 호출 전 LockService로 잠겨 있어야 합니다(handleApplyRequest_에서 처리).
  */
-function submitApplication_(studentId, selection) {
+function submitApplication_(studentId, selection, name) {
   if (!isApplyOpen_()) {
     throw new Error("신청 기간이 아닙니다. 변경/취소가 불가능합니다.");
   }
 
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName(APPLY_SHEET_NAME);
-  if (!sheet) throw new Error("'" + APPLY_SHEET_NAME + "' 시트를 찾을 수 없습니다.");
+  var sheet = getApplySheet_();
 
-  var found = findStudentRow_(sheet, studentId);
-  if (!found) throw new Error("학생 명단에서 본인 정보를 찾을 수 없습니다.");
-
+  // 행이 없으면(최초 신청) 새로 생성해서 그 행에 기록
+  var found = findOrCreateStudentRow_(sheet, studentId, name);
   var rowIndex = found.rowIndex;
   var existingApplyTime = found.row[3];
   var now = new Date();
