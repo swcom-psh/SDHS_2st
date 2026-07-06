@@ -304,9 +304,9 @@ function cleanId(idVal) {
 //          월_배정, 화_배정, 수_배정, 목_배정, 금_배정, 참여횟수,
 //          월1, 월2, 화1, 화2, 수1, 수2, 목1, 목2, 금1, 금2
 //
-// - 월_배정~금_배정 : 해당 요일에 참여하면 "참여", 아니면 ""
-// - 월1,월2,... : 해당 요일의 1교시/2교시 참여 여부 ("참여" / "")
-// - 참여횟수 : 체크된 교시(월1~금2) 총 개수
+// - 월_배정~금_배정 : 담당교사가 직접 반(2-3~2-6)을 배정하는 칸. 앱은 건드리지 않음.
+// - 월1,월2,... : 해당 요일의 1교시/2교시 신청 여부 (신청 시 숫자 1, 아니면 "")
+// - 참여횟수 : 신청한 교시(월1~금2) 총 개수
 // - 신청시간 : 최초 제출 시각 (한번 기록되면 변경 안 함)
 // - 참여시간 : 마지막 수정(제출) 시각
 //
@@ -517,12 +517,14 @@ function getMyApplicationData_(studentId, profileName) {
   var applyTime = row[3] || "";
   var updateTime = row[4] || "";
 
-  var colIdx = { F: 5, G: 6, H: 7, I: 8, J: 9, L: 11, M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20 };
+  var colIdx = { L: 11, M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20 };
   var selection = {};
   APPLY_DAYS.forEach(function (d) {
+    var v1 = row[colIdx[d.p1Col] - 1];
+    var v2 = row[colIdx[d.p2Col] - 1];
     selection[d.key] = {
-      p1: row[colIdx[d.p1Col] - 1] === "참여",
-      p2: row[colIdx[d.p2Col] - 1] === "참여"
+      p1: (v1 === "1" || v1 === "참여"),  // 숫자 1(신규) / "참여"(구버전 데이터) 모두 인식
+      p2: (v2 === "1" || v2 === "참여")
     };
   });
 
@@ -556,17 +558,16 @@ function submitApplication_(studentId, selection, name) {
   var now = new Date();
   var count = 0;
 
-  var colMap = { F: 6, G: 7, H: 8, I: 9, J: 10, L: 12, M: 13, N: 14, O: 15, P: 16, Q: 17, R: 18, S: 19, T: 20, U: 21 };
+  // 교시 칸(L~U)만 기록. F~J(요일_배정)는 담당교사가 직접 반을 배정하는 칸이라 건드리지 않음.
+  var colMap = { L: 12, M: 13, N: 14, O: 15, P: 16, Q: 17, R: 18, S: 19, T: 20, U: 21 };
 
   APPLY_DAYS.forEach(function (d) {
     var sel = selection[d.key] || { p1: false, p2: false };
     var p1 = !!sel.p1;
     var p2 = !!sel.p2;
-    var dayParticipate = (p1 || p2);
 
-    sheet.getRange(rowIndex, colMap[d.dayCol]).setValue(dayParticipate ? "참여" : "");
-    sheet.getRange(rowIndex, colMap[d.p1Col]).setValue(p1 ? "참여" : "");
-    sheet.getRange(rowIndex, colMap[d.p2Col]).setValue(p2 ? "참여" : "");
+    sheet.getRange(rowIndex, colMap[d.p1Col]).setValue(p1 ? 1 : "");
+    sheet.getRange(rowIndex, colMap[d.p2Col]).setValue(p2 ? 1 : "");
 
     if (p1) count++;
     if (p2) count++;
