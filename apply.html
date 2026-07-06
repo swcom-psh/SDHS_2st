@@ -210,6 +210,68 @@
   #msg.error { color: #c0392b; }
   #msg.ok { color: #1d8a4c; }
 
+  /* ── 신청 완료 모달 ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(20, 26, 42, 0.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    animation: overlayIn .18s ease;
+  }
+  .modal-card {
+    width: 100%; max-width: 340px;
+    background: #fff; border-radius: 20px;
+    padding: 30px 24px 22px; text-align: center;
+    box-shadow: 0 30px 60px -18px rgba(0, 0, 0, 0.5);
+    animation: popIn .32s cubic-bezier(.2, .9, .3, 1.25);
+  }
+  .check-circle {
+    width: 66px; height: 66px; margin: 0 auto 16px;
+    border-radius: 50%;
+    background: #2ea36a;
+    box-shadow: 0 8px 20px -6px rgba(46, 163, 106, 0.6);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-circle svg { width: 34px; height: 34px; }
+  .check-circle path {
+    stroke-dasharray: 30; stroke-dashoffset: 30;
+    animation: draw .4s .12s ease forwards;
+  }
+  .modal-title { font-size: 21px; font-weight: 800; margin: 0 0 6px; color: var(--ink); }
+  .modal-sub { font-size: 13.5px; color: var(--muted); margin: 0 0 18px; }
+
+  .summary {
+    text-align: left;
+    background: #f7f4ee; border: 1px solid var(--line);
+    border-radius: 12px; padding: 6px 4px; margin-bottom: 20px;
+  }
+  .summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 14px; font-size: 14px;
+    border-bottom: 1px solid #ece6d9;
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .s-day { font-weight: 700; color: var(--ink); }
+  .summary-row .s-per {
+    color: #7a5417; font-weight: 600; font-size: 13px;
+    background: #fbf0dc; padding: 3px 10px; border-radius: 999px;
+  }
+  .summary-empty {
+    text-align: center; color: var(--muted); font-size: 13.5px;
+    padding: 14px 8px; line-height: 1.6;
+  }
+  .modal-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 13px;
+    background: linear-gradient(180deg, #263252 0%, var(--navy) 100%);
+    color: #fff; font-size: 16px; font-weight: 700; font-family: inherit;
+    cursor: pointer;
+  }
+  .modal-btn:active { transform: translateY(1px); }
+
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: none; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
   .hidden { display: none; }
 </style>
 </head>
@@ -252,6 +314,20 @@
         <button id="submitBtn">신청 내용 저장</button>
         <div id="msg"></div>
       </div>
+    </div>
+  </div>
+
+  <div id="doneModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="check-circle">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 12.5l5 5L20 6.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="modal-title">신청 완료!</h2>
+      <p class="modal-sub" id="doneSub"></p>
+      <div class="summary" id="doneSummary"></div>
+      <button id="doneCloseBtn" class="modal-btn">확인</button>
     </div>
   </div>
 
@@ -354,6 +430,7 @@
         if (data.result === 'success') {
           msg.className = 'ok';
           msg.textContent = '저장되었습니다.';
+          showDoneModal(selection);
         } else {
           msg.className = 'error';
           msg.textContent = data.message || '오류가 발생했습니다.';
@@ -364,6 +441,46 @@
         msg.className = 'error';
         msg.textContent = '서버 연결에 실패했습니다: ' + err;
       });
+  });
+
+  function showDoneModal(selection) {
+    var rows = [];
+    var total = 0;
+    DAYS.forEach(function (day) {
+      var s = selection[day] || {};
+      var ps = [];
+      if (s.p1) ps.push('1교시');
+      if (s.p2) ps.push('2교시');
+      if (ps.length) {
+        rows.push({ day: day, periods: ps.join(', ') });
+        total += ps.length;
+      }
+    });
+
+    var sub = document.getElementById('doneSub');
+    var summary = document.getElementById('doneSummary');
+
+    if (rows.length === 0) {
+      sub.textContent = '신청 내용이 저장되었어요.';
+      summary.innerHTML = '<div class="summary-empty">신청한 야자가 없습니다.<br>(전체 미신청 상태로 저장됨)</div>';
+    } else {
+      sub.textContent = '총 ' + total + '개 교시를 신청했어요.';
+      summary.innerHTML = rows.map(function (r) {
+        return '<div class="summary-row"><span class="s-day">' + r.day + '요일</span>' +
+               '<span class="s-per">' + r.periods + '</span></div>';
+      }).join('');
+    }
+
+    document.getElementById('doneModal').classList.remove('hidden');
+  }
+
+  function hideDoneModal() {
+    document.getElementById('doneModal').classList.add('hidden');
+  }
+
+  document.getElementById('doneCloseBtn').addEventListener('click', hideDoneModal);
+  document.getElementById('doneModal').addEventListener('click', function (e) {
+    if (e.target === this) hideDoneModal(); // 바깥 배경 클릭 시 닫기
   });
 </script>
 </body>
