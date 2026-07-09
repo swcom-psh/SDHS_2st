@@ -3,665 +3,427 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>야자 자리 배치 프로그램</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>여름방학 자기주도학습 출결</title>
 
-    <!-- Pretendard Font -->
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700,800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 🌊 Premium Summer Ocean Color Theme (HSL based for rich harmony) */
-            --primary: hsl(200, 95%, 40%);
-            /* Rich sky ocean blue */
-            --primary-dark: hsl(230, 85%, 15%);
-            /* Midnight navy */
-            --secondary: hsl(204, 100%, 96%);
-            /* Ice drop blue */
-            --accent-glow: hsla(200, 95%, 45%, 0.15);
+            /* 여름 공부방 — 따뜻한 종이 + 석양 오렌지 + 청록/솔록 */
+            --paper: #F1E9D8;
+            --paper-soft: #F8F2E6;
+            --surface: #FFFDF7;
+            --surface-soft: #F6EFE0;
+            --ink: #241E18;
+            --ink-soft: #6C6154;
+            --ink-faint: #A99C87;
+            --line: #E7DBC4;
+            --line-strong: #D8C7A6;
 
-            --bg-canvas: hsl(204, 100%, 96%);
-            --card-bg: rgba(255, 255, 255, 0.65);
-            /* Glassmorphism transparent white */
+            --sun: #E07B2E;
+            --sun-strong: #BF5D16;
+            --sun-soft: #F8E2C9;
+            --sun-tint: #FCF1E2;
 
-            --text-main: hsl(222, 47%, 11%);
-            /* Clean dark slate */
-            --text-sub: hsl(215, 25%, 27%);
-            /* Slate 700 */
-            --text-muted: hsl(215, 16%, 47%);
-            /* Slate 500 */
+            --sea: #2B7B78;
+            --sea-strong: #1F5E5C;
+            --sea-soft: #D8ECEA;
 
-            --border: rgba(255, 255, 255, 0.45);
-            --border-hover: rgba(0, 119, 182, 0.35);
-            --border-focus: hsl(200, 95%, 35%);
+            --present: #2E8054;
+            --present-strong: #1E6340;
+            --present-soft: #DDEEE0;
 
-            --shadow-sm: 0 4px 12px rgba(3, 4, 94, 0.03);
-            --shadow-md: 0 12px 36px rgba(3, 4, 94, 0.06);
-            --shadow-lg: 0 20px 50px rgba(3, 4, 94, 0.1);
+            --memo: #E5A417;
+            --memo-soft: #FBEDC4;
+            --memo-ink: #8A6209;
 
-            --drag-over: rgba(224, 242, 254, 0.8);
+            --room-a: var(--sun);
+            --room-b: var(--sea);
 
-            /* Table variables */
-            --table-border: hsl(214, 32%, 91%);
-            --table-header: hsl(210, 40%, 96.1%);
-            --table-row-hover: hsl(204, 100%, 97%);
+            --shadow-sm: 0 1px 2px rgba(52, 40, 26, 0.06);
+            --shadow-md: 0 10px 30px -14px rgba(52, 40, 26, 0.28);
+            --shadow-lg: 0 30px 70px -24px rgba(52, 40, 26, 0.45);
 
-            /* Room Point Colors - modern palettes */
-            --room-2-3: hsl(197, 92%, 44%);
-            /* Deep Ocean */
-            --room-2-4: hsl(38, 92%, 50%);
-            /* Sand Gold */
-            --room-2-5: hsl(22, 90%, 50%);
-            /* Coral Sunset */
-            --room-2-6: hsl(175, 80%, 38%);
-            /* Emerald Mint */
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 13px;
+            --r-sm: 9px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
-            background: linear-gradient(135deg, hsl(204, 100%, 96%), hsl(200, 80%, 90%), hsl(190, 85%, 93%), hsl(204, 100%, 96%));
-            background-size: 300% 300%;
-            animation: oceanWaves 18s ease-in-out infinite;
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 40px 20px;
-            letter-spacing: -0.02em;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background:
+                radial-gradient(140% 60% at 100% -5%, rgba(224, 123, 46, 0.10), transparent 55%),
+                radial-gradient(120% 55% at -10% 0%, rgba(43, 123, 120, 0.08), transparent 50%),
+                var(--paper);
+            color: var(--ink);
+            line-height: 1.55;
+            letter-spacing: -0.01em;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
+            padding: 28px 20px calc(90px + env(safe-area-inset-bottom));
         }
 
-        @keyframes oceanWaves {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        header {
-            max-width: 1300px;
-            margin: 0 auto 40px;
-            text-align: center;
-            padding: 45px 40px;
-            background: var(--card-bg);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-radius: 32px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 850;
-            color: var(--primary);
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            letter-spacing: -0.05em;
-            text-shadow: 0 2px 4px rgba(0, 119, 182, 0.05);
-        }
-
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            align-items: center;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        #dayButtons,
-        #periodButtons {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 6px;
-            border-radius: 50px;
-            display: flex;
-            gap: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
-        }
-
-        /* Turn day/period buttons into segment toggles */
-        #dayButtons .day-btn,
-        #periodButtons .day-btn {
-            background: transparent;
-            color: var(--text-sub);
-            border: none;
-            box-shadow: none;
-            padding: 10px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #dayButtons .day-btn:hover,
-        #periodButtons .day-btn:hover {
-            color: var(--primary);
-            transform: scale(1.03);
-            border-color: transparent;
-        }
-
-        #dayButtons .day-btn.active,
-        #periodButtons .day-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 14px rgba(0, 119, 182, 0.25);
-            font-weight: 800;
-            border: none;
-        }
-
-        .btn {
-            padding: 11px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.6);
-            color: var(--text-sub);
-            font-size: 0.93rem;
-            box-shadow: var(--shadow-sm);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--primary-dark);
-            border-color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.2);
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #02022e 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(3, 4, 94, 0.3);
-        }
-
-        .btn-danger {
-            background: #FFF5F5;
-            color: #E07070;
-            border: 1px solid #F5D0D0;
-        }
-
-        .btn-danger:hover {
-            background: #FFE8E8;
-            color: #C05050;
-        }
-
-        /* Layout Grid */
-        .seating-container {
-            max-width: 1300px;
+        .wrap {
+            max-width: 1040px;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 50px;
         }
 
-        .classroom-section {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 36px 40px;
-            border-radius: 28px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .classroom-section:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .grid-6x5 {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px minmax(0, 1fr) minmax(0, 1fr) 40px minmax(0, 1fr) minmax(0, 1fr);
-            row-gap: 14px;
-            margin: 28px 0;
-        }
-
-        /* 모바일 대응 미디어 쿼리 */
-        @media (max-width: 768px) {
-            .classroom-section {
-                padding: 20px 15px;
-                border-radius: 20px;
-            }
-
-            .grid-6x5 {
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 15px minmax(0, 1fr) minmax(0, 1fr) 15px minmax(0, 1fr) minmax(0, 1fr);
-                row-gap: 8px;
-            }
-
-            .seat {
-                border-radius: 12px;
-                font-size: 0.75rem;
-                min-width: 0;
-                overflow: hidden;
-            }
-
-            .student-id {
-                font-size: 0.6rem;
-            }
-
-            .student-name {
-                font-size: 0.85rem;
-                font-weight: 700;
-            }
-
-            .room-title {
-                font-size: 1.5rem !important;
-            }
-
-            .header-left {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .grid-6x5 {
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8px minmax(0, 1fr) minmax(0, 1fr) 8px minmax(0, 1fr) minmax(0, 1fr);
-                row-gap: 6px;
-            }
-
-            .seat {
-                border-radius: 8px;
-                min-width: 0;
-                overflow: hidden;
-            }
-        }
-
-        .seat {
-            aspect-ratio: 1 / 1.15;
-            border: 1.5px solid rgba(0, 119, 182, 0.12);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.88);
-            font-size: 0.85rem;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-            box-shadow: 0 4px 10px rgba(3, 4, 94, 0.02);
-            min-width: 0;
+        /* ───────── 헤더 (석양 히어로 + 컨트롤) ───────── */
+        header {
+            border-radius: var(--r-xl);
             overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--line);
+            margin: 0 auto 26px;
+            max-width: 1040px;
         }
 
-        .seat:not(.empty):hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: 0 12px 28px rgba(3, 4, 94, 0.08);
-            border-color: var(--primary);
-            z-index: 10;
-        }
-
-        .seat.empty {
-            border: 1.5px dashed hsl(38, 92%, 60%);
-            background: rgba(254, 250, 224, 0.45);
-            box-shadow: inset 0 2px 4px rgba(233, 196, 106, 0.03);
-            cursor: default;
-            opacity: 0.8;
-        }
-
-        .seat.present {
-            border: 2px solid var(--primary);
-            background: linear-gradient(135deg, hsl(204, 100%, 96%) 0%, hsl(200, 95%, 90%) 100%);
-            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-            color: var(--primary-dark);
-            font-weight: 800;
-        }
-
-        .seat.present::after {
-            display: none;
-        }
-
-        .seat.not-in-period {
-            background: hsl(210, 40%, 96.1%) !important;
-            border: 1px dashed hsl(214, 32%, 91%) !important;
-            opacity: 0.35;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-
-        .seat.not-in-period .student-name {
-            color: hsl(215, 16%, 65%);
-        }
-
-        .seat.not-in-period::after {
-            content: 'N/A';
-            position: absolute;
-            top: 6px;
-            right: 10px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: hsl(215, 16%, 65%);
-        }
-
-        .seat.drag-over {
-            background: var(--secondary);
-            border-color: var(--primary);
-            border-style: solid;
-            transform: scale(1.05);
-            box-shadow: 0 8px 24px rgba(0, 119, 182, 0.15);
-        }
-
-        .teacher-desk {
-            width: 50%;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 16px;
-            margin: 24px auto 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-dark);
-            font-weight: 850;
-            letter-spacing: 0.65em;
-            font-size: 1.15rem;
-            box-shadow: var(--shadow-sm);
+        .hero {
             position: relative;
-            transition: all 0.25s ease;
+            overflow: hidden;
+            padding: 34px 34px 30px;
+            color: #FFF7EC;
+            background:
+                radial-gradient(90% 130% at 84% -30%, #F7B45A 0%, #E9843311 45%, transparent 62%),
+                linear-gradient(135deg, #3A2320 0%, #7C3A1E 52%, #C4611D 100%);
         }
 
-        .teacher-desk::before {
-            content: '⛱️';
-            margin-right: 12px;
-            font-size: 1.25rem;
-            letter-spacing: normal;
-        }
-
-        .student-id {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 3px;
+        .hero-sun {
+            position: absolute;
+            right: -28px;
+            top: -34px;
+            width: 190px;
+            height: 190px;
+            opacity: 0.9;
+            color: #FFCE7A;
+            filter: drop-shadow(0 8px 20px rgba(255, 180, 90, 0.35));
             pointer-events: none;
         }
 
-        .student-name {
-            font-weight: 850;
-            font-size: 1.2rem;
-            color: var(--text-main);
-            pointer-events: none;
-            letter-spacing: -0.05em;
-        }
-
-        /* Toast notification */
-        #toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--primary-dark);
-            color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
+        .eyebrow {
+            font-family: 'Nanum Myeongjo', serif;
             font-weight: 700;
-            box-shadow: var(--shadow-lg);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: fit-content;
-            max-width: 90vw;
-            white-space: normal;
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            color: #FFD9A8;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 5.5vw, 2.55rem);
+            font-weight: 900;
+            letter-spacing: -0.035em;
+            line-height: 1.05;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 16px rgba(40, 18, 10, 0.25);
+        }
+
+        .hero h1 .accent {
+            display: inline-block;
+            position: relative;
+        }
+
+        .hero h1 .accent::after {
+            content: '';
+            position: absolute;
+            left: -2px;
+            right: -2px;
+            bottom: 0.08em;
+            height: 0.32em;
+            background: rgba(255, 206, 122, 0.42);
+            border-radius: 3px;
+            z-index: -1;
+        }
+
+        .hero-sub {
+            font-size: 0.95rem;
+            color: rgba(255, 240, 224, 0.82);
+            font-weight: 500;
+            max-width: 40ch;
+            line-height: 1.5;
             word-break: keep-all;
-            text-align: center;
-            pointer-events: none;
-            user-select: none;
         }
 
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
+        .controls-bar {
+            background: var(--surface);
+            padding: 18px 22px;
+            border-top: 1px solid var(--line);
         }
 
-        @media (max-width: 600px) {
-            #toast {
-                padding: 12px 20px;
-                bottom: 30px;
-                font-size: 0.9rem;
-            }
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
         }
 
         .spacer {
-            pointer-events: none;
+            flex: 1 1 auto;
         }
 
-        /* Info text */
+        #dateInput {
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--line-strong);
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 600;
+            background: var(--surface-soft);
+            color: var(--ink);
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        #dateInput:focus {
+            outline: none;
+            border-color: var(--sun);
+            background: var(--surface);
+        }
+
+        #periodButtons {
+            background: var(--surface-soft);
+            padding: 4px;
+            border-radius: var(--r-md);
+            display: inline-flex;
+            gap: 3px;
+            border: 1px solid var(--line);
+        }
+
+        #periodButtons .day-btn {
+            background: transparent;
+            color: var(--ink-soft);
+            border: none;
+            padding: 9px 17px;
+            border-radius: var(--r-sm);
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(0.3, 0.9, 0.4, 1);
+        }
+
+        #periodButtons .day-btn:hover {
+            color: var(--ink);
+        }
+
+        #periodButtons .day-btn.active {
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: #fff;
+            box-shadow: 0 6px 14px -6px rgba(191, 93, 22, 0.7);
+        }
+
+        .supervisor-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--ink);
+            background: var(--sun-tint);
+            border: 1px solid var(--sun-soft);
+            padding: 7px 8px 7px 15px;
+            border-radius: 100px;
+        }
+
+        .logout-btn {
+            background: var(--surface);
+            border: 1px solid var(--line-strong);
+            border-radius: 100px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--ink-soft);
+            transition: all 0.15s ease;
+        }
+
+        .logout-btn:hover {
+            color: var(--sun-strong);
+            border-color: var(--sun-soft);
+        }
+
         .info-text {
-            font-size: 0.88rem;
-            color: var(--text-sub);
-            background: rgba(224, 242, 254, 0.6);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(255, 255, 255, 0.4);
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.83rem;
+            color: var(--ink-soft);
+        }
+
+        .info-text .hint {
+            display: inline-flex;
+            align-items: center;
             gap: 8px;
-        }
-
-        /* Attendance List */
-        .attendance-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: none;
-            flex-direction: column;
-            gap: 36px;
-        }
-
-        .attendance-section {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 32px;
-            border-radius: 28px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-        }
-
-        .attendance-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 16px;
-            font-size: 0.95rem;
-        }
-
-        .attendance-table th,
-        .attendance-table td {
-            padding: 14px 16px;
-            text-align: center;
-            border-bottom: 1px solid var(--table-border);
-        }
-
-        .attendance-table th {
-            background-color: var(--table-header);
-            font-weight: 700;
-            color: var(--text-sub);
-        }
-
-        .attendance-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .attendance-table tr:hover td {
-            background-color: var(--table-row-hover);
-        }
-
-        .attendance-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .col-num {
-            width: 50px;
-        }
-
-        .col-id {
-            width: 90px;
-        }
-
-        .col-name {
-            width: 80px;
-        }
-
-        .col-check {
-            width: 100px;
-            white-space: nowrap;
-        }
-
-        .col-remark {
-            width: auto;
-        }
-
-        .attendance-remark {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background: #FFFBF8;
-            color: var(--text-main);
-        }
-
-        .attendance-remark:focus {
-            border-color: var(--primary);
-            background: white;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(17, 138, 142, 0.15);
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 20px;
-            background: var(--primary);
-            padding: 6px;
-            border-radius: 50px;
-            border: none;
-            box-shadow: inset 0 2px 6px rgba(11, 110, 113, 0.2);
-        }
-
-        .toggle-btn {
-            padding: 10px 24px;
-            border-radius: 50px;
+            background: var(--sea-soft);
+            color: var(--sea-strong);
+            padding: 8px 14px;
+            border-radius: 100px;
             font-weight: 600;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.85);
-            transition: all 0.2s;
         }
 
-        .toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            transform: none;
+        .info-text .hint::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--sea);
+            flex: none;
         }
 
-        .toggle-btn.active {
-            background: white;
-            color: var(--primary-dark);
-            box-shadow: 0 2px 8px rgba(11, 110, 113, 0.3);
-            font-weight: 800;
-        }
-
-        .gas-config {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .gas-config input {
-            flex: 1;
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1.5px solid var(--border);
-            font-size: 0.9rem;
-            background: #FFFBF8;
-        }
-
-        .btn-save-sheet {
-            margin-top: 20px;
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, hsl(175, 80%, 40%) 0%, hsl(175, 80%, 32%) 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
+        /* ───────── 버튼 ───────── */
+        .btn {
+            padding: 9px 16px;
+            border-radius: var(--r-md);
             font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.28s ease;
-            box-shadow: 0 4px 14px rgba(93, 196, 170, 0.2);
+            transition: all 0.15s ease;
+            border: 1px solid var(--line-strong);
+            background: var(--surface);
+            color: var(--ink-soft);
+            font-size: 0.85rem;
         }
 
-        .btn-save-sheet:hover {
-            filter: brightness(1.08);
-            transform: translateY(-1.5px);
-            box-shadow: 0 6px 20px rgba(93, 196, 170, 0.35);
+        .btn:hover {
+            background: var(--surface-soft);
+            color: var(--ink);
+            border-color: var(--ink-faint);
         }
 
-        .btn-save-sheet:disabled {
-            background: hsl(210, 16%, 82%);
-            cursor: not-allowed;
+        .ghost-btn {
+            background: transparent;
+            border-style: dashed;
+            padding: 7px 14px;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 18px -8px rgba(191, 93, 22, 0.75);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.05);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--ink-faint);
             box-shadow: none;
-            transform: none;
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        /* ───────── 교실 섹션 ───────── */
+        .seating-container {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .classroom-section {
+            position: relative;
+            background: var(--surface);
+            padding: 26px 28px 28px;
+            border-radius: var(--r-xl);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--line);
+            overflow: hidden;
+        }
+
+        .classroom-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--line);
+        }
+
+        .classroom-section[data-room="2-3"]::before {
+            background: linear-gradient(90deg, var(--room-a), #F0A45A);
+        }
+
+        .classroom-section[data-room="2-4"]::before {
+            background: linear-gradient(90deg, var(--room-b), #4FA9A5);
         }
 
         .classroom-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
             gap: 12px;
             flex-wrap: wrap;
+        }
+
+        .room-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .room-title::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            transform: rotate(45deg);
+        }
+
+        .room-title.color-2-3 {
+            color: var(--sun-strong);
+        }
+
+        .room-title.color-2-3::before {
+            background: var(--room-a);
+        }
+
+        .room-title.color-2-4 {
+            color: var(--sea-strong);
+        }
+
+        .room-title.color-2-4::before {
+            background: var(--room-b);
+        }
+
+        .room-meta {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--ink-soft);
+            background: var(--surface-soft);
+            border: 1px solid var(--line);
+            padding: 6px 14px;
+            border-radius: 100px;
+            white-space: nowrap;
         }
 
         .header-right-btns {
@@ -669,1518 +431,451 @@
             gap: 8px;
             align-items: center;
             flex-wrap: wrap;
-            justify-content: flex-end;
         }
 
-        .header-right-btns .btn {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            min-width: auto;
+        .seat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+            gap: 11px;
         }
 
-        .btn-past-memo {
-            background: #F59E0B !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        .btn-refresh {
-            background: var(--card-bg) !important;
-            border: 1px solid var(--border) !important;
-        }
-
-        .btn-submit {
-            background: var(--primary) !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        .header-left {
+        /* ───────── 좌석 ───────── */
+        .seat {
+            position: relative;
+            border: 1px solid var(--line);
+            border-radius: var(--r-md);
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            background: var(--surface-soft);
+            padding: 17px 10px 15px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.14s cubic-bezier(0.3, 0.9, 0.4, 1), box-shadow 0.14s ease, border-color 0.14s ease, background 0.14s ease;
         }
 
-        .room-title {
-            font-size: 2.1rem;
+        .seat:hover {
+            border-color: var(--ink-faint);
+            background: var(--surface);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .seat:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .student-id {
+            font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 1px 7px;
+            border-radius: 100px;
+            margin-bottom: 7px;
+            letter-spacing: 0.02em;
+        }
+
+        .student-name {
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* 출석 = 초록 스탬프 */
+        .seat.present {
+            border: 1.5px solid var(--present);
+            background: var(--present-soft);
+            color: var(--present-strong);
+        }
+
+        .seat.present .student-id {
+            color: var(--present);
+            background: rgba(46, 128, 84, 0.12);
+        }
+
+        .seat.present::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: var(--present);
+            color: #fff;
+            font-size: 0.68rem;
             font-weight: 900;
-            color: var(--text-main);
-            letter-spacing: -0.04em;
-            line-height: 1.1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 7px -2px rgba(30, 99, 64, 0.6);
         }
 
-        .room-notice {
-            font-size: 0.82rem;
-            color: var(--text-muted);
+        /* 비고 = 포스트잇 태그 */
+        .seat-memo {
+            margin-top: 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            line-height: 1.35;
+            color: var(--memo-ink);
+            background: var(--memo-soft);
+            border: 1px solid #F1DDA0;
+            border-radius: 7px;
+            padding: 3px 8px;
+            max-width: 100%;
+            word-break: break-word;
+            text-align: center;
+            box-shadow: 0 1px 0 #E7CE86;
+        }
+
+        .empty-room-msg {
+            text-align: center;
+            color: var(--ink-faint);
+            padding: 30px 0;
+            font-size: 0.9rem;
             font-weight: 500;
         }
 
-        .room-meta {
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: white;
-            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
-            padding: 6px 18px;
-            border-radius: 50px;
-            letter-spacing: -0.01em;
-            white-space: nowrap;
-            align-self: flex-start;
-            box-shadow: 0 3px 10px rgba(232, 115, 154, 0.3);
-        }
-
-        /* Room color top-bar accent */
-        .classroom-section[data-room="2-3"] {
-            border-top: 5px solid var(--room-2-3);
-        }
-
-        .classroom-section[data-room="2-4"] {
-            border-top: 5px solid var(--room-2-4);
-        }
-
-        .classroom-section[data-room="2-5"] {
-            border-top: 5px solid var(--room-2-5);
-        }
-
-        .classroom-section[data-room="2-6"] {
-            border-top: 5px solid var(--room-2-6);
-        }
-
-        .room-title.color-2-3 {
-            color: var(--room-2-3);
-        }
-
-        .room-title.color-2-4 {
-            color: var(--room-2-4);
-        }
-
-        .room-title.color-2-5 {
-            color: var(--room-2-5);
-        }
-
-        .room-title.color-2-6 {
-            color: var(--room-2-6);
-        }
-
-        .print-title {
-            display: none;
-        }
-
-        /* Loading Overlay → 단일 정의는 하단 'Loading Overlay Styles' 섹션 참조 */
-
-        /* Custom Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(224, 242, 254, 0.4);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            z-index: 20000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            padding: 32px;
-            border-radius: 28px;
-            max-width: 450px;
-            width: 100%;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes modalPop {
-            0% {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .modal-message {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 28px;
-            line-height: 1.5;
-            word-break: keep-all;
-        }
-
-        .modal-btns {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            min-width: 100px;
-        }
-
-        .modal-btn-confirm {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(17, 138, 142, 0.3);
-        }
-
-        .modal-btn-confirm:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .modal-btn-cancel {
-            background: var(--secondary);
-            color: var(--primary);
-        }
-
-        .modal-btn-cancel:hover {
-            background: #D1E5E6;
-        }
-
-        /* Print Styles */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-
-            body {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            #mainApp {
-                display: block !important;
-                opacity: 1 !important;
-                visibility: visible !important;
-            }
-
-            header,
-            button,
-            .controls,
-            .view-toggle,
-            #toast,
-            .info-text,
-            .bubble-container,
-            .tree-bg,
-            .login-overlay,
-            .gas-config {
-                display: none !important;
-            }
-
-            .seating-container {
-                gap: 0 !important;
-                margin: 0 !important;
-                max-width: none !important;
-                display: block !important;
-            }
-
-            .classroom-section {
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-                padding: 8mm !important;
-                page-break-after: always !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                box-sizing: border-box !important;
-                display: flex !important;
-                flex-direction: column !important;
-                background: white !important;
-                border: none !important;
-                overflow: hidden !important;
-                transform: none !important;
-            }
-
-            .print-title {
-                display: block !important;
-                font-size: 1.8rem !important;
-                font-weight: 800 !important;
-                text-align: center !important;
-                margin-bottom: 5mm !important;
-                color: #000 !important;
-                width: 100% !important;
-            }
-
-            .classroom-section[data-room="2-3"] {
-                border-top: 8px solid #4A90E2 !important;
-            }
-
-            .classroom-section[data-room="2-4"] {
-                border-top: 8px solid #50E3C2 !important;
-            }
-
-            .classroom-section[data-room="2-5"] {
-                border-top: 8px solid #f59e0b !important;
-            }
-
-            .classroom-section[data-room="2-6"] {
-                border-top: 8px solid #D0021B !important;
-            }
-
-            .classroom-header {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                border-bottom: 2px solid #e2e8f0 !important;
-                margin-bottom: 5mm !important;
-                padding-bottom: 3mm !important;
-                flex-shrink: 0 !important;
-            }
-
-            .room-title {
-                font-size: 1.8rem !important;
-                font-weight: 900 !important;
-                color: #0f172a !important;
-            }
-
-            .room-notice {
-                display: none !important;
-            }
-
-            .room-meta {
-                font-size: 0.95rem !important;
-                color: #475569 !important;
-                font-weight: 700 !important;
-                background: none !important;
-                padding: 0 !important;
-            }
-
-            .grid-6x5 {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr 20px 1fr 1fr 20px 1fr 1fr !important;
-                gap: 4px !important;
-                margin-top: 5mm !important;
-                flex-grow: 1 !important;
-            }
-
-            .seat {
-                border: 1px solid #cbd5e1 !important;
-                height: 18mm !important;
-                background: white !important;
-                color: black !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
-            }
-
-            .student-id {
-                font-size: 0.65rem !important;
-                color: #64748b !important;
-            }
-
-            .student-name {
-                font-size: 1.1rem !important;
-                color: black !important;
-                font-weight: 800 !important;
-            }
-
-            .teacher-desk {
-                display: flex !important;
-                height: 35px !important;
-                width: 55% !important;
-                margin: 5mm auto 0 !important;
-                background: #e2e8f0 !important;
-                color: #0f172a !important;
-                border: 2px solid #94a3b8 !important;
-                align-items: center !important;
-                justify-content: center !important;
-                font-size: 1.1rem !important;
-                font-weight: 800 !important;
-                border-radius: 6px !important;
-                letter-spacing: 1em !important;
-            }
-
-            .grid-6x5 {
-                flex: none !important;
-                row-gap: 5mm !important;
-                column-gap: 0 !important;
-                grid-template-columns: 1fr 1fr 5mm 1fr 1fr 5mm 1fr 1fr !important;
-                margin: 5mm 0 !important;
-            }
-
-            /* Maintain aspect-ratio for consistent cell shapes */
-            .seat {
-                aspect-ratio: 1 / 1.15 !important;
-                border: 2px solid #1e293b !important;
-                border-radius: 8px !important;
-                background: white !important;
-                box-shadow: none !important;
-                height: auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
-                overflow: hidden !important;
-                transform: none !important;
-                transition: none !important;
-                padding: 2px !important;
-            }
-
-            .seat.empty {
-                border: 2px dashed #94a3b8 !important;
-                background: #f8fafc !important;
-            }
-
-            .student-name {
-                font-size: 1.05rem !important;
-                color: #0f172a !important;
-                font-weight: 800 !important;
-                line-height: 1.2 !important;
-                margin: 0 !important;
-                word-break: keep-all !important;
-                text-align: center !important;
-            }
-
-            .student-id {
-                font-size: 0.65rem !important;
-                color: #64748b !important;
-                font-weight: 600 !important;
-                margin-bottom: 1px !important;
-            }
-
-            .seat-num-badge {
-                font-size: 0.6rem !important;
-                color: #94a3b8 !important;
-            }
-
-            .seat.absent {
-                background: #fff0f3 !important;
-                border-color: #ff4d4f !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .seat.present {
-                background: #f0fdf4 !important;
-                border-color: #4caf50 !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-
-            .spacer {
-                display: block !important;
-            }
-        }
-
-        /* Login Overlay */
+        /* ───────── 로그인 ───────── */
         .login-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(224, 242, 254, 0.4);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            inset: 0;
+            background: radial-gradient(120% 90% at 80% 0%, rgba(224, 123, 46, 0.28), transparent 55%), rgba(36, 30, 24, 0.5);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.3s;
+            padding: 22px;
         }
 
         .login-box {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 28px;
+            background: var(--surface);
+            padding: 34px 32px 30px;
+            border-radius: var(--r-xl);
             box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid var(--border);
-            text-align: center;
+            width: 100%;
+            max-width: 390px;
+            border: 1px solid var(--line);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--sun), var(--memo));
+        }
+
+        .login-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 15px;
+            background: linear-gradient(150deg, #FBE1C2, #F6C98A);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--sun-strong);
+            margin-bottom: 18px;
+            box-shadow: 0 8px 18px -8px rgba(224, 123, 46, 0.6);
+        }
+
+        .login-badge svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        .login-eyebrow {
+            font-family: 'Nanum Myeongjo', serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.05em;
+            color: var(--sun-strong);
+            margin-bottom: 5px;
         }
 
         .login-box h2 {
-            margin-bottom: 15px;
-            color: var(--text-main);
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        .login-desc {
+            color: var(--ink-soft);
+            font-size: 0.9rem;
+            word-break: keep-all;
         }
 
         .login-box input {
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.5);
-            font-size: 1.1rem;
+            padding: 14px 15px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--line-strong);
+            background: var(--surface-soft);
+            font-size: 1rem;
             outline: none;
-            transition: border-color 0.2s, background-color 0.2s;
-            text-align: center;
-            margin-top: 10px;
+            margin-top: 18px;
             font-family: inherit;
-            color: var(--text-main);
+            font-weight: 600;
+            color: var(--ink);
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
 
         .login-box input:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--sun);
+            background: var(--surface);
+        }
+
+        .login-box input::placeholder {
+            color: var(--ink-faint);
+            font-weight: 500;
         }
 
         .login-box button {
             width: 100%;
-            margin-top: 20px;
-            padding: 15px;
-            font-size: 1.1rem;
-            font-weight: 700;
+            margin-top: 12px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: var(--r-md);
         }
 
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            html, body {
-                overflow-x: hidden;
-                width: 100%;
-            }
-
-            input, textarea, select {
-                font-size: 16px !important;
-            }
-
-            body {
-                padding: 15px 10px;
-                background-size: 16px 16px;
-            }
-
-            header {
-                padding: 25px 15px;
-                border-radius: 16px;
-                margin-bottom: 25px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-                text-align: center;
-                justify-content: center;
-                word-break: keep-all;
-                flex-wrap: wrap;
-            }
-
-            .classroom-section {
-                padding: 20px 15px;
-                border-radius: 20px;
-            }
-
-            .room-title {
-                font-size: 1.4rem;
-            }
-
-            .grid-6x5 {
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 4px minmax(0, 1fr) minmax(0, 1fr) 4px minmax(0, 1fr) minmax(0, 1fr);
-                gap: 5px;
-                margin: 15px 0;
-            }
-
-            .grid-6x5 .spacer {
-                display: block;
-                min-width: 4px;
-            }
-
-            .seat {
-                border-radius: 8px;
-                font-size: 0.75rem;
-                aspect-ratio: 1 / 1.2;
-                min-width: 0;
-                overflow: hidden;
-            }
-
-            .student-name {
-                font-size: 0.85rem;
-            }
-
-            .student-id {
-                font-size: 0.65rem;
-                margin-bottom: 0;
-            }
-
-            .teacher-desk {
-                width: 100%;
-                height: 36px;
-                font-size: 0.9rem;
-                margin-top: 15px;
-            }
-
-            /* Table Scroller for Mobile */
-            .table-responsive {
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin-top: 15px;
-                border-radius: 12px;
-            }
-
-            .attendance-table {
-                margin-top: 0;
-                min-width: 100%;
-                /* Changed from 480px to 100% to fit screen */
-                table-layout: fixed;
-            }
-
-            .attendance-table th,
-            .attendance-table td {
-                padding: 8px 4px;
-                font-size: 0.85rem;
-                word-wrap: break-word;
-            }
-
-            .attendance-checkbox {
-                width: 24px;
-                height: 24px;
-            }
-
-            /* Adjust column widths for mobile */
-            .col-num {
-                width: 35px !important;
-                padding: 8px 2px !important;
-            }
-
-            .col-id {
-                width: 65px !important;
-            }
-
-            .col-name {
-                width: 60px !important;
-            }
-
-            .col-check {
-                width: 65px !important;
-            }
-
-            .col-remark {
-                width: auto !important;
-            }
-
-            .attendance-remark {
-                font-size: 16px;
-                padding: 5px;
-            }
-
-            /* Larger touch target */
-
-            /* Buttons and Controls */
-            .btn {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-                flex: 1;
-                min-width: 80px;
-            }
-
-            .btn-group {
-                width: 100%;
-                justify-content: center;
-                gap: 6px;
-            }
-
-            .view-toggle {
-                width: 100%;
-                flex-wrap: wrap;
-            }
-
-            .toggle-btn {
-                flex: 1;
-                text-align: center;
-            }
-
-            /* Login Box */
-            .login-box {
-                padding: 30px 20px;
-            }
-
-            .login-box h2 {
-                font-size: 1.5rem;
-            }
-
-            /* Header Info */
-            .info-text {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 10px;
-                border-radius: 12px;
-            }
-
-            .info-text>div {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .header-left {
-                min-width: auto;
-                width: 100%;
-            }
-
-            .classroom-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .header-right-btns {
-                width: 100%;
-                justify-content: flex-start;
-                gap: 8px;
-            }
-
-            .header-right-btns .btn {
-                flex: 1;
-                font-size: 0.8rem;
-                padding: 10px 8px;
-            }
-
-            .room-meta {
-                width: 100%;
-                text-align: center;
-                margin-top: 5px;
-            }
-        }
-
-        /* Floating Bubbles Animation */
-        .bubble-container {
+        /* ───────── 비고 모달 ───────── */
+        .modal-overlay {
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
+            background: rgba(36, 30, 24, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 20000;
+            justify-content: center;
+            align-items: center;
+            padding: 22px;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 24px 22px;
+            border-radius: var(--r-xl);
+            max-width: 380px;
             width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            text-align: left;
         }
 
-        .bubble {
-            position: absolute;
-            bottom: -50px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .modal-content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--ink-soft);
+        }
+
+        .modal-content h3 span {
+            color: var(--ink);
+            font-weight: 900;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            min-height: 96px;
+            padding: 13px 14px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--r-md);
+            font-size: 0.96rem;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+            background: var(--surface-soft);
+            margin-bottom: 15px;
+            color: var(--ink);
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        .modal-content textarea:focus {
+            border-color: var(--sun);
+            background: var(--surface);
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 9px;
+        }
+
+        .modal-btns button {
+            flex: 1;
+            padding: 12px;
+            border-radius: var(--r-md);
+            font-weight: 800;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: var(--surface-soft);
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+        }
+
+        .btn-cancel:hover {
+            background: var(--paper-soft);
+        }
+
+        .btn-save {
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: white;
+        }
+
+        .btn-save:hover {
+            filter: brightness(1.05);
+        }
+
+        /* ───────── 토스트 ───────── */
+        #toast {
+            position: fixed;
+            bottom: calc(28px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: var(--ink);
+            color: #FFF7EC;
+            padding: 14px 24px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            z-index: 10000;
+            max-width: 90vw;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        #toast::before {
+            content: '';
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.25);
-            pointer-events: none;
-            animation: rise linear infinite;
+            background: var(--sun);
         }
 
-        @keyframes rise {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 0.6;
-            }
-
-            90% {
-                opacity: 0.6;
-            }
-
-            100% {
-                transform: translateY(-110vh) translateX(100px);
-                opacity: 0;
-            }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
         }
 
-        /* Loading Overlay Styles */
+        /* ───────── 로딩 ───────── */
         #loadingOverlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
+            inset: 0;
+            background: radial-gradient(100% 70% at 50% 30%, rgba(248, 242, 230, 0.96), rgba(241, 233, 216, 0.96));
             z-index: 10000;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 20px;
+            gap: 18px;
         }
 
         .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid var(--secondary);
-            border-top: 5px solid var(--primary);
+            width: 38px;
+            height: 38px;
+            border: 4px solid var(--sun-soft);
+            border-top-color: var(--sun);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
+            to {
                 transform: rotate(360deg);
             }
         }
 
         #loadingText {
             font-weight: 700;
-            color: var(--primary-dark);
-            font-size: 1.1rem;
-            letter-spacing: -0.02em;
-        }
-
-        /* Styles for html2pdf export */
-        .is-exporting-pdf header,
-        .is-exporting-pdf .controls,
-        .is-exporting-pdf .view-toggle,
-        .is-exporting-pdf #toast,
-        .is-exporting-pdf .info-text,
-        .is-exporting-pdf .btn-group,
-        .is-exporting-pdf button {
-            display: none !important;
-        }
-
-        .is-exporting-pdf .classroom-section {
-            page-break-after: always;
-            margin-bottom: 0;
-            border: none !important;
-            box-shadow: none !important;
-        }
-
-        .is-exporting-pdf-월 .seat {
-            background: #FDF6F0 !important;
-            border: 1.5px solid #EAD8C8 !important;
-        }
-
-        .is-exporting-pdf-화 .seat {
-            background: #F3F9F6 !important;
-            border: 1.5px solid #D1EADF !important;
-        }
-
-        .is-exporting-pdf-수 .seat {
-            background: #F3F7FD !important;
-            border: 1.5px solid #D1E0F3 !important;
-        }
-
-        .is-exporting-pdf-목 .seat {
-            background: #F8F5FE !important;
-            border: 1.5px solid #E0D8F1 !important;
-        }
-
-        .is-exporting-pdf-금 .seat {
-            background: #FDFDF3 !important;
-            border: 1.5px solid #F1E9D1 !important;
-        }
-
-        .is-exporting-pdf .seat.not-in-period {
-            opacity: 1 !important;
-            border-style: solid !important;
-            background-color: unset !important;
-            /* 요일별 배경색이 그대로 적용되도록 방해하는 속성 제거 */
-        }
-
-        .is-exporting-pdf .seat.not-in-period .student-name,
-        .is-exporting-pdf .seat.not-in-period .student-id {
-            color: #0f172a !important;
-            /* 옅은 회색이 아닌 진한 남색으로 강제 통일 */
-            opacity: 1 !important;
-        }
-
-        .is-exporting-pdf .seat::after {
-            display: none !important;
-        }
-
-        .is-exporting-pdf .student-name,
-        .is-exporting-pdf .student-id {
-            color: #0f172a !important;
-            opacity: 1 !important;
-        }
-
-        /* Overlap memo-like indicator */
-        .seat.overlap {
-            position: relative;
-        }
-
-        .overlap-marker {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-top: 20px solid #FF3B30;
-            border-left: 20px solid transparent;
-            border-top-right-radius: 18px;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .overlap-marker {
-                border-top: 14px solid #FF3B30;
-                border-left: 14px solid transparent;
-                border-top-right-radius: 6px;
-            }
-        }
-
-        .is-exporting-pdf .overlap-marker {
-            display: none !important;
-        }
-
-        /* ===== 개인 자리표 섹션 ===== */
-        .personal-card-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: none;
-            flex-direction: column;
-            gap: 28px;
-        }
-
-        .personal-card-search-bar {
-            background: var(--card-bg);
-            padding: 28px 32px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-sm);
-            border: 1.5px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .personal-card-search-bar h3 {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
-        }
-
-        .personal-search-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .personal-search-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 20px;
-            border-radius: 50px;
-            border: 1.5px solid var(--border);
-            font-size: 1rem;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.2s;
-            background: #FDFCFB;
-            color: var(--text-main);
-        }
-
-        .personal-search-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(17, 138, 142, 0.12);
-            background: white;
-        }
-
-        /* 학생 자리표 카드 그리드 */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 20px;
-        }
-
-        /* 개별 학생 카드 */
-        .student-week-card {
-            background: white;
-            border-radius: 20px;
-            border: 1.5px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            transition: box-shadow 0.2s, transform 0.2s;
-            page-break-inside: avoid;
-        }
-
-        .student-week-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-3px);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
-            color: white;
-            padding: 16px 22px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-student-name {
-            font-size: 1.25rem;
-            font-weight: 900;
-            letter-spacing: -0.04em;
-        }
-
-        .card-student-id {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            font-weight: 600;
-        }
-
-        .card-label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.02em;
-        }
-
-        /* 주간 자리 표 */
-        .week-seat-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .week-seat-table th {
-            background: var(--table-header);
-            color: var(--text-sub);
-            font-weight: 700;
-            font-size: 0.8rem;
-            padding: 10px 6px;
-            text-align: center;
-            border-bottom: 1.5px solid var(--table-border);
-        }
-
-        .week-seat-table td {
-            padding: 12px 8px;
-            text-align: center;
-            border-bottom: 1px solid var(--table-border);
-            font-weight: 600;
-            color: var(--text-main);
-            vertical-align: middle;
-        }
-
-        .week-seat-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .week-seat-table .room-label-cell {
-            font-weight: 800;
-            font-size: 0.88rem;
-            background: #F8FCFC;
-            color: var(--primary-dark);
-            border-right: 1.5px solid var(--table-border);
-            min-width: 54px;
-        }
-
-        .seat-chip {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary) 0%, #0D6F72 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 4px 10px;
-            font-weight: 800;
-            font-size: 0.92rem;
-            min-width: 36px;
-            box-shadow: 0 2px 6px rgba(17, 138, 142, 0.25);
-            line-height: 1.4;
-        }
-
-        .seat-chip.period-1 {
-            background: linear-gradient(135deg, #118A8E 0%, #0D6F72 100%);
-        }
-
-        .seat-chip.period-2 {
-            background: linear-gradient(135deg, #4DB6AC 0%, #009688 100%);
-        }
-
-        .seat-chip-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .seat-chip-label {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .seat-empty-cell {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .card-print-btn {
-            width: 100%;
-            padding: 11px;
-            background: var(--secondary);
-            color: var(--primary-dark);
-            border: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: inherit;
-        }
-
-        .card-print-btn:hover {
-            background: #C8E6E6;
-        }
-
-        /* 일괄 인쇄용 숨긴 컨테이너 */
-        #printAllContainer {
-            display: none;
-        }
-
-        /* 인쇄 스타일 — 개인 자리표 전용 */
-        @media print {
-
-            html,
-            body {
-                height: auto !important;
-                overflow: visible !important;
-            }
-
-            body.printing-personal-cards #mainApp {
-                display: none !important;
-            }
-
-            body.printing-personal-cards #printAllContainer,
-            body.printing-personal-cards #printAllContainer * {
-                visibility: visible;
-            }
-
-            body.printing-personal-cards #printAllContainer {
-                display: block !important;
-                position: relative;
-                width: 100%;
-                background: white;
-                margin: 0;
-                padding: 0;
-            }
-
-            @page {
-                size: A4;
-                margin: 10mm;
-            }
-
-            body.printing-personal-cards .print-card-page {
-                break-inside: avoid-page;
-                break-after: page;
-                width: fit-content;
-                /* 내부 표에 맞춰 너비 조정 */
-                height: auto;
-                margin: 0 auto;
-                border: none;
-                /* 외부 테두리는 표의 검정 테두리로 대체 */
-                border-radius: 0;
-                font-family: 'Pretendard', sans-serif;
-                background: white;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                overflow: visible;
-            }
-
-            body.printing-personal-cards .print-card-header {
-                background: #118A8E !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                color: white !important;
-                padding: 10px 18px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            body.printing-personal-cards .print-card-title {
-                font-size: 36px;
-                /* 더 크게 */
-                font-weight: 900;
-                letter-spacing: -2px;
-                line-height: 1.1;
-            }
-
-            body.printing-personal-cards .print-card-subtitle {
-                font-size: 10px;
-                opacity: 0.85;
-            }
-
-            body.printing-personal-cards .print-seat-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 16px;
-                /* 크게 */
-            }
-
-            body.printing-personal-cards .print-seat-table th,
-            body.printing-personal-cards .print-seat-table td {
-                border: 3px solid #000;
-                padding: 0;
-                text-align: center;
-                font-weight: 900;
-                font-size: 38px;
-                /* 45px -> 38px로 축소 */
-                width: 32mm;
-                /* 38mm -> 32mm로 축소 */
-                height: 32mm;
-                /* 38mm -> 32mm로 축소 */
-                vertical-align: middle;
-                box-sizing: border-box;
-                line-height: 1;
-            }
-
-            body.printing-personal-cards .print-seat-table th {
-                background: #f0f9f9 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                font-weight: 900;
-                color: #036;
-                font-size: 36px;
-                /* 요일이 짤리지 않게 약간 작게 조정 */
-                white-space: nowrap;
-            }
-
-            body.printing-personal-cards .print-seat-table .room-col {
-                background: #f0f9f9 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                font-weight: 950;
-                color: #118A8E;
-                font-size: 22px;
-                /* 한 줄에 들어오도록 조정 */
-                white-space: nowrap;
-            }
-
-            body.printing-personal-cards .print-seat-num {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 92%;
-                height: 92%;
-                margin: 0 auto;
-                background: #118A8E !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                color: white !important;
-                border-radius: 6px;
-                font-weight: 950;
-                font-size: 44px;
-                /* 50px -> 44px로 축소 */
-            }
-
-            body.printing-personal-cards .print-seat-num.p2 {
-                background: #4DB6AC !important;
-            }
-
-            body.printing-personal-cards .print-card-footer {
-                padding: 8px 16px;
-                font-size: 9px;
-                color: #888;
-                text-align: center;
-                border-top: 1px solid #eee;
-            }
-        }
-
-        /* ====== Memo (Long Press) Feature ====== */
-        #memoModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(29, 45, 46, 0.6);
-            backdrop-filter: blur(5px);
-            z-index: 25000;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-            padding-top: 15vh;
-            overflow-y: auto;
-        }
-
-        @keyframes modalSlideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .memo-modal-content {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            padding: 28px 24px;
-            border-radius: 24px;
-            max-width: 380px;
-            width: 100%;
-            box-shadow: var(--shadow-lg);
-            animation: modalSlideDown 0.3s ease-out;
-        }
-
-        .memo-modal-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .memo-modal-header .memo-icon {
-            font-size: 1.5rem;
-        }
-
-        .memo-modal-header .memo-title {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.03em;
-        }
-
-        .memo-student-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-            padding: 10px 14px;
-            background: var(--secondary);
-            border-radius: 14px;
-        }
-
-        .memo-student-info .memo-student-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-        }
-
-        .memo-student-info .memo-student-id {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-
-        .memo-textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 14px 16px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            font-size: 1rem;
-            font-family: inherit;
-            resize: vertical;
-            outline: none;
-            transition: border-color 0.2s, background-color 0.2s;
-            background: rgba(255, 255, 255, 0.5);
-            color: var(--text-main);
-            line-height: 1.5;
-        }
-
-        .memo-textarea:focus {
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .memo-textarea::placeholder {
-            color: var(--text-muted);
-        }
-
-        .memo-modal-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-        }
-
-        .memo-modal-btns button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 50px;
-            font-weight: 700;
+            color: var(--ink-soft);
             font-size: 0.95rem;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            font-family: inherit;
         }
 
-        .memo-btn-save {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(17, 138, 142, 0.3);
-        }
-
-        .memo-btn-save:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .memo-btn-cancel {
-            background: var(--secondary);
-            color: var(--primary);
-        }
-
-        .memo-btn-cancel:hover {
-            background: #D1E5E6;
-        }
-
-        .memo-btn-clear {
-            background: #FFF5F5;
-            color: #E07070;
-            flex: 0.6;
-        }
-
-        .memo-btn-clear:hover {
-            background: #FFE8E8;
-            color: #C05050;
-        }
-
-        /* Student memo text under name */
-        .student-memo {
-            color: #E63946;
-            /* Vibrant Red */
-            font-weight: 600;
-            margin-top: 4px;
-            width: 90%;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.2;
-        }
-
-        .seat {
-            -webkit-touch-callout: none;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
+        /* ───────── 반응형 ───────── */
         @media (max-width: 768px) {
-            #memoModal {
-                align-items: flex-start;
-                padding-top: 40px;
-                /* 키보드가 올라와도 고정된 위치 유지 */
+            body {
+                padding: 14px 12px calc(80px + env(safe-area-inset-bottom));
             }
 
-            .memo-modal-content {
-                max-width: 340px;
-                padding: 24px 20px;
+            .hero {
+                padding: 26px 22px 24px;
             }
 
-            .memo-textarea {
-                min-height: 80px;
-                font-size: 16px;
+            .hero-sun {
+                width: 140px;
+                height: 140px;
+                right: -22px;
+                top: -26px;
             }
-        }
 
-        @media print {
-
-            .seat-memo-badge,
-            #memoModal {
-                display: none !important;
+            .controls-bar {
+                padding: 16px 16px;
             }
-        }
 
-        .is-exporting-pdf .seat-memo-badge {
-            display: none !important;
-        }
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
 
-        /* 🔄 Background Sync Floating Container & Cards */
-        #sync-status-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
+            #dateInput {
+                width: 100%;
+                text-align: center;
+            }
 
-        .sync-toast {
-            pointer-events: auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            padding: 12px 18px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 250px;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+            #periodButtons {
+                width: 100%;
+            }
 
-        .sync-toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+            #periodButtons .day-btn {
+                flex: 1;
+                padding: 11px 8px;
+                white-space: nowrap;
+            }
 
-        .sync-toast.fade-out {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
+            .spacer {
+                display: none;
+            }
 
-        .sync-toast .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--border);
-            border-top: 2px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+            .supervisor-chip {
+                width: 100%;
+                justify-content: space-between;
+            }
 
-        .sync-toast .icon-success {
-            color: #10B981;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+            .classroom-section {
+                padding: 20px 16px 22px;
+            }
 
-        .sync-toast .icon-error {
-            color: #EF4444;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+            .room-title {
+                font-size: 1.22rem;
+            }
 
-        .sync-toast .text {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
+            .seat-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 9px;
+            }
 
-        /* 💾 Temporary Success Button style */
-        .btn-success-temp {
-            background: #10B981 !important;
-            color: white !important;
-            border-color: #10B981 !important;
+            .student-name {
+                font-size: 0.98rem;
+            }
         }
     </style>
 </head>
@@ -2188,1528 +883,548 @@
 <body>
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
-            <h2>🌴 야자 감독 교사 로그인 🛟</h2>
-            <div style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 10px; word-break: keep-all;">
-                출석부에 기록될 감독 선생님 성함을 입력해주세요.
+            <div class="login-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    aria-hidden="true">
+                    <circle cx="12" cy="12" r="4.4" fill="currentColor" stroke="none" />
+                    <path
+                        d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8" />
+                </svg>
             </div>
+            <div class="login-eyebrow">여름방학 · 자기주도학습</div>
+            <h2>출결 시작하기</h2>
+            <p class="login-desc">출석부에 기록될 감독 선생님 성함을 입력해 주세요.</p>
             <input type="text" id="teacherNameInput" placeholder="이름 입력 (예: 홍길동)"
                 onkeypress="if(event.key==='Enter') handleLogin()">
-            <button class="btn btn-primary" onclick="handleLogin()">출석부 시작하기</button>
+            <button class="btn btn-primary" onclick="handleLogin()">시작하기</button>
         </div>
     </div>
 
-    <div id="customModal" class="modal-overlay">
+    <div id="memoModal" class="modal-overlay" onclick="if(event.target===this) closeMemoModal()">
         <div class="modal-content">
-            <div id="modalMessage" class="modal-message"></div>
-            <div id="modalBtns" class="modal-btns">
-                <button id="modalCancel" class="modal-btn modal-btn-cancel">취소</button>
-                <button id="modalConfirm" class="modal-btn modal-btn-confirm">확인</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Memo Modal for Long Press -->
-    <div id="memoModal" onclick="if(event.target===this) closeMemoModal()">
-        <div class="memo-modal-content">
-            <div class="memo-modal-header">
-                <span class="memo-icon">📝</span>
-                <span class="memo-title">결석 사유 메모</span>
-            </div>
-            <div class="memo-student-info">
-                <span class="memo-student-name" id="memoStudentName"></span>
-                <span class="memo-student-id" id="memoStudentId"></span>
-            </div>
-            <div id="memoDateContainer" style="display: none; margin-bottom: 10px; width: 100%;">
-                <label for="memoDatePicker"
-                    style="font-size: 0.85rem; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; display: block;">과거
-                    메모 날짜 선택 (구글 시트 기록용)</label>
-                <input type="date" id="memoDatePicker"
-                    style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-family: inherit; font-size: 1rem; color: var(--text-main);">
-            </div>
-            <textarea class="memo-textarea" id="memoTextarea" placeholder="결석 사유를 입력하세요 (예: 체험학습, 병결 등)"></textarea>
-            <div class="memo-modal-btns">
-                <button class="memo-btn-cancel" onclick="closeMemoModal()">취소</button>
-                <button class="memo-btn-clear" id="memoBtnClear" onclick="clearMemo()">삭제</button>
-                <button class="memo-btn-save" id="memoBtnSave" onclick="saveMemo()">저장</button>
+            <h3>비고 입력 — <span id="memoStudentName"></span></h3>
+            <textarea id="memoTextarea" placeholder="결석 사유 등을 입력하세요 (예: 병결, 체험학습)"></textarea>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeMemoModal()">취소</button>
+                <button class="btn-save" onclick="saveMemo()">저장</button>
             </div>
         </div>
     </div>
 
     <div id="mainApp" style="display: none;">
-
         <header>
-            <h1>🌊 2026학년도 2학년 1학기 자기주도적 학습 자리 배치도 🏖️ <small
-                    style="font-size: 0.6rem; opacity: 0.7; vertical-align: middle;">MadeBy 박상현T</small></h1>
-            <div class="controls">
-                <div class="btn-group" id="dayButtons">
-                    <button class="btn day-btn active" data-day="월">월요일</button>
-                    <button class="btn day-btn" data-day="화">화요일</button>
-                    <button class="btn day-btn" data-day="수">수요일</button>
-                    <button class="btn day-btn" data-day="목">목요일</button>
-                    <button class="btn day-btn" data-day="금">금요일</button>
-                </div>
-                <div class="btn-group" id="periodButtons">
-                    <button class="btn day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
-                    <button class="btn day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-primary" onclick="downloadPDF()">📄 PDF 저장하기</button>
-                    <!-- 배치 및 출석 초기화 버튼 제거됨 (사용자 요청) -->
-                </div>
-
-                <input type="hidden" id="gasUrl"
-                    value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
-                <input type="hidden" id="gasBackupUrl"
-                    value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
-                <div class="info-text"
-                    style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">
-                    <div style="display: flex; gap: 8px;">
-                        <span>💡</span>
-                        <span>학생 출결 체크 후 반드시 '출결 결과 시트 전송' 버튼을 눌러주세요.</span>
-                        <span>학생을 선택하는 것이 출석입니다</span>
-                        <button class="btn" style="padding:4px 12px; font-size:0.8rem; height: 28px; line-height: 1;"
-                            onclick="refreshStudentList()">명단 갱신</button>
+            <div class="hero">
+                <svg class="hero-sun" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5"
+                    stroke-linecap="round" aria-hidden="true">
+                    <circle cx="50" cy="50" r="20" fill="currentColor" stroke="none" opacity="0.95" />
+                    <g opacity="0.85">
+                        <path d="M50 12V2M50 98V88M12 50H2M98 50H88M23 23l-7-7M84 84l-7-7M77 23l7-7M16 84l7-7" />
+                    </g>
+                </svg>
+                <div class="eyebrow">여름방학 · 자기주도학습</div>
+                <h1><span class="accent">자기주도학습</span> 출결</h1>
+                <p class="hero-sub">학생 선택하는 것이 '출석'입니다!! 체크하신 후, 전송 버튼 눌러주세요!</p>
+            </div>
+            <div class="controls-bar">
+                <div class="controls-row">
+                    <input type="date" id="dateInput">
+                    <div id="periodButtons">
+                        <button class="day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
+                        <button class="day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
+                        <button class="day-btn" data-period="3" onclick="selectPeriod(this)">3교시</button>
                     </div>
-                    <div
-                        style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-left: auto;">
-                        👤 <span id="displaySupervisorName"></span> 선생님
-                        <button onclick="handleLogout()"
-                            style="background: white; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); font-weight: 600; box-shadow: var(--shadow-sm); transition: all 0.2s;">로그아웃</button>
+                    <div class="spacer"></div>
+                    <div class="supervisor-chip">
+                        <span class="sv-label"><span id="displaySupervisorName"></span> 선생님</span>
+                        <button class="logout-btn" onclick="handleLogout()">로그아웃</button>
                     </div>
+                </div>
+                <div class="info-text">
+                    <span class="hint">클릭 = 출석 · 길게 누르거나 우클릭 = 비고</span>
+                    <button class="btn ghost-btn" onclick="refreshStudentList()">명단 갱신</button>
                 </div>
             </div>
+            <input type="hidden" id="gasUrl"
+                value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
         </header>
 
-        <div class="seating-container active" id="seatingDisplay"></div>
-        <div id="toast"><span>✅</span> 배치 정보가 자동 저장되었습니다.</div>
-    </div> <!-- Close mainApp -->
+        <div class="seating-container" id="seatingDisplay"></div>
+        <div id="toast">전송되었습니다.</div>
+    </div>
 
     <div id="loadingOverlay">
         <div class="loader"></div>
-        <div id="loadingText">출석 정보를 동기화하고 있습니다...</div>
+        <div id="loadingText">불러오는 중...</div>
     </div>
 
     <script>
-        let supervisorName = sessionStorage.getItem('yajaSupervisor') || '';
-        let allowedTeachers = []; // 구글 시트에서 받아올 동적 명단 (v20)
-        let teacherListPromise = null;
-        let studentListPromise = null;
+        let supervisorName = sessionStorage.getItem('summerSupervisor') || '';
+        let allowedTeachers = [];
+        let globalData = [];
+        let currentPeriod = '1';
+        // attendance[room][studentId] = { status: bool, remark: string }
+        let attendance = { '2-3': {}, '2-4': {} };
+        let memoTargetId = null;
 
-        function showLoading(type = 'init', text) {
-            const overlay = document.getElementById('loadingOverlay');
-            if (!overlay) return;
+        const ROOMS = ['2-3', '2-4'];
+        const DAY_MAP = ['일', '월', '화', '수', '목', '금', '토'];
 
-            if (text) {
-                document.getElementById('loadingText').innerText = text;
-            } else {
-                const messages = type === 'upload' ? uploadLoadingMessages : initLoadingMessages;
-                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-                document.getElementById('loadingText').innerText = randomMsg;
-            }
-            overlay.style.display = 'flex';
+        function showLoading(text) {
+            document.getElementById('loadingText').innerText = text || '불러오는 중...';
+            document.getElementById('loadingOverlay').style.display = 'flex';
         }
 
         function hideLoading() {
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        function cleanupOldCache() {
-            const todayStr = getTodayDateString();
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && (key.startsWith('att_') || key.startsWith('rem_') || key.startsWith('sup_') || key.startsWith('synced_') || key.startsWith('initial_att_') || key.startsWith('initial_rem_'))) {
-                    if (!key.includes(todayStr)) {
-                        keysToRemove.push(key);
-                    }
-                }
-            }
-            keysToRemove.forEach(k => localStorage.removeItem(k));
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        function loadGlobalDataFromCache() {
-            const cached = localStorage.getItem('yajaStudentList');
-            if (cached) {
-                try {
-                    globalData = JSON.parse(cached);
-                    if (Array.isArray(globalData) && globalData.length > 0) return true;
-                } catch (e) {
-                    localStorage.removeItem('yajaStudentList');
-                }
-            }
-            return false;
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function getTodayDateString() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
         }
 
         function loadTeacherListFromCache() {
-            const cached = localStorage.getItem('yajaTeacherList');
-            if (cached) {
-                try {
-                    allowedTeachers = JSON.parse(cached);
-                    if (Array.isArray(allowedTeachers) && allowedTeachers.length > 0) return true;
-                } catch (e) {
-                    localStorage.removeItem('yajaTeacherList');
-                }
+            const cached = localStorage.getItem('summerTeacherList');
+            if (!cached) return false;
+            try {
+                allowedTeachers = JSON.parse(cached);
+                return Array.isArray(allowedTeachers) && allowedTeachers.length > 0;
+            } catch (e) {
+                localStorage.removeItem('summerTeacherList');
+                return false;
             }
-            return false;
         }
 
-        async function revalidateDataInBackground() {
+        function loadStudentListFromCache() {
+            const cached = localStorage.getItem('summerStudentList');
+            if (!cached) return false;
             try {
-                await Promise.all([fetchTeacherList(), fetchGlobalData(true)]);
-                if (supervisorName && document.getElementById('mainApp').style.display === 'block') {
-                    renderSeating();
-                }
+                globalData = JSON.parse(cached);
+                return Array.isArray(globalData) && globalData.length > 0;
             } catch (e) {
-                console.error("백그라운드 동기화 실패:", e);
+                localStorage.removeItem('summerStudentList');
+                return false;
             }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            cleanupOldCache();
-            const hasStudents = loadGlobalDataFromCache();
-            loadTeacherListFromCache();
-            SyncManager.init();
-            createBubbles();
+            document.getElementById('dateInput').value = getTodayDateString();
+            document.getElementById('dateInput').addEventListener('change', onDateOrPeriodChange);
 
-            if (supervisorName) {
-                if (hasStudents) {
-                    await startAppSession(supervisorName);
-                } else {
-                    showLoading('init', "학생 명단을 불러오는 중...");
-                    await fetchGlobalData(true);
-                    await startAppSession(supervisorName);
-                }
-            } else {
-                hideLoading();
+            const hasTeachers = loadTeacherListFromCache();
+            const hasStudents = loadStudentListFromCache();
+
+            if (supervisorName && hasStudents) {
+                // 캐시가 있으면 네트워크 응답을 기다리지 않고 즉시 화면을 띄움
+                await startAppSession(supervisorName, { skipFetch: true });
+            } else if (supervisorName) {
+                showLoading('학생 명단을 불러오는 중...');
+                await fetchTeacherList(true);
+                await fetchSummerStudents(true);
+                await startAppSession(supervisorName, { skipFetch: true });
             }
 
-            revalidateDataInBackground();
+            // 캐시로 먼저 띄운 경우에도 최신 데이터로 백그라운드 갱신
+            if (supervisorName) {
+                revalidateDataInBackground();
+            }
         });
 
-        async function startAppSession(name) {
+        async function revalidateDataInBackground() {
+            try {
+                const [teacherResult, studentResult] = await Promise.all([
+                    fetchTeacherList(true),
+                    fetchSummerStudents(true)
+                ]);
+                if (studentResult.changed && document.getElementById('mainApp').style.display === 'block') {
+                    onDateOrPeriodChange();
+                }
+            } catch (e) {
+                console.error('백그라운드 동기화 실패', e);
+            }
+        }
+
+        async function startAppSession(name, opts) {
             supervisorName = name;
-            sessionStorage.setItem('yajaSupervisor', supervisorName);
+            sessionStorage.setItem('summerSupervisor', supervisorName);
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
             document.getElementById('displaySupervisorName').innerText = supervisorName;
-
-            // 이미 초기 로딩(DOMContentLoaded)에서 데이터를 다 가져왔으므로
-            // 여기서는 별도의 로딩 없이 즉시 렌더링만 진행합니다.
-            renderSeating();
-
-            // 로딩창 닫기
             hideLoading();
+            await onDateOrPeriodChange();
         }
 
         async function handleLogin() {
             const nameInput = document.getElementById('teacherNameInput').value.trim();
-
             if (!nameInput) {
-                showAlert('감독 교사 성함을 입력해주세요.');
+                alert('감독 교사 성함을 입력해주세요.');
                 return;
             }
 
-            // 교사 명단이 아직 로드 안됐으면 대기
-            if (allowedTeachers.length === 0) {
-                showLoading('init', "교사 명단을 확인하는 중...");
-                await fetchTeacherList();
+            // 교사 명단 / 학생 명단을 동시에(병렬로) 요청해서 GAS 콜드스타트 대기 시간을 한 번만 겪도록 함
+            const needTeachers = allowedTeachers.length === 0;
+            const needStudents = globalData.length === 0;
+            if (needTeachers || needStudents) {
+                showLoading('명단을 불러오는 중...');
+                const [teacherResult, studentResult] = await Promise.all([
+                    needTeachers ? fetchTeacherList(true) : Promise.resolve({ success: true }),
+                    needStudents ? fetchSummerStudents(true) : Promise.resolve({ success: true })
+                ]);
                 hideLoading();
-            }
 
-            if (allowedTeachers.length === 0) {
-                showAlert('인터넷 연결이 원활하지 않거나 구글 시트 주소가 올바르지 않아 교사 명단을 불러올 수 없습니다.\n인터넷 연결을 확인한 후 다시 시도해 주세요.');
-                return;
+                if (!teacherResult.success) {
+                    alert('인터넷 연결이 원활하지 않거나 구글 시트 주소가 올바르지 않아 교사 명단을 불러올 수 없습니다.');
+                    return;
+                }
+                if (!studentResult.success) {
+                    alert('구글 시트에서 자기주도학습 명단을 가져오는 데 실패했습니다.');
+                    return;
+                }
             }
 
             if (!allowedTeachers.includes(nameInput)) {
-                showAlert('등록되지 않은 선생님입니다. 입력하신 성함을 다시 한 번 확인해주세요.');
+                alert('등록되지 않은 선생님입니다. 입력하신 성함을 다시 한 번 확인해주세요.');
                 return;
-            }
-
-            // 학생 데이터가 아직 없는 경우에만 로딩 (보통은 초기화에서 이미 로드 완료)
-            if (globalData.length === 0) {
-                showLoading('init', "학생 명단을 불러오는 중...");
-                const success = await fetchGlobalData(true);
-                if (!success) {
-                    hideLoading();
-                    showAlert('구글 시트에서 학생 명단을 가져오는 데 실패했습니다.');
-                    return;
-                }
             }
 
             await startAppSession(nameInput);
         }
 
-
-        async function fetchTeacherList() {
-            if (teacherListPromise) return teacherListPromise;
-
-            const gasUrl = document.getElementById('gasUrl').value.trim();
-            if (!gasUrl) return;
-
-            teacherListPromise = (async () => {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
-
-                    const response = await fetch(`${gasUrl}?action=getTeachers`, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-
-                    const names = await response.json();
-                    if (Array.isArray(names)) {
-                        allowedTeachers = names;
-                        localStorage.setItem('yajaTeacherList', JSON.stringify(allowedTeachers));
-                        console.log("감독 교사 명단 로드 완료:", allowedTeachers.length, "명");
-                    }
-                } catch (e) {
-                    console.error("Fetch teachers error:", e);
-                } finally {
-                    teacherListPromise = null;
-                }
-            })();
-
-            return teacherListPromise;
+        function handleLogout() {
+            if (!confirm('로그아웃 하시겠습니까?')) return;
+            sessionStorage.removeItem('summerSupervisor');
+            supervisorName = '';
+            document.getElementById('teacherNameInput').value = '';
+            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
         }
 
-        async function handleLogout() {
-            showConfirm('로그아웃 하시겠습니까?', () => {
-                sessionStorage.removeItem('yajaSupervisor');
-                // 로그아웃 시 보안을 위해 학생 명단 캐시도 삭제할 수 있지만, 
-                // 속도를 위해 남겨두는 편이 좋습니다. (필요 시 아래 주석 해제)
-                // localStorage.removeItem('yajaStudentList');
-                supervisorName = '';
-                document.getElementById('teacherNameInput').value = '';
-                document.getElementById('loginOverlay').style.display = 'flex';
-                document.getElementById('mainApp').style.display = 'none';
-            });
+        // force가 false면 캐시가 있으면 캐시만 쓰고 네트워크 요청을 하지 않음 (즉시 로딩용)
+        // 반환값: { success: 데이터를 확보했는지, changed: 이전 값과 달라졌는지 }
+        async function fetchTeacherList(force = false) {
+            if (!force && loadTeacherListFromCache()) return { success: true, changed: false };
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            try {
+                const res = await fetch(`${gasUrl}?action=getTeachers`);
+                const names = await res.json();
+                if (Array.isArray(names)) {
+                    const changed = JSON.stringify(names) !== JSON.stringify(allowedTeachers);
+                    allowedTeachers = names;
+                    localStorage.setItem('summerTeacherList', JSON.stringify(allowedTeachers));
+                    return { success: true, changed };
+                }
+            } catch (e) {
+                console.error('교사 명단 로드 실패', e);
+            }
+            return { success: allowedTeachers.length > 0, changed: false };
+        }
+
+        async function fetchSummerStudents(force = false) {
+            if (!force && loadStudentListFromCache()) return { success: true, changed: false };
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            try {
+                const res = await fetch(`${gasUrl}?action=getSummerStudents`);
+                const data = await res.json();
+                if (Array.isArray(data)) {
+                    const mapped = data.map(s => {
+                        const obj = {};
+                        for (const key in s) {
+                            obj[String(key).trim()] = (s[key] === null || s[key] === undefined) ? '' : String(s[key]).trim();
+                        }
+                        return obj;
+                    }).filter(s => s['학번']);
+                    const changed = JSON.stringify(mapped) !== JSON.stringify(globalData);
+                    globalData = mapped;
+                    localStorage.setItem('summerStudentList', JSON.stringify(globalData));
+                    return { success: true, changed };
+                }
+            } catch (e) {
+                console.error('자기주도학습 명단 로드 실패', e);
+            }
+            return { success: globalData.length > 0, changed: false };
         }
 
         async function refreshStudentList() {
-            showLoading('init', "최신 데이터를 불러오고 있습니다...");
-            const success = await fetchGlobalData(true); // 강제 새로고침
-            await fetchAllTodayAttendance(true, true); // 출결 데이터도 서버에서 새로 동기화
+            showLoading('최신 데이터를 불러오고 있습니다...');
+            const { success } = await fetchSummerStudents(true);
             hideLoading();
-            if (success) {
-                showToast("데이터가 성공적으로 갱신되었습니다.");
-                renderSeating();
-            } else {
-                showAlert("명단 갱신에 실패했습니다. 인터넷 연결을 확인해주세요.");
+            if (!success) {
+                alert('명단 갱신에 실패했습니다. 인터넷 연결을 확인해주세요.');
+                return;
             }
+            showToast('명단이 갱신되었습니다.');
+            await onDateOrPeriodChange();
         }
-        // 시트 데이터 캐싱 로직
-        let globalData = [];
-
-        async function fetchGlobalData(force = false) {
-            // 강제 갱신이 아니고 캐시가 존재하면 캐시 데이터 사용 (속도 향상)
-            if (!force) {
-                const cached = localStorage.getItem('yajaStudentList');
-                if (cached) {
-                    try {
-                        globalData = JSON.parse(cached);
-                        if (Array.isArray(globalData) && globalData.length > 0) {
-                            console.log("캐시된 학생 명단 로드 완료:", globalData.length, "명");
-                            return true;
-                        }
-                    } catch (e) {
-                        localStorage.removeItem('yajaStudentList');
-                    }
-                }
-            }
-
-            if (studentListPromise) return studentListPromise;
-
-            const gasUrl = document.getElementById('gasUrl').value.trim();
-            if (!gasUrl) return false;
-
-            studentListPromise = (async () => {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
-
-                    const response = await fetch(`${gasUrl}?action=getStudents`, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-
-                    const data = await response.json();
-                    if (Array.isArray(data)) {
-                        if (data.length === 0) {
-                            print("서버에서 빈 명단을 반환했습니다.")
-                            return false;
-                        }
-
-                        globalData = data.map(s => {
-                            const obj = {};
-                            for (let key in s) {
-                                const cleanKey = String(key).trim();
-                                obj[cleanKey] = (s[key] === null || s[key] === undefined) ? "" : String(s[key]).trim();
-                            }
-                            return obj;
-                        });
-
-                        localStorage.setItem('yajaStudentList', JSON.stringify(globalData));
-                        console.log("학생 명단 서버 로드 완료:", globalData.length, "명");
-
-                        return true;
-                    }
-                } catch (e) {
-                    console.error("Fetch students error:", e);
-                    if (!localStorage.getItem('yajaStudentList')) {
-                        showAlert("서버에서 학생 명단을 가져오는 데 실패했습니다.");
-                    }
-                } finally {
-                    studentListPromise = null;
-                }
-                return false;
-            })();
-
-            return studentListPromise;
-        }
-
-        // 오늘 요일 자동 감지 및 초기값 설정
-        const daysMap = ['일', '월', '화', '수', '목', '금', '토'];
-        const todayIdx = new Date().getDay();
-        const initialDay = (todayIdx >= 1 && todayIdx <= 5) ? daysMap[todayIdx] : '월';
-
-        let currentDay = initialDay;
-        let currentPeriod = '1';
 
         function selectPeriod(btn) {
-            document.querySelectorAll('#periodButtons [data-period]').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#periodButtons .day-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentPeriod = btn.dataset.period;
-            renderSeating();
+            onDateOrPeriodChange();
         }
 
-        document.querySelectorAll('#dayButtons .day-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('#dayButtons .day-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentDay = btn.dataset.day;
-                renderSeating();
-            });
-        });
+        function getSelectedDayInfo() {
+            const dateVal = document.getElementById('dateInput').value;
+            const d = new Date(dateVal + 'T00:00:00');
+            const day = DAY_MAP[d.getDay()];
+            return { dateVal, day, isWeekend: (day === '일' || day === '토') };
+        }
 
-        function getRoomStudents(day) {
-            const col1 = `${day}1`;
-            const col2 = `${day}2`;
-            const overrideCol = `${day}_배정`;
-
-            // 1. 방 리스트 초기화
-            const roomLists = { '2-3': [], '2-4': [], '2-5': [], '2-6': [] };
-            const unassignedStudents = [];
-
-            // 2. 수동 배정(Override) 우선 처리
+        function getRoomLists(day) {
+            const lists = { '2-3': [], '2-4': [] };
+            const periodKey = `${day}${currentPeriod}`; // 예: "월1" = 월요일 1교시 신청 여부
             globalData.forEach(s => {
-                const manualRoom = s[overrideCol];
-                const hasP1 = s[col1] && String(s[col1]).trim() !== '';
-                const hasP2 = s[col2] && String(s[col2]).trim() !== '';
-
-                if (manualRoom && roomLists[manualRoom]) {
-                    roomLists[manualRoom].push(s);
-                } else {
-                    // 수동 배정이 없는 경우, 1/2교시 중 하나라도 출석 번호가 있으면 미배정 목록에 추가
-                    if (hasP1 || hasP2) {
-                        unassignedStudents.push(s);
-                    }
+                // 해당 교시 신청 컬럼이 있으면, 신청한(값이 있는) 학생만 포함
+                if (Object.prototype.hasOwnProperty.call(s, periodKey)) {
+                    if (!(s[periodKey] || '').trim()) return;
                 }
+                const room = (s[`${day}_배정`] || '').trim();
+                if (lists[room]) lists[room].push(s);
             });
-
-            // 3. 미배정 학생들을 참여 시간(P1/P2/Both)에 따라 기본 그룹화
-            // (1 대신 실제 번호 값이 있으면 참여하는 것으로 간주)
-            let bothP = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
-            let p1Only = unassignedStudents.filter(s => (s[col1] && String(s[col1]).trim() !== '') && !(s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
-            let p2Only = unassignedStudents.filter(s => !(s[col1] && String(s[col1]).trim() !== '') && (s[col2] && String(s[col2]).trim() !== '')).sort((a, b) => Number(a.학번) - Number(b.학번));
-
-            // 4. 일반 자동 배정 (피리오드에 따라 반 할당)
-            roomLists['2-5'].push(...p1Only);
-            roomLists['2-6'].push(...p2Only);
-
-            // 5. 양쪽 시간대(bothP) 학생들을 2-3, 2-4반에 균등 분할
-            const half = Math.ceil(bothP.length / 2);
-            roomLists['2-3'].push(...bothP.slice(0, half));
-            roomLists['2-4'].push(...bothP.slice(half));
-
-            // 6. 모든 방 명단 학번 순 정렬 마무리
-            Object.keys(roomLists).forEach(room => {
-                roomLists[room].sort((a, b) => Number(a.학번) - Number(b.학번));
-            });
-
-            return roomLists;
+            ROOMS.forEach(r => lists[r].sort((a, b) => Number(a['학번']) - Number(b['학번'])));
+            return lists;
         }
 
-        // ====== Background Sync Manager (v23) ======
-        const SyncManager = {
-            queue: [],
-            isProcessing: false,
-            beforeUnloadHandlerBound: false,
+        async function onDateOrPeriodChange() {
+            const { day, isWeekend } = getSelectedDayInfo();
+            const display = document.getElementById('seatingDisplay');
 
-            init() {
-                // 1. localStorage에서 저장된 미전송 큐 로드
-                const stored = localStorage.getItem('yajaSyncQueue');
-                if (stored) {
-                    try {
-                        this.queue = JSON.parse(stored);
-                        // 혹시 남아있을 수 있는 'processing' 상태를 'pending'으로 복구
-                        this.queue.forEach(item => {
-                            if (item.status === 'processing') {
-                                item.status = 'pending';
-                            }
-                        });
-                        console.log("미전송 백그라운드 큐 로드 완료:", this.queue.length, "건");
-                    } catch (e) {
-                        localStorage.removeItem('yajaSyncQueue');
-                    }
-                }
-
-                // 2. UI 초기화 및 프로세스 시작
-                this.updateUI();
-                if (this.queue.length > 0) {
-                    this.processQueue();
-                }
-            },
-
-            saveQueue() {
-                localStorage.setItem('yajaSyncQueue', JSON.stringify(this.queue));
-                this.checkBeforeUnload();
-            },
-
-            checkBeforeUnload() {
-                const hasPending = this.queue.some(item => item.status === 'pending' || item.status === 'processing');
-                if (hasPending && !this.beforeUnloadHandlerBound) {
-                    window.addEventListener('beforeunload', this.beforeUnloadListener);
-                    this.beforeUnloadHandlerBound = true;
-                } else if (!hasPending && this.beforeUnloadHandlerBound) {
-                    window.removeEventListener('beforeunload', this.beforeUnloadListener);
-                    this.beforeUnloadHandlerBound = false;
-                }
-            },
-
-            beforeUnloadListener(e) {
-                const message = "현재 출결 시트 전송이 백그라운드에서 진행 중입니다. 페이지를 닫으시면 전송이 중단될 수 있습니다.";
-                e.returnValue = message;
-                return message;
-            },
-
-            add(roomName, payload) {
-                const id = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const item = {
-                    id,
-                    roomName,
-                    payload,
-                    status: 'pending',
-                    retries: 0
-                };
-
-                // 동일 학급/교시의 이전 요청이 있다면 상태에 관계없이 제거하고 최신 것으로 대체 (중복 전송 방지)
-                this.queue = this.queue.filter(q => !(q.roomName === roomName && q.payload.period === payload.period));
-
-                this.queue.push(item);
-                this.saveQueue();
-                this.updateUI();
-                this.processQueue();
-            },
-
-            async processQueue() {
-                if (this.isProcessing) return;
-                this.isProcessing = true;
-
-                while (this.queue.some(item => item.status === 'pending')) {
-                    const item = this.queue.find(item => item.status === 'pending');
-                    if (!item) break;
-
-                    item.status = 'processing';
-                    this.saveQueue();
-                    this.updateUI();
-
-                    try {
-                        const gasUrl = document.getElementById('gasUrl').value.trim();
-                        if (!gasUrl) throw new Error("GAS URL이 비어있습니다.");
-
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15초 제한
-
-                        await fetch(gasUrl, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            body: JSON.stringify(item.payload),
-                            signal: controller.signal
-                        });
-
-                        clearTimeout(timeoutId);
-
-                        // 전송 성공 처리
-                        item.status = 'success';
-                        const dateStr = getTodayDateString();
-                        const periodNum = item.payload.period.replace('교시', '');
-                        localStorage.setItem(`synced_${dateStr}_${item.payload.day}_${periodNum}_${item.roomName}`, 'true');
-
-                        // 동기화 완료 토스트 업데이트 후 3초 뒤에 제거
-                        this.saveQueue();
-                        this.updateUI();
-
-                        const toastId = item.id;
-                        setTimeout(() => {
-                            this.queue = this.queue.filter(q => q.id !== toastId);
-                            this.saveQueue();
-                            this.updateUI();
-                        }, 3000);
-
-                    } catch (e) {
-                        console.error("Sync failed for room:", item.roomName, e);
-                        item.retries++;
-                        if (item.retries >= 3) {
-                            item.status = 'failed';
-                            this.saveQueue();
-                            this.updateUI();
-                            showAlert(`${item.roomName}반 출결 시트 전송에 실패했습니다.\n네트워크 연결을 확인한 후 다시 시도해 주세요.`);
-
-                            // 8초 후 큐에서 제거
-                            const toastId = item.id;
-                            setTimeout(() => {
-                                this.queue = this.queue.filter(q => q.id !== toastId);
-                                this.saveQueue();
-                                this.updateUI();
-                            }, 8000);
-                        } else {
-                            // 대기 상태로 되돌려 다음 루프에서 재시도 하도록 유도
-                            item.status = 'pending';
-                            this.saveQueue();
-                            this.updateUI();
-                            // 재시도 대기 (2초 후)
-                            await new Promise(resolve => setTimeout(resolve, 2000));
-                        }
-                    }
-                }
-
-                this.isProcessing = false;
-                this.checkBeforeUnload();
-            },
-
-            updateUI() {
-                let container = document.getElementById('sync-status-container');
-                if (!container) {
-                    container = document.createElement('div');
-                    container.id = 'sync-status-container';
-                    document.body.appendChild(container);
-                }
-
-                const activeItems = this.queue.filter(item => ['pending', 'processing', 'success', 'failed'].includes(item.status));
-
-                container.innerHTML = '';
-                activeItems.forEach(item => {
-                    const toast = document.createElement('div');
-                    toast.className = 'sync-toast show';
-                    toast.id = `toast_${item.id}`;
-
-                    let iconHtml = '';
-                    let textHtml = '';
-
-                    if (item.status === 'pending' || item.status === 'processing') {
-                        iconHtml = '<div class="spinner"></div>';
-                        textHtml = `<span class="text">${item.roomName}반 전송 중...</span>`;
-                    } else if (item.status === 'success') {
-                        iconHtml = '<span class="icon-success">✓</span>';
-                        textHtml = `<span class="text" style="color: #10B981;">${item.roomName}반 전송 완료!</span>`;
-                    } else if (item.status === 'failed') {
-                        iconHtml = '<span class="icon-error">✗</span>';
-                        textHtml = `<span class="text" style="color: #EF4444;">${item.roomName}반 전송 실패 (다시 시도)</span>`;
-                    }
-
-                    toast.innerHTML = `${iconHtml}${textHtml}`;
-                    container.appendChild(toast);
-                });
-
-                // 각 자습실의 시트 전송 버튼 상태 동기화
-                const rooms = ['2-3', '2-4', '2-5', '2-6'];
-                rooms.forEach(roomName => {
-                    const submitBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-submit`);
-                    if (submitBtn) {
-                        const isSyncing = this.queue.some(item => item.roomName === roomName && (item.status === 'pending' || item.status === 'processing'));
-                        if (isSyncing) {
-                            submitBtn.disabled = true;
-                            submitBtn.classList.add('btn-success-temp');
-                            submitBtn.innerHTML = '✅ 전송 요청됨';
-                        } else {
-                            submitBtn.disabled = false;
-                            submitBtn.classList.remove('btn-success-temp');
-                            submitBtn.innerHTML = '💾 시트 전송';
-                        }
-                    }
-                });
+            if (isWeekend) {
+                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">주말(${day}요일)에는 여름방학 자기주도학습이 운영되지 않습니다.</div></div>`;
+                return;
             }
-        };
 
-        async function saveRoomAttendanceToSheet(roomName) {
+            if (!globalData.length) {
+                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">여름방학 자기주도학습 명단을 불러오지 못했습니다. [명단 갱신]을 눌러주세요.</div></div>`;
+                return;
+            }
+
+            // 출결 데이터가 도착하기 전에도 명단부터 먼저 그려서 "오래 걸린다"는 느낌을 줄임
+            attendance = { '2-3': {}, '2-4': {} };
+            renderSeating(day, true);
+
+            await fetchAllAttendance(day);
+            renderSeating(day, false);
+        }
+
+        // 2-3반/2-4반을 따로 조회하지 않고 한 번의 요청으로 합쳐서 가져와 GAS 콜드스타트 지연을 절반으로 줄임
+        async function fetchAllAttendance(day) {
+            const { dateVal } = getSelectedDayInfo();
             const gasUrl = document.getElementById('gasUrl').value.trim();
-            if (!gasUrl) return;
+            const roomLists = getRoomLists(day);
+            const idToRoom = {};
+            ROOMS.forEach(r => roomLists[r].forEach(s => { idToRoom[s['학번']] = r; }));
 
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
+                const url = `${gasUrl}?sheetTarget=summer&date=${encodeURIComponent(dateVal)}&day=${encodeURIComponent(day)}&period=${currentPeriod}교시`;
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                const data = await res.json();
 
-            if (currentDay !== actualToday) {
-                showAlert(`${actualToday}요일 데이터만 시트 전송이 가능합니다.\n현재 선택된 요일(${currentDay}요일)은 전송할 수 없습니다.`);
-                return;
-            }
-
-            const roomStudents = getRoomStudents(currentDay)[roomName];
-            const activeStudents = roomStudents.filter(s => s[`${currentDay}${currentPeriod}`] && String(s[`${currentDay}${currentPeriod}`]).trim() !== '');
-
-            if (activeStudents.length === 0) {
-                showAlert(`${roomName}반에 ${currentPeriod}교시 참여 학생이 없습니다.`);
-                return;
-            }
-
-            const dateStr = getTodayDateString();
-
-            let isAnyStatusChanged = false;
-            activeStudents.forEach(s => {
-                const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`;
-                const attVal = localStorage.getItem(attKey);
-                const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true || attVal === '출석');
-                const initialStatus = localStorage.getItem(`initial_att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`);
-
-                if (initialStatus !== null) {
-                    const currentStatusStr = isPresent ? 'true' : 'false';
-                    const initialStatusStr = (initialStatus === 'true' || initialStatus === '출석') ? 'true' : 'false';
-                    if (currentStatusStr !== initialStatusStr) isAnyStatusChanged = true;
+                attendance = { '2-3': {}, '2-4': {} };
+                Object.keys(data || {}).forEach(id => {
+                    const room = idToRoom[id];
+                    if (room) attendance[room][id] = data[id];
+                });
+            } catch (e) {
+                console.error('출결 정보 로드 실패', e);
+                if (e.name === 'AbortError') {
+                    showToast('서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.');
                 }
+            }
+        }
+
+        function renderSeating(day, isSyncing) {
+            const display = document.getElementById('seatingDisplay');
+            display.innerHTML = '';
+            const roomLists = getRoomLists(day);
+
+            ROOMS.forEach(room => {
+                const students = roomLists[room];
+                const section = document.createElement('div');
+                section.className = 'classroom-section';
+                section.setAttribute('data-room', room);
+                const colorClass = 'color-' + room;
+                const syncBadge = isSyncing ? ` · 동기화 중` : '';
+
+                section.innerHTML = `
+                    <div class="classroom-header">
+                        <span class="room-title ${colorClass}">${room}반</span>
+                        <div class="header-right-btns">
+                            <span class="room-meta">${day}요일 ${currentPeriod}교시 · ${students.length}명${syncBadge}</span>
+                            <button class="btn btn-primary" onclick="submitRoom('${room}')" ${isSyncing ? 'disabled' : ''}>출결 전송</button>
+                        </div>
+                    </div>
+                    <div class="seat-grid"></div>
+                `;
+
+                const grid = section.querySelector('.seat-grid');
+                if (students.length === 0) {
+                    grid.innerHTML = `<div class="empty-room-msg" style="grid-column: 1/-1;">${day}요일 ${currentPeriod}교시에 ${room}반 신청 학생이 없습니다.</div>`;
+                } else {
+                    students.forEach(s => {
+                        const id = s['학번'];
+                        const saved = attendance[room][id];
+                        const isPresent = saved ? saved.status : false;
+                        const remark = saved ? (saved.remark || '') : '';
+
+                        const seat = document.createElement('div');
+                        seat.className = 'seat' + (isPresent ? ' present' : '') + (remark ? ' has-memo' : '');
+                        seat.dataset.id = id;
+                        seat.dataset.name = s['이름'];
+                        seat.dataset.remark = remark;
+                        seat.innerHTML = `<div class="student-id">${escapeHtml(id)}</div><div class="student-name">${escapeHtml(s['이름'])}</div>`
+                            + (remark ? `<div class="seat-memo">${escapeHtml(remark)}</div>` : '');
+
+                        setupSeatEvents(seat, room);
+                        grid.appendChild(seat);
+                    });
+                }
+
+                display.appendChild(section);
             });
+        }
 
-            const currentSup = (typeof supervisorName !== 'undefined' && supervisorName) ? supervisorName : "선생님";
-            const existingRoomSup = localStorage.getItem(`sup_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`);
-            const batchSupervisor = (isAnyStatusChanged || !existingRoomSup || existingRoomSup === "선생님") ? currentSup : existingRoomSup;
+        function setupSeatEvents(seatEl, room) {
+            let pressTimer = null;
+            let isLong = false;
 
-            const studentsData = activeStudents.map(s => {
-                const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`;
-                const attVal = localStorage.getItem(attKey);
-                const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true || attVal === '출석');
-                const remark = localStorage.getItem(`rem_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`) || "";
-
-                return {
-                    id: s.학번,
-                    name: s.이름,
-                    status: isPresent,
-                    remark: remark,
-                    supervisor: batchSupervisor
-                };
-            });
-
-            const payload = {
-                type: "bulk",
-                date: dateStr,
-                day: currentDay,
-                period: currentPeriod + '교시',
-                room: roomName,
-                supervisor: batchSupervisor,
-                students: studentsData
+            const openMemo = () => {
+                isLong = true;
+                openMemoModal(seatEl.dataset.id, seatEl.dataset.name, room, seatEl.dataset.remark);
             };
 
-            // 버튼 즉시 성공 상태 변경 피드백
-            const submitBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-submit`);
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.classList.add('btn-success-temp');
-                submitBtn.innerHTML = '✅ 전송 요청됨';
-            }
-
-            // SyncManager에 위임하여 백그라운드 전송 실행
-            SyncManager.add(roomName, payload);
+            seatEl.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return;
+                isLong = false;
+                pressTimer = setTimeout(openMemo, 550);
+            });
+            seatEl.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+                if (!isLong) togglePresent(seatEl, room);
+            });
+            seatEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+            seatEl.addEventListener('touchstart', (e) => {
+                isLong = false;
+                pressTimer = setTimeout(openMemo, 550);
+            }, { passive: true });
+            seatEl.addEventListener('touchend', () => {
+                clearTimeout(pressTimer);
+                if (!isLong) togglePresent(seatEl, room);
+            });
+            seatEl.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                openMemoModal(seatEl.dataset.id, seatEl.dataset.name, room, seatEl.dataset.remark);
+            });
         }
 
-        // ====== Memo (Long Press) Feature ======
-        let memoCurrentStudentId = null;
-        let memoCurrentDay = null;
-        let memoCurrentPeriod = null;
-        let memoCurrentRoom = null;
+        function togglePresent(seatEl, room) {
+            const id = seatEl.dataset.id;
+            const nowPresent = seatEl.classList.contains('present');
+            seatEl.classList.toggle('present', !nowPresent);
+            if (!attendance[room][id]) attendance[room][id] = { status: false, remark: '' };
+            attendance[room][id].status = !nowPresent;
+        }
 
-        function openMemoModal(studentId, studentName, day, period, room) {
-            memoCurrentStudentId = studentId;
-            memoCurrentDay = day;
-            memoCurrentPeriod = period;
-            memoCurrentRoom = room;
-
-            document.getElementById('memoStudentName').innerText = studentName;
-            document.getElementById('memoStudentId').innerText = studentId;
-
-            const dateStr = getTodayDateString();
-            const remarkKey = `rem_${dateStr}_${day}_${period}_${studentId}`;
-            const existing = localStorage.getItem(remarkKey) || '';
-            document.getElementById('memoTextarea').value = existing;
-
-            // 과거 날짜 여부 확인
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
-            const isPastDay = (day !== actualToday);
-
-            if (isPastDay) {
-                document.getElementById('memoDateContainer').style.display = 'block';
-                const lastDate = localStorage.getItem('last_past_date') || '';
-                document.getElementById('memoDatePicker').value = lastDate;
-            } else {
-                document.getElementById('memoDateContainer').style.display = 'none';
-            }
-
-            document.getElementById('memoBtnSave').style.display = 'block';
-            document.getElementById('memoBtnClear').style.display = 'block';
-
+        function openMemoModal(studentId, studentName, room, remark) {
+            memoTargetId = { studentId, room };
+            document.getElementById('memoStudentName').innerText = `${studentName} (${studentId})`;
+            document.getElementById('memoTextarea').value = remark || '';
             document.getElementById('memoModal').style.display = 'flex';
-
-            setTimeout(() => {
-                document.getElementById('memoTextarea').focus();
-            }, 300);
         }
 
         function closeMemoModal() {
             document.getElementById('memoModal').style.display = 'none';
-            memoCurrentStudentId = null;
+            memoTargetId = null;
         }
 
         function saveMemo() {
-            if (!memoCurrentStudentId) return;
-            const text = document.getElementById('memoTextarea').value.trim();
-            const dateStr = getTodayDateString();
-            const remarkKey = `rem_${dateStr}_${memoCurrentDay}_${memoCurrentPeriod}_${memoCurrentStudentId}`;
+            if (!memoTargetId) return;
+            const { studentId, room } = memoTargetId;
+            const remark = document.getElementById('memoTextarea').value.trim();
+            if (!attendance[room][studentId]) attendance[room][studentId] = { status: false, remark: '' };
+            attendance[room][studentId].remark = remark;
 
-            // 과거 날짜 여부 확인
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
-            const isPastDay = (memoCurrentDay !== actualToday);
-
-            if (isPastDay) {
-                const dateInput = document.getElementById('memoDatePicker').value;
-                if (!dateInput && text) {
-                    showAlert('과거 메모를 기록할 정확한 날짜를 선택해주세요.');
-                    return;
-                }
-                const pastDateKey = `past_date_${memoCurrentDay}_${memoCurrentPeriod}_${memoCurrentStudentId}`;
-                if (text) {
-                    const d = new Date(dateInput);
-                    const formattedDate = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
-                    localStorage.setItem(pastDateKey, formattedDate);
-                    localStorage.setItem('last_past_date', dateInput); // 다음 입력의 편의성을 위해 기억
-                } else {
-                    localStorage.removeItem(pastDateKey);
-                }
-            }
-
-            if (text) {
-                localStorage.setItem(remarkKey, text);
-            } else {
-                localStorage.removeItem(remarkKey);
-            }
-
-            closeMemoModal();
-            showToast(text ? '📝 메모가 임시 저장되었습니다.' : '🗑️ 메모가 삭제되었습니다.');
-
-            renderSeating();
-        }
-
-        function clearMemo() {
-            document.getElementById('memoTextarea').value = '';
-        }
-
-        async function sendBulkPastMemos(roomName) {
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
-            if (currentDay === actualToday) return;
-
-            const dateStr = getTodayDateString();
-            const prefix = `rem_${dateStr}_${currentDay}_${currentPeriod}_`;
-            const datePrefix = `past_date_${currentDay}_${currentPeriod}_`;
-
-            const memosToSend = [];
-
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith(prefix)) {
-                    const studentId = key.split('_').pop();
-                    const text = localStorage.getItem(key);
-                    const pastDate = localStorage.getItem(datePrefix + studentId);
-
-                    if (text && pastDate) {
-                        const studentObj = globalData.find(s => String(s['학번']) === String(studentId));
-                        if (!studentObj) continue;
-
-                        const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${studentId}`;
-                        const isChecked = (localStorage.getItem(attKey) === 'true');
-                        if (isChecked) {
-                            showAlert(`${studentObj['이름']} 학생의 출결 기록이 변경되어 있습니다.\n지난 과거의 출결 기록은 앱에서 변경할 수 없습니다.\n체크를 해제하고 시트에서 직접 변경해주세요.`);
-                            return;
-                        }
-
-                        memosToSend.push({
-                            date: pastDate,
-                            day: currentDay,
-                            period: currentPeriod + '교시',
-                            room: roomName,
-                            supervisor: (typeof supervisorName !== 'undefined' && supervisorName) ? supervisorName : "선생님",
-                            student: {
-                                id: studentId,
-                                name: studentObj['이름'],
-                                remark: text,
-                                status: false
-                            }
-                        });
+            const seatEl = document.querySelector(`.classroom-section[data-room="${room}"] .seat[data-id="${studentId}"]`);
+            if (seatEl) {
+                seatEl.dataset.remark = remark;
+                seatEl.classList.toggle('has-memo', !!remark);
+                let memoEl = seatEl.querySelector('.seat-memo');
+                if (remark) {
+                    if (!memoEl) {
+                        memoEl = document.createElement('div');
+                        memoEl.className = 'seat-memo';
+                        seatEl.appendChild(memoEl);
                     }
+                    memoEl.textContent = remark;
+                } else if (memoEl) {
+                    memoEl.remove();
                 }
             }
+            closeMemoModal();
+        }
 
-            if (memosToSend.length === 0) {
-                showAlert("전송할 과거 메모가 없습니다. 먼저 학생을 꾹 눌러 메모를 저장해주세요.");
+        async function submitRoom(room) {
+            const { dateVal, day } = getSelectedDayInfo();
+            const roomLists = getRoomLists(day);
+            const students = roomLists[room];
+            if (!students.length) {
+                alert(`${room}반에 출석체크할 학생이 없습니다.`);
                 return;
             }
 
-            const gasUrl = document.getElementById('gasUrl').value.trim();
-            if (!gasUrl) return;
+            const studentsData = students.map(s => {
+                const id = s['학번'];
+                const saved = attendance[room][id] || { status: false, remark: '' };
+                return { id, name: s['이름'], status: !!saved.status, remark: saved.remark || '', supervisor: supervisorName };
+            });
 
             const payload = {
-                type: "past_memos",
-                memos: memosToSend
+                sheetTarget: 'summer',
+                type: 'batch',
+                date: dateVal,
+                day: day,
+                period: `${currentPeriod}교시`,
+                room: room,
+                supervisor: supervisorName,
+                students: studentsData
             };
 
-            showLoading('upload', "과거 메모 일괄 전송 중...");
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            const btn = document.querySelector(`.classroom-section[data-room="${room}"] .btn-primary`);
+            if (btn) { btn.disabled = true; btn.innerText = '전송 중...'; }
 
+            try {
                 await fetch(gasUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
+                    body: JSON.stringify(payload)
                 });
-
-                clearTimeout(timeoutId);
-                showToast(`총 ${memosToSend.length}건의 과거 메모가 시트로 안전하게 전송되었습니다.`);
-                // 성공 후에도 로컬 데이터를 냅두어 시각적으로 유지되도록 함
-            } catch (error) {
-                console.error(error);
-                if (error.name === 'AbortError') {
-                    showAlert("과거 메모 전송 시간이 초과되었습니다. 네트워크 연결을 확인한 후 다시 시도해 주세요.");
-                } else {
-                    showAlert("전송 중 오류가 발생했습니다. 다시 시도해 주세요.");
-                }
+                showToast(`${room}반 출결이 전송되었습니다.`);
+            } catch (e) {
+                console.error(e);
+                alert(`${room}반 전송에 실패했습니다. 인터넷 연결을 확인해주세요.`);
             } finally {
-                hideLoading();
+                if (btn) { btn.disabled = false; btn.innerText = '출결 전송'; }
             }
         }
-
-        /**
-         * 좌석에 롱프레스(꾹 누르기) 이벤트를 설정합니다.
-         * - 짧게 누르면: 출석/결석 토글 (기존 기능)
-         * - 길게 누르면 (500ms): 메모 입력 모달 표시
-         */
-        let lastTouchTime = 0;
-
-        function setupLongPress(seatElement, studentId, studentName, attKey) {
-            let pressTimer = null;
-            let isLong = false;
-            let isMoved = false;
-            let startX = 0, startY = 0;
-
-            seatElement.style.touchAction = 'pan-y';
-
-            const startPress = (x, y, isTouch = false) => {
-                if (!isTouch && Date.now() - lastTouchTime < 500) return; // 마우스-터치 중복 발화 방지
-
-                isLong = false;
-                isMoved = false;
-                startX = x;
-                startY = y;
-
-                if (pressTimer) clearTimeout(pressTimer);
-                pressTimer = setTimeout(() => {
-                    if (isMoved) return;
-                    isLong = true;
-                    if (navigator.vibrate) navigator.vibrate(50);
-                    const roomName = seatElement.closest('.classroom-section').dataset.room;
-                    openMemoModal(studentId, studentName, currentDay, currentPeriod, roomName);
-                }, 600); // 500ms -> 600ms로 약간 여유있게
-            };
-
-            const cancelPress = () => {
-                clearTimeout(pressTimer);
-            };
-
-            const endPress = (isTouch = false) => {
-                if (!isTouch && Date.now() - lastTouchTime < 500) return;
-                if (isTouch) lastTouchTime = Date.now();
-
-                clearTimeout(pressTimer);
-
-                if (!isLong && !isMoved) {
-                    const attVal = localStorage.getItem(attKey);
-                    const nowPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true);
-                    localStorage.setItem(attKey, !nowPresent);
-                    seatElement.classList.toggle('present', !nowPresent);
-                }
-                isLong = false;
-                isMoved = false;
-            };
-
-            // Touch events (mobile)
-            seatElement.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                startPress(touch.clientX, touch.clientY, true);
-            }, { passive: true });
-
-            seatElement.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                const dx = Math.abs(touch.clientX - startX);
-                const dy = Math.abs(touch.clientY - startY);
-                // 판별 임계값을 20px로 상향 (너무 민감하지 않게)
-                if (dx > 20 || dy > 20) {
-                    isMoved = true;
-                    cancelPress();
-                }
-            }, { passive: true });
-
-            seatElement.addEventListener('touchend', (e) => {
-                endPress(true);
-            });
-
-            // Mouse events (desktop)
-            seatElement.addEventListener('mousedown', (e) => {
-                if (e.button !== 0) return;
-                startPress(e.clientX, e.clientY, false);
-            });
-
-            seatElement.addEventListener('mousemove', (e) => {
-                if (!pressTimer && !isMoved) return;
-                const dx = Math.abs(e.clientX - startX);
-                const dy = Math.abs(e.clientY - startY);
-                if (dx > 20 || dy > 20) {
-                    isMoved = true;
-                    cancelPress();
-                }
-            });
-
-            seatElement.addEventListener('mouseup', (e) => {
-                if (e.button !== 0) return;
-                endPress(false);
-            });
-
-            seatElement.addEventListener('mouseleave', () => {
-                cancelPress();
-                isMoved = false;
-            });
-            seatElement.addEventListener('contextmenu', (e) => e.preventDefault());
-        }
-
-        function renderSeating() {
-            const display = document.getElementById('seatingDisplay');
-            display.innerHTML = '';
-
-            if (!globalData || globalData.length === 0) {
-                display.innerHTML = `<div class="info-text" style="text-align:center; padding:80px 20px; width:100%; border:2px dashed var(--border); border-radius:30px;">
-                    현재 불러온 학생 명단이 없습니다.<br>상단 [🔄 명단 갱신] 버튼을 눌러 데이터를 불러와주세요.
-                </div>`;
-                return;
-            }
-
-            const roomStudents = getRoomStudents(currentDay);
-            const rooms = ['2-3', '2-4', '2-5', '2-6'];
-
-            let totalFetched = 0;
-            rooms.forEach(r => totalFetched += roomStudents[r].length);
-
-            if (totalFetched === 0) {
-                display.innerHTML = `<div class="info-text" style="text-align:center; padding:80px 20px; width:100%; border:2px dashed var(--border); border-radius:30px;">
-                    <span style="font-size:1.2rem; font-weight:700; color:var(--primary-dark);">${currentDay}요일에 배정된 학생이 없습니다.</span><br><br>
-                    <span style="color:var(--text-sub); display:block; margin-top:10px;">
-                        💡 <b>도움말</b><br>
-                        1. 구글 시트의 [${currentDay}1], [${currentDay}2] 컬럼에 숫자 '1'이 입력되어 있나요?<br>
-                        2. 시트의 데이터가 [학생명단] 탭에 위치하고 있나요?
-                    </span>
-                </div>`;
-                return;
-            }
-
-            // 실제 오늘 요일 확인 (동기화 제한용)
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
-
-            rooms.forEach(roomName => {
-                const students = roomStudents[roomName];
-                if (students.length === 0) return;
-
-                // 구글 시트 셀에 적힌 '숫자 (1~30)'를 실제 배치 좌석 번호로 매핑
-                let gridSeats = new Array(30).fill(null).map(() => []);
-                students.forEach(student => {
-                    let seatStr = student[`${currentDay}${currentPeriod}`];
-                    // 이번 교시에 빈칸이라면 다른 교시 자리를 기본 자리로 인식하여 배치 (.not-in-period 처리 위해)
-                    if (!seatStr || String(seatStr).trim() === '') {
-                        seatStr = student[`${currentDay}1`] || student[`${currentDay}2`];
-                    }
-                    if (seatStr && String(seatStr).trim() !== '') {
-                        const seatNum = parseInt(String(seatStr).trim(), 10);
-                        if (!isNaN(seatNum) && seatNum >= 1 && seatNum <= 30) {
-                            // 1번 자리: 칠판(교탁 앞) 맨 아랫줄 맨 왼쪽
-                            const row = 4 - Math.floor((seatNum - 1) / 6);
-                            const col = (seatNum - 1) % 6;
-                            const idx = row * 6 + col;
-                            gridSeats[idx].push(student);
-                        }
-                    }
-                });
-
-                const section = document.createElement('div');
-                section.className = 'classroom-section';
-                section.setAttribute('data-room', roomName);
-                const roomColorClass = 'color-' + roomName;
-
-                // Calculate unique students for the whole day in this room
-                const uniqueStudentsForDay = students.filter(s => {
-                    const p1 = s[`${currentDay}1`];
-                    const p2 = s[`${currentDay}2`];
-                    return (p1 && String(p1).trim() !== '') || (p2 && String(p2).trim() !== '');
-                });
-
-                const roomEmojis = {
-                    '2-3': '🌊',
-                    '2-4': '🏖️',
-                    '2-5': '🪸',
-                    '2-6': '🛟'
-                };
-                const roomEmoji = roomEmojis[roomName] || '';
-                section.innerHTML = `
-                    <div class="print-title">2학년 자기주도적 학습 자리 배치표</div>
-                    <div class="classroom-header">
-                        <div class="header-left">
-                            <span class="room-title ${roomColorClass}">${roomEmoji} ${roomName}반</span>
-                        </div>
-                        <div class="header-right-btns">
-                            ${(currentDay !== actualToday) ? `<button class="btn btn-past-memo" onclick="sendBulkPastMemos('${roomName}')">📝 과거 메모 일괄 전송</button>` : ''}
-                            <span class="sync-loading-indicator" style="color: #2e7d32; font-size: 0.8rem; font-weight: bold; display: none; align-items: center; gap: 4px;">
-                                <span class="spinner-small" style="display:inline-block; width:10px; height:10px; border:2px solid #2e7d32; border-radius:50%; border-top-color:transparent; animation:spin 1s linear infinite; vertical-align: middle;"></span>
-                                불러오는 중...
-                            </span>
-                            <button class="btn btn-refresh" onclick="fetchAttendanceFromSheet('${roomName}', { force: true })">🔄 출결 새로고침</button>
-                            <button class="btn btn-primary btn-submit" onclick="saveRoomAttendanceToSheet('${roomName}')">💾 시트 전송</button>
-                            <span class="room-meta">${currentDay}요일 | ${uniqueStudentsForDay.length}명</span>
-                        </div>
-                    </div>
-                    <div class="grid-6x5"></div>
-                    <div class="teacher-desk">교탁</div>
-                `;
-
-                const dateStr = getTodayDateString();
-                const syncCacheKey = `synced_${dateStr}_${currentDay}_${currentPeriod}_${roomName}`;
-                if (!localStorage.getItem(syncCacheKey)) {
-                    // 렌더링 시에는 항상 silent 옵션을 주어 로딩창이 뜨지 않게 함
-                    fetchAttendanceFromSheet(roomName, { silent: true });
-                }
-
-                const grid = section.querySelector('.grid-6x5');
-                gridSeats.forEach((inSeat, i) => {
-                    const col = i % 6;
-                    if (col === 2 || col === 4) grid.appendChild(Object.assign(document.createElement('div'), { className: 'spacer' }));
-
-                    const seat = document.createElement('div');
-                    seat.className = 'seat';
-                    seat.setAttribute('data-index', i);
-
-                    if (inSeat.length === 0) {
-                        seat.classList.add('empty');
-                    } else {
-                        // 기존처럼 마지막 배정 학생을 기본으로 표시하되
-                        const student = inSeat[inSeat.length - 1];
-
-                        const periodVal = student[`${currentDay}${currentPeriod}`];
-                        const isStudentInPeriod = periodVal && String(periodVal).trim() !== '';
-                        if (!isStudentInPeriod) {
-                            seat.classList.add('not-in-period');
-                            seat.innerHTML = `<div class="student-id">${student.학번}</div><div class="student-name">${student.이름}</div>`;
-                        } else {
-                            const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${student.학번}`;
-                            const attVal = localStorage.getItem(attKey);
-                            const isPresent = (attVal === 'true' || attVal === 'TRUE' || attVal === true);
-                            if (isPresent) seat.classList.add('present');
-
-                            const remarkKey = `rem_${dateStr}_${currentDay}_${currentPeriod}_${student.학번}`;
-                            const hasMemo = localStorage.getItem(remarkKey);
-
-                            let memoHtml = "";
-                            if (hasMemo) {
-                                // 글자 길이에 따른 유동적 폰트 크기 계산 (기본 0.75rem ~ 최소 0.45rem)
-                                const memoLen = hasMemo.length;
-                                let fontSize = 0.75;
-                                if (memoLen > 8) fontSize = 0.65;
-                                if (memoLen > 12) fontSize = 0.55;
-                                if (memoLen > 16) fontSize = 0.45;
-
-                                memoHtml = `<div class="student-memo" style="font-size: ${fontSize}rem;" title="${hasMemo}">${hasMemo}</div>`;
-                            }
-
-                            seat.innerHTML = `
-                                 <div class="student-id">${student.학번}</div>
-                                 <div class="student-name">${student.이름}</div>
-                                 ${memoHtml}
-                             `;
-                            setupLongPress(seat, student.학번, student.이름, attKey);
-                        }
-
-                        // 중복 시각적 알림 (엑셀 메모 기능과 유사)
-                        if (inSeat.length > 1) {
-                            seat.classList.add('overlap');
-                            const names = inSeat.map(s => s.이름).join(', ');
-                            seat.setAttribute('title', `⚠️ 중복 배정 알림: 이 자리에 ${names} 학생들이 함께 배정되어 있습니다. 구글 시트를 확인해주세요.`);
-                            // 우측 상단 삼각형 마커 추가
-                            seat.innerHTML += `<div class="overlap-marker"></div>`;
-                        }
-                    }
-                    // 구글 시트 순번 중심 철저화 (마우스 드래그 이동 원천 차단)
-                    grid.appendChild(seat);
-                });
-                display.appendChild(section);
-            });
-
-            // 시트 전송 중인 자습실 버튼 상태 적용
-            if (typeof SyncManager !== 'undefined' && SyncManager.updateUI) {
-                SyncManager.updateUI();
-            }
-        }
-
-        function fillZigzag(grid, students) {
-            let sIdx = 0;
-            for (let row = 4; row >= 0; row--) {
-                for (let col = 0; col < 6; col++) {
-                    const idx = row * 6 + col;
-                    if (!grid[idx] && (row + col) % 2 === 0 && sIdx < students.length) grid[idx] = students[sIdx++];
-                }
-            }
-            if (sIdx < students.length) {
-                for (let row = 4; row >= 0; row--) {
-                    for (let col = 0; col < 6; col++) {
-                        const idx = row * 6 + col;
-                        if (!grid[idx] && sIdx < students.length) grid[idx] = students[sIdx++];
-                    }
-                }
-            }
-        }
-
-        let draggedElement = null;
-        function handleDragStart(e) { draggedElement = this; e.dataTransfer.setData('text/plain', this.dataset.index); this.style.opacity = '0.4'; }
-        function handleDragOver(e) { e.preventDefault(); this.classList.add('drag-over'); }
-        function handleDragLeave() { this.classList.remove('drag-over'); }
-        function handleDrop(e) {
-            e.preventDefault();
-            this.classList.remove('drag-over');
-            if (draggedElement) draggedElement.style.opacity = '1';
-            const sIdx = parseInt(e.dataTransfer.getData('text/plain'));
-            const tIdx = parseInt(this.dataset.index);
-            const sRoom = draggedElement.parentElement.parentElement.dataset.room;
-            const tRoom = this.parentElement.parentElement.dataset.room;
-            if (sRoom !== tRoom || sIdx === tIdx) return;
-            const k = `yajaDataV2_${currentDay}_${sRoom}`;
-            let arr = JSON.parse(localStorage.getItem(k));
-            [arr[sIdx], arr[tIdx]] = [arr[tIdx], arr[sIdx]];
-            localStorage.setItem(k, JSON.stringify(arr));
-            showToast();
-            renderSeating();
-        }
-        function saveArrangement(roomName, grid) {
-            const dateStr = getTodayDateString();
-            localStorage.setItem(`yajaDataV2_${currentDay}_${roomName}`, JSON.stringify(grid.map(s => s ? s.학번 : "")));
-        }
-        function showToast(msg = '배치가 저장되었습니다.') {
-            const toast = document.getElementById('toast');
-            toast.innerHTML = `<span>✅</span> <span>${msg}</span>`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
-        }
-        function resetArrangement() {
-            showConfirm('현재 요일의 모든 배치를 초기화하시겠습니까?', () => {
-                Object.keys(localStorage).filter(k => k.startsWith(`yajaDataV2_${currentDay}_`)).forEach(k => localStorage.removeItem(k));
-                showToast('배치가 초기화되었습니다.');
-                renderSeating();
-            });
-        }
-
-
-        const initLoadingMessages = [
-            "선생님, 오늘 하루도 고생 많으셨습니다! ☕",
-            "구글 시트와 열심히 요정들이 소통하는 중입니다... 📡",
-            "잠시만요! 최신 명단을 준비하고 있습니다 ⏳",
-            "데이터를 안전하게 가져오고 있어요 🚀",
-            "출석부가 곧 도착합니다. 잠시만 기다려주세요! 📬"
-        ];
-
-        const uploadLoadingMessages = [
-            "출석 정보를 시트로 전송하고 있습니다... 📤",
-            "선생님의 소중한 기록을 안전하게 저장 중입니다 💾",
-            "시트에 데이터를 기록하고 있어요. 잠시만요! ✍️",
-            "전송 완료까지 아주 조금만 더 기다려주세요 ⏳",
-            "기록된 내용이 구글 시트에 잘 도착하고 있습니다 📡"
-        ];
-
-        function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.style.display = 'none';
-        }
-
-        function showAlert(msg) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalMessage').innerText = msg;
-            document.getElementById('modalCancel').style.display = 'none';
-            const confirmBtn = document.getElementById('modalConfirm');
-            confirmBtn.onclick = () => { modal.style.display = 'none'; };
-            modal.style.display = 'flex';
-        }
-
-        function showConfirm(msg, onConfirm) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('modalMessage').innerText = msg;
-            document.getElementById('modalCancel').style.display = 'block';
-            document.getElementById('modalCancel').onclick = () => { modal.style.display = 'none'; };
-            const confirmBtn = document.getElementById('modalConfirm');
-            confirmBtn.onclick = () => {
-                modal.style.display = 'none';
-                if (onConfirm) onConfirm();
-            };
-            modal.style.display = 'flex';
-        }
-
-        function getTodayDateString() {
-            // "2026. 3. 19." 형식으로 통일 (끝에 점 포함)
-            const d = new Date();
-            return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
-        }
-
-        const fetchingRooms = new Set();
-        /**
-         * 시트에서 출석 데이터를 가져오는 함수
-         * @param {string} roomName - 반 이름
-         * @param {Object} options - { silent: 로딩창 숨김 여부, day: 명시적 요일, period: 명시적 교시 }
-         */
-        async function fetchAttendanceFromSheet(roomName, options = {}) {
-            const { silent = false, day = currentDay, period = currentPeriod, force = false } = options;
-            const gasUrl = document.getElementById('gasUrl').value.trim();
-            if (!gasUrl) return;
-
-            const dateStr = getTodayDateString();
-            const fetchId = `${dateStr}_${day}_${period}_${roomName}`;
-
-            // 이미 요청 중이면 중복 방지
-            if (fetchingRooms.has(fetchId)) return;
-
-            const cacheKey = `synced_${fetchId}`;
-            if (!force && localStorage.getItem(cacheKey)) return;
-
-            fetchingRooms.add(fetchId);
-            const refreshBtn = document.querySelector(`.classroom-section[data-room="${roomName}"] .btn-refresh`);
-            if (refreshBtn && force) {
-                refreshBtn.disabled = true;
-                refreshBtn.innerHTML = '🔄 로딩 중...';
-            }
-
-            // 🟢 초록색 불러오는 중 표시 활성화 (자동으로 구글 시트에서 가져올 때만 표시)
-            const indicator = document.querySelector(`.classroom-section[data-room="${roomName}"] .sync-loading-indicator`);
-            if (indicator && !force) {
-                indicator.style.display = 'inline-flex';
-            }
-
-            try {
-                const url = `${gasUrl}${gasUrl.includes('?') ? '&' : '?'}date=${encodeURIComponent(dateStr)}&day=${encodeURIComponent(day)}&period=${encodeURIComponent(period + '교시')}&room=${encodeURIComponent(roomName)}`;
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 20000); // 20초 제한
-
-                const response = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                const results = await response.json();
-
-                if (results && typeof results === 'object' && !results.error) {
-                    let hasData = false;
-                    let existingSup = "";
-                    Object.keys(results).forEach(key => {
-                        const data = results[key];
-                        if (!data || typeof data !== 'object') return;
-
-                        // 학번 식별 (키값 자체가 학번이거나, 데이터 내부에 '학번' 필드가 있는 경우 모두 대응)
-                        const studentId = (data['학번'] || key || "").toString().trim();
-                        if (!studentId || studentId === "error" || studentId === "supervisor") return;
-
-                        hasData = true;
-                        // '상태' 열 확인
-                        const rawStatus = String(data['상태'] || data.status || "").trim();
-                        const statusStr = (rawStatus === '출석' || rawStatus.toLowerCase() === 'true') ? 'true' : 'false';
-
-                        localStorage.setItem(`att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
-                        localStorage.setItem(`rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
-
-                        // '감독교사' 열 확인
-                        const rawSup = (data['감독교사'] || data.supervisor || data['감독'] || data.teacher || "").trim();
-                        localStorage.setItem(`sup_val_${dateStr}_${day}_${period}_${studentId}`, rawSup);
-
-                        // v22: 변동 감지를 위한 초기 상태 별도 보관
-                        localStorage.setItem(`initial_att_${dateStr}_${day}_${period}_${studentId}`, statusStr);
-                        localStorage.setItem(`initial_rem_${dateStr}_${day}_${period}_${studentId}`, (data['비고'] || data.remark || "").trim());
-
-                        // 반 전체 대표 감독교사 정보 업데이트
-                        if (rawSup && !existingSup && rawSup !== "선생님") {
-                            existingSup = rawSup;
-                        }
-                    });
-
-                    if (hasData) {
-                        if (existingSup) {
-                            localStorage.setItem(`sup_${dateStr}_${day}_${period}_${roomName}`, existingSup);
-                        }
-                        localStorage.setItem(cacheKey, 'true');
-                        if (force) showToast(`${roomName}반 출결 정보를 업데이트했습니다.`);
-                    } else if (force) {
-                        showToast(`${roomName}반의 기존 출결 정보가 없습니다.`);
-                    }
-
-                    // 현재 보고 있는 화면과 데이터가 일치하면 UI 갱신
-                    if (currentDay === day && currentPeriod === period) {
-                        renderSeating();
-                    }
-                } else if (force && results && results.error) {
-                    showAlert(`오류 발생: ${results.error}`);
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                if (force) {
-                    if (error.name === 'AbortError') {
-                        showAlert(`${roomName}반 출결 조회 시간이 초과되었습니다. 네트워크 상태를 확인 후 다시 시도해 주세요.`);
-                    } else {
-                        showAlert(`${roomName}반 출결 정보를 가져오는 데 실패했습니다. 다시 시도해 주세요.`);
-                    }
-                }
-            } finally {
-                fetchingRooms.delete(fetchId);
-                // 🟢 초록색 불러오는 중 표시 비활성화
-                const cleanIndicator = document.querySelector(`.classroom-section[data-room="${roomName}"] .sync-loading-indicator`);
-                if (cleanIndicator) {
-                    cleanIndicator.style.display = 'none';
-                }
-                if (refreshBtn && force) {
-                    refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = '🔄 출결 새로고침';
-                }
-            }
-        }
-
-        // 실제 오늘 날짜(현지 시간 기준)의 모든 반/모든 교시 데이터를 한꺼번에 로드 (모달)
-        async function fetchAllTodayAttendance(silent = false, force = false) {
-            const rooms = ['2-3', '2-4', '2-5', '2-6'];
-            const periods = ['1', '2'];
-
-            // 실제 오늘 요일 감지
-            const dMap = ['일', '월', '화', '수', '목', '금', '토'];
-            const actualToday = dMap[new Date().getDay()];
-            if (actualToday === '일' || actualToday === '토') return;
-
-            if (!silent) showLoading("데이터를 빠르게 동기화하는 중입니다..."); // 모든 데이터 로드 시 로딩창 표시
-
-            try {
-                // v19 개선: 병렬 실행(Promise.all)으로 속도 대폭 향상 (기존 10초+ -> 약 2초)
-                const fetchPromises = [];
-                for (const p of periods) {
-                    for (const r of rooms) {
-                        fetchPromises.push(fetchAttendanceFromSheet(r, { silent: true, day: actualToday, period: p, force: force }));
-                    }
-                }
-                await Promise.all(fetchPromises);
-            } catch (error) {
-                console.error("전체 동기화 중 일부 오류 발생:", error);
-            } finally {
-                if (!silent) hideLoading();
-            }
-        }
-
-
-
-
-        // 요일 버튼 초기 활성화 (교시 버튼에 영향을 주지 않도록 선택자 한정)
-        const activeDayBtn = document.querySelector(`#dayButtons .day-btn[data-day="${currentDay}"]`);
-        if (activeDayBtn) {
-            document.querySelectorAll('#dayButtons .day-btn').forEach(b => b.classList.remove('active'));
-            activeDayBtn.classList.add('active');
-        }
-
-        // 교시 버튼 초기 활성화
-        const activePeriodBtn = document.querySelector(`#periodButtons .day-btn[data-period="${currentPeriod}"]`);
-        if (activePeriodBtn) {
-            document.querySelectorAll('#periodButtons .day-btn').forEach(b => b.classList.remove('active'));
-            activePeriodBtn.classList.add('active');
-        }
-
-        // Floating Bubbles dynamic creation
-        function createBubbles() {
-            const container = document.createElement('div');
-            container.className = 'bubble-container';
-            document.body.appendChild(container);
-
-            const bubbleCount = 20;
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-
-                // Randomize bubble size (5px to 20px)
-                const size = Math.random() * 15 + 5;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-
-                // Randomize horizontal position
-                bubble.style.left = `${Math.random() * 100}vw`;
-
-                // Randomize animation delay and duration
-                bubble.style.animationDelay = `${Math.random() * 8}s`;
-                bubble.style.animationDuration = `${Math.random() * 12 + 8}s`; // 8s to 20s
-
-                container.appendChild(bubble);
-            }
-        }
-
-
-        async function downloadPDF() {
-            const element = document.getElementById('seatingDisplay');
-            if (!element || element.innerHTML.trim() === "") {
-                showAlert("저장할 자리 배치도 데이터가 없습니다.");
-                return;
-            }
-
-            const opt = {
-                margin: 0,
-                filename: `야자배치도_${currentDay}_${currentPeriod}교시.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            showLoading();
-            const exportDataDay = currentDay;
-            document.body.classList.add('is-exporting-pdf');
-            document.body.classList.add(`is-exporting-pdf-${exportDataDay}`);
-
-            try {
-                // html2pdf는 전역 객체로 로드됨
-                await html2pdf().set(opt).from(element).save();
-            } catch (error) {
-                console.error("PDF Export Error:", error);
-                showAlert("PDF 저장 중 오류가 발생했습니다.");
-            } finally {
-                document.body.classList.remove('is-exporting-pdf');
-                document.body.classList.remove(`is-exporting-pdf-${exportDataDay}`);
-                hideLoading();
-            }
-        }
-
-        renderSeating();
-
-
-
     </script>
-
 </body>
 
 </html>
