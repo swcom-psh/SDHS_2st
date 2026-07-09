@@ -75,7 +75,10 @@
             padding: 28px 20px calc(90px + env(safe-area-inset-bottom));
         }
 
-        .wrap { max-width: 1040px; margin: 0 auto; }
+        .wrap {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
 
         /* ───────── 헤더 (석양 히어로 + 컨트롤) ───────── */
         header {
@@ -149,7 +152,9 @@
             font-size: 0.95rem;
             color: rgba(255, 240, 224, 0.82);
             font-weight: 500;
-            max-width: 34ch;
+            max-width: 40ch;
+            line-height: 1.5;
+            word-break: keep-all;
         }
 
         .controls-bar {
@@ -166,7 +171,9 @@
             margin-bottom: 14px;
         }
 
-        .spacer { flex: 1 1 auto; }
+        .spacer {
+            flex: 1 1 auto;
+        }
 
         #dateInput {
             padding: 10px 14px;
@@ -180,7 +187,11 @@
             transition: border-color 0.15s ease, background 0.15s ease;
         }
 
-        #dateInput:focus { outline: none; border-color: var(--sun); background: var(--surface); }
+        #dateInput:focus {
+            outline: none;
+            border-color: var(--sun);
+            background: var(--surface);
+        }
 
         #periodButtons {
             background: var(--surface-soft);
@@ -204,7 +215,9 @@
             transition: all 0.18s cubic-bezier(0.3, 0.9, 0.4, 1);
         }
 
-        #periodButtons .day-btn:hover { color: var(--ink); }
+        #periodButtons .day-btn:hover {
+            color: var(--ink);
+        }
 
         #periodButtons .day-btn.active {
             background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
@@ -238,7 +251,10 @@
             transition: all 0.15s ease;
         }
 
-        .logout-btn:hover { color: var(--sun-strong); border-color: var(--sun-soft); }
+        .logout-btn:hover {
+            color: var(--sun-strong);
+            border-color: var(--sun-soft);
+        }
 
         .info-text {
             display: flex;
@@ -263,7 +279,9 @@
 
         .info-text .hint::before {
             content: '';
-            width: 7px; height: 7px; border-radius: 50%;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
             background: var(--sea);
             flex: none;
         }
@@ -282,7 +300,11 @@
             font-size: 0.85rem;
         }
 
-        .btn:hover { background: var(--surface-soft); color: var(--ink); border-color: var(--ink-faint); }
+        .btn:hover {
+            background: var(--surface-soft);
+            color: var(--ink);
+            border-color: var(--ink-faint);
+        }
 
         .ghost-btn {
             background: transparent;
@@ -298,9 +320,21 @@
             box-shadow: 0 8px 18px -8px rgba(191, 93, 22, 0.75);
         }
 
-        .btn-primary:hover { filter: brightness(1.05); color: white; }
-        .btn-primary:active { transform: translateY(1px); }
-        .btn-primary:disabled { background: var(--ink-faint); box-shadow: none; cursor: not-allowed; filter: none; }
+        .btn-primary:hover {
+            filter: brightness(1.05);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-primary:disabled {
+            background: var(--ink-faint);
+            box-shadow: none;
+            cursor: not-allowed;
+            filter: none;
+        }
 
         /* ───────── 교실 섹션 ───────── */
         .seating-container {
@@ -324,13 +358,20 @@
         .classroom-section::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 5px;
             background: var(--line);
         }
 
-        .classroom-section[data-room="2-3"]::before { background: linear-gradient(90deg, var(--room-a), #F0A45A); }
-        .classroom-section[data-room="2-4"]::before { background: linear-gradient(90deg, var(--room-b), #4FA9A5); }
+        .classroom-section[data-room="2-3"]::before {
+            background: linear-gradient(90deg, var(--room-a), #F0A45A);
+        }
+
+        .classroom-section[data-room="2-4"]::before {
+            background: linear-gradient(90deg, var(--room-b), #4FA9A5);
+        }
 
         .classroom-header {
             display: flex;
@@ -352,14 +393,27 @@
 
         .room-title::before {
             content: '';
-            width: 12px; height: 12px; border-radius: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
             transform: rotate(45deg);
         }
 
-        .room-title.color-2-3 { color: var(--sun-strong); }
-        .room-title.color-2-3::before { background: var(--room-a); }
-        .room-title.color-2-4 { color: var(--sea-strong); }
-        .room-title.color-2-4::before { background: var(--room-b); }
+        .room-title.color-2-3 {
+            color: var(--sun-strong);
+        }
+
+        .room-title.color-2-3::before {
+            background: var(--room-a);
+        }
+
+        .room-title.color-2-4 {
+            color: var(--sea-strong);
+        }
+
+        .room-title.color-2-4::before {
+            background: var(--room-b);
+        }
 
         .room-meta {
             font-size: 0.8rem;
@@ -408,7 +462,9 @@
             box-shadow: var(--shadow-md);
         }
 
-        .seat:active { transform: translateY(0) scale(0.98); }
+        .seat:active {
+            transform: translateY(0) scale(0.98);
+        }
 
         .student-id {
             font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -512,7 +568,9 @@
         .login-box::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 5px;
             background: linear-gradient(90deg, var(--sun), var(--memo));
         }
@@ -530,7 +588,10 @@
             box-shadow: 0 8px 18px -8px rgba(224, 123, 46, 0.6);
         }
 
-        .login-badge svg { width: 30px; height: 30px; }
+        .login-badge svg {
+            width: 30px;
+            height: 30px;
+        }
 
         .login-eyebrow {
             font-family: 'Nanum Myeongjo', serif;
@@ -569,9 +630,15 @@
             transition: border-color 0.15s ease, background 0.15s ease;
         }
 
-        .login-box input:focus { border-color: var(--sun); background: var(--surface); }
+        .login-box input:focus {
+            border-color: var(--sun);
+            background: var(--surface);
+        }
 
-        .login-box input::placeholder { color: var(--ink-faint); font-weight: 500; }
+        .login-box input::placeholder {
+            color: var(--ink-faint);
+            font-weight: 500;
+        }
 
         .login-box button {
             width: 100%;
@@ -613,7 +680,10 @@
             color: var(--ink-soft);
         }
 
-        .modal-content h3 span { color: var(--ink); font-weight: 900; }
+        .modal-content h3 span {
+            color: var(--ink);
+            font-weight: 900;
+        }
 
         .modal-content textarea {
             width: 100%;
@@ -631,9 +701,15 @@
             transition: border-color 0.15s ease, background 0.15s ease;
         }
 
-        .modal-content textarea:focus { border-color: var(--sun); background: var(--surface); }
+        .modal-content textarea:focus {
+            border-color: var(--sun);
+            background: var(--surface);
+        }
 
-        .modal-btns { display: flex; gap: 9px; }
+        .modal-btns {
+            display: flex;
+            gap: 9px;
+        }
 
         .modal-btns button {
             flex: 1;
@@ -646,11 +722,24 @@
             border: none;
         }
 
-        .btn-cancel { background: var(--surface-soft); color: var(--ink-soft); border: 1px solid var(--line); }
-        .btn-cancel:hover { background: var(--paper-soft); }
+        .btn-cancel {
+            background: var(--surface-soft);
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+        }
 
-        .btn-save { background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%); color: white; }
-        .btn-save:hover { filter: brightness(1.05); }
+        .btn-cancel:hover {
+            background: var(--paper-soft);
+        }
+
+        .btn-save {
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: white;
+        }
+
+        .btn-save:hover {
+            filter: brightness(1.05);
+        }
 
         /* ───────── 토스트 ───────── */
         #toast {
@@ -676,11 +765,15 @@
 
         #toast::before {
             content: '';
-            width: 8px; height: 8px; border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             background: var(--sun);
         }
 
-        #toast.show { transform: translateX(-50%) translateY(0); }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
 
         /* ───────── 로딩 ───────── */
         #loadingOverlay {
@@ -704,7 +797,11 @@
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
 
         #loadingText {
             font-weight: 700;
@@ -714,24 +811,71 @@
 
         /* ───────── 반응형 ───────── */
         @media (max-width: 768px) {
-            body { padding: 14px 12px calc(80px + env(safe-area-inset-bottom)); }
+            body {
+                padding: 14px 12px calc(80px + env(safe-area-inset-bottom));
+            }
 
-            .hero { padding: 26px 22px 24px; }
-            .hero-sun { width: 140px; height: 140px; right: -22px; top: -26px; }
+            .hero {
+                padding: 26px 22px 24px;
+            }
 
-            .controls-bar { padding: 16px 16px; }
-            .controls-row { flex-direction: column; align-items: stretch; gap: 10px; }
-            #dateInput { width: 100%; text-align: center; }
-            #periodButtons { width: 100%; }
-            #periodButtons .day-btn { flex: 1; padding: 11px 8px; white-space: nowrap; }
-            .spacer { display: none; }
-            .supervisor-chip { width: 100%; justify-content: space-between; }
+            .hero-sun {
+                width: 140px;
+                height: 140px;
+                right: -22px;
+                top: -26px;
+            }
 
-            .classroom-section { padding: 20px 16px 22px; }
-            .room-title { font-size: 1.22rem; }
+            .controls-bar {
+                padding: 16px 16px;
+            }
 
-            .seat-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 9px; }
-            .student-name { font-size: 0.98rem; }
+            .controls-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            #dateInput {
+                width: 100%;
+                text-align: center;
+            }
+
+            #periodButtons {
+                width: 100%;
+            }
+
+            #periodButtons .day-btn {
+                flex: 1;
+                padding: 11px 8px;
+                white-space: nowrap;
+            }
+
+            .spacer {
+                display: none;
+            }
+
+            .supervisor-chip {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .classroom-section {
+                padding: 20px 16px 22px;
+            }
+
+            .room-title {
+                font-size: 1.22rem;
+            }
+
+            .seat-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 9px;
+            }
+
+            .student-name {
+                font-size: 0.98rem;
+            }
         }
     </style>
 </head>
@@ -740,9 +884,11 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
             <div class="login-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    aria-hidden="true">
                     <circle cx="12" cy="12" r="4.4" fill="currentColor" stroke="none" />
-                    <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8" />
+                    <path
+                        d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8" />
                 </svg>
             </div>
             <div class="login-eyebrow">여름방학 · 자기주도학습</div>
@@ -768,7 +914,8 @@
     <div id="mainApp" style="display: none;">
         <header>
             <div class="hero">
-                <svg class="hero-sun" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true">
+                <svg class="hero-sun" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5"
+                    stroke-linecap="round" aria-hidden="true">
                     <circle cx="50" cy="50" r="20" fill="currentColor" stroke="none" opacity="0.95" />
                     <g opacity="0.85">
                         <path d="M50 12V2M50 98V88M12 50H2M98 50H88M23 23l-7-7M84 84l-7-7M77 23l7-7M16 84l7-7" />
@@ -776,7 +923,7 @@
                 </svg>
                 <div class="eyebrow">여름방학 · 자기주도학습</div>
                 <h1><span class="accent">자기주도학습</span> 출결</h1>
-                <p class="hero-sub">교실별 좌석에서 출결을 체크하고, 반별로 전송하세요.</p>
+                <p class="hero-sub">학생 선택하는 것이 '출석'입니다!! 체크하신 후, 전송 버튼 눌러주세요!</p>
             </div>
             <div class="controls-bar">
                 <div class="controls-row">
