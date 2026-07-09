@@ -323,6 +323,22 @@
             letter-spacing: -0.02em;
         }
 
+        .seat-memo {
+            margin-top: 7px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: var(--accent-strong);
+            background: var(--accent-tint);
+            border: 1px solid var(--accent-soft);
+            border-radius: 6px;
+            padding: 3px 7px;
+            max-width: 100%;
+            word-break: break-word;
+            white-space: normal;
+            text-align: center;
+        }
+
         .empty-room-msg {
             text-align: center;
             color: var(--ink-faint);
@@ -680,6 +696,12 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
         function getTodayDateString() {
             const d = new Date();
             const pad = n => String(n).padStart(2, '0');
@@ -875,7 +897,12 @@
 
         function getRoomLists(day) {
             const lists = { '2-3': [], '2-4': [] };
+            const periodKey = `${day}${currentPeriod}`; // 예: "월1" = 월요일 1교시 신청 여부
             globalData.forEach(s => {
+                // 해당 교시 신청 컬럼이 있으면, 신청한(값이 있는) 학생만 포함
+                if (Object.prototype.hasOwnProperty.call(s, periodKey)) {
+                    if (!(s[periodKey] || '').trim()) return;
+                }
                 const room = (s[`${day}_배정`] || '').trim();
                 if (lists[room]) lists[room].push(s);
             });
@@ -960,7 +987,7 @@
 
                 const grid = section.querySelector('.seat-grid');
                 if (students.length === 0) {
-                    grid.innerHTML = `<div class="empty-room-msg" style="grid-column: 1/-1;">이 요일에 ${room}반으로 배정된 학생이 없습니다.</div>`;
+                    grid.innerHTML = `<div class="empty-room-msg" style="grid-column: 1/-1;">${day}요일 ${currentPeriod}교시에 ${room}반 신청 학생이 없습니다.</div>`;
                 } else {
                     students.forEach(s => {
                         const id = s['학번'];
@@ -973,7 +1000,8 @@
                         seat.dataset.id = id;
                         seat.dataset.name = s['이름'];
                         seat.dataset.remark = remark;
-                        seat.innerHTML = `<div class="student-id">${id}</div><div class="student-name">${s['이름']}</div>`;
+                        seat.innerHTML = `<div class="student-id">${escapeHtml(id)}</div><div class="student-name">${escapeHtml(s['이름'])}</div>`
+                            + (remark ? `<div class="seat-memo">${escapeHtml(remark)}</div>` : '');
 
                         setupSeatEvents(seat, room);
                         grid.appendChild(seat);
@@ -1048,6 +1076,17 @@
             if (seatEl) {
                 seatEl.dataset.remark = remark;
                 seatEl.classList.toggle('has-memo', !!remark);
+                let memoEl = seatEl.querySelector('.seat-memo');
+                if (remark) {
+                    if (!memoEl) {
+                        memoEl = document.createElement('div');
+                        memoEl.className = 'seat-memo';
+                        seatEl.appendChild(memoEl);
+                    }
+                    memoEl.textContent = remark;
+                } else if (memoEl) {
+                    memoEl.remove();
+                }
             }
             closeMemoModal();
         }
