@@ -3,112 +3,191 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>하계 야자 출석체크</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>여름방학 자기주도학습 출결</title>
 
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700,800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Claude 브랜드 톤 — 따뜻한 종이 배경 + 클레이(코랄) 액센트 */
-            --bg: #F7F4EC;
-            --surface: #FFFFFF;
-            --surface-soft: #FBF8F1;
-            --ink: #2B2A26;
-            --ink-soft: #6B6457;
-            --ink-faint: #9A9384;
-            --line: #E7E1D3;
-            --line-strong: #D9D1BD;
+            /* 여름 공부방 — 따뜻한 종이 + 석양 오렌지 + 청록/솔록 */
+            --paper: #F1E9D8;
+            --paper-soft: #F8F2E6;
+            --surface: #FFFDF7;
+            --surface-soft: #F6EFE0;
+            --ink: #241E18;
+            --ink-soft: #6C6154;
+            --ink-faint: #A99C87;
+            --line: #E7DBC4;
+            --line-strong: #D8C7A6;
 
-            --accent: #C2632F;
-            --accent-strong: #A8501F;
-            --accent-soft: #F3E3D6;
-            --accent-tint: #FBF0E7;
+            --sun: #E07B2E;
+            --sun-strong: #BF5D16;
+            --sun-soft: #F8E2C9;
+            --sun-tint: #FCF1E2;
 
-            --present: #3D6B52;
-            --present-soft: #E3EEE6;
+            --sea: #2B7B78;
+            --sea-strong: #1F5E5C;
+            --sea-soft: #D8ECEA;
 
-            --room-a: #C2632F;
-            --room-b: #3E5C76;
+            --present: #2E8054;
+            --present-strong: #1E6340;
+            --present-soft: #DDEEE0;
 
-            --shadow-sm: 0 1px 2px rgba(43, 42, 38, 0.06);
-            --shadow-md: 0 8px 24px rgba(43, 42, 38, 0.08);
-            --shadow-lg: 0 24px 60px rgba(43, 42, 38, 0.18);
+            --memo: #E5A417;
+            --memo-soft: #FBEDC4;
+            --memo-ink: #8A6209;
 
-            --radius-lg: 20px;
-            --radius-md: 14px;
-            --radius-sm: 10px;
+            --room-a: var(--sun);
+            --room-b: var(--sea);
+
+            --shadow-sm: 0 1px 2px rgba(52, 40, 26, 0.06);
+            --shadow-md: 0 10px 30px -14px rgba(52, 40, 26, 0.28);
+            --shadow-lg: 0 30px 70px -24px rgba(52, 40, 26, 0.45);
+
+            --r-xl: 24px;
+            --r-lg: 18px;
+            --r-md: 13px;
+            --r-sm: 9px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
-            background: var(--bg);
-            background-image:
-                radial-gradient(circle at 12% 8%, rgba(194, 99, 47, 0.06), transparent 38%),
-                radial-gradient(circle at 88% 92%, rgba(62, 92, 118, 0.05), transparent 42%);
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+            background:
+                radial-gradient(140% 60% at 100% -5%, rgba(224, 123, 46, 0.10), transparent 55%),
+                radial-gradient(120% 55% at -10% 0%, rgba(43, 123, 120, 0.08), transparent 50%),
+                var(--paper);
             color: var(--ink);
-            line-height: 1.6;
-            padding: 36px 20px 80px;
+            line-height: 1.55;
             letter-spacing: -0.01em;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
+            padding: 28px 20px calc(90px + env(safe-area-inset-bottom));
         }
 
+        .wrap { max-width: 1040px; margin: 0 auto; }
+
+        /* ───────── 헤더 (석양 히어로 + 컨트롤) ───────── */
         header {
-            max-width: 980px;
-            margin: 0 auto 32px;
-            padding: 32px 36px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--r-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
             border: 1px solid var(--line);
+            margin: 0 auto 26px;
+            max-width: 1040px;
         }
 
-        h1 {
-            font-size: 1.55rem;
-            font-weight: 800;
-            color: var(--ink);
-            margin-bottom: 22px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            letter-spacing: -0.03em;
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 34px 34px 30px;
+            color: #FFF7EC;
+            background:
+                radial-gradient(90% 130% at 84% -30%, #F7B45A 0%, #E9843311 45%, transparent 62%),
+                linear-gradient(135deg, #3A2320 0%, #7C3A1E 52%, #C4611D 100%);
         }
 
-        h1::before {
-            content: '';
+        .hero-sun {
+            position: absolute;
+            right: -28px;
+            top: -34px;
+            width: 190px;
+            height: 190px;
+            opacity: 0.9;
+            color: #FFCE7A;
+            filter: drop-shadow(0 8px 20px rgba(255, 180, 90, 0.35));
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            font-family: 'Nanum Myeongjo', serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            color: #FFD9A8;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(1.8rem, 5.5vw, 2.55rem);
+            font-weight: 900;
+            letter-spacing: -0.035em;
+            line-height: 1.05;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 16px rgba(40, 18, 10, 0.25);
+        }
+
+        .hero h1 .accent {
             display: inline-block;
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: var(--accent);
+            position: relative;
         }
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .hero h1 .accent::after {
+            content: '';
+            position: absolute;
+            left: -2px;
+            right: -2px;
+            bottom: 0.08em;
+            height: 0.32em;
+            background: rgba(255, 206, 122, 0.42);
+            border-radius: 3px;
+            z-index: -1;
         }
 
-        .btn-group {
+        .hero-sub {
+            font-size: 0.95rem;
+            color: rgba(255, 240, 224, 0.82);
+            font-weight: 500;
+            max-width: 34ch;
+        }
+
+        .controls-bar {
+            background: var(--surface);
+            padding: 18px 22px;
+            border-top: 1px solid var(--line);
+        }
+
+        .controls-row {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 12px;
             align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
         }
+
+        .spacer { flex: 1 1 auto; }
+
+        #dateInput {
+            padding: 10px 14px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--line-strong);
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 600;
+            background: var(--surface-soft);
+            color: var(--ink);
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        #dateInput:focus { outline: none; border-color: var(--sun); background: var(--surface); }
 
         #periodButtons {
             background: var(--surface-soft);
             padding: 4px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            gap: 2px;
+            border-radius: var(--r-md);
+            display: inline-flex;
+            gap: 3px;
             border: 1px solid var(--line);
         }
 
@@ -116,139 +195,179 @@
             background: transparent;
             color: var(--ink-soft);
             border: none;
-            box-shadow: none;
-            padding: 9px 18px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.92rem;
+            padding: 9px 17px;
+            border-radius: var(--r-sm);
+            font-weight: 700;
+            font-size: 0.9rem;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.18s cubic-bezier(0.3, 0.9, 0.4, 1);
         }
 
-        #periodButtons .day-btn:hover {
-            color: var(--ink);
-        }
+        #periodButtons .day-btn:hover { color: var(--ink); }
 
         #periodButtons .day-btn.active {
-            background: var(--ink);
-            color: white;
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: #fff;
+            box-shadow: 0 6px 14px -6px rgba(191, 93, 22, 0.7);
+        }
+
+        .supervisor-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
             font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--ink);
+            background: var(--sun-tint);
+            border: 1px solid var(--sun-soft);
+            padding: 7px 8px 7px 15px;
+            border-radius: 100px;
         }
 
-        .btn {
-            padding: 10px 18px;
-            border-radius: var(--radius-sm);
+        .logout-btn {
+            background: var(--surface);
+            border: 1px solid var(--line-strong);
+            border-radius: 100px;
+            padding: 5px 12px;
+            font-size: 0.78rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            border: 1px solid var(--line-strong);
-            background: var(--surface);
-            color: var(--ink-soft);
-            font-size: 0.88rem;
-        }
-
-        .btn:hover {
-            background: var(--surface-soft);
-            color: var(--ink);
-            border-color: var(--ink-faint);
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-strong);
-            color: white;
-        }
-
-        .btn-primary:disabled {
-            background: var(--ink-faint);
-            cursor: not-allowed;
-        }
-
-        #dateInput {
-            padding: 9px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--line-strong);
-            font-size: 0.95rem;
             font-family: inherit;
-            background: var(--surface);
-            color: var(--ink);
+            cursor: pointer;
+            color: var(--ink-soft);
+            transition: all 0.15s ease;
         }
+
+        .logout-btn:hover { color: var(--sun-strong); border-color: var(--sun-soft); }
 
         .info-text {
-            font-size: 0.84rem;
-            color: var(--ink-soft);
-            background: var(--accent-tint);
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--accent-soft);
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
             flex-wrap: wrap;
-            width: 100%;
+            font-size: 0.83rem;
+            color: var(--ink-soft);
         }
 
+        .info-text .hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--sea-soft);
+            color: var(--sea-strong);
+            padding: 8px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+
+        .info-text .hint::before {
+            content: '';
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--sea);
+            flex: none;
+        }
+
+        /* ───────── 버튼 ───────── */
+        .btn {
+            padding: 9px 16px;
+            border-radius: var(--r-md);
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid var(--line-strong);
+            background: var(--surface);
+            color: var(--ink-soft);
+            font-size: 0.85rem;
+        }
+
+        .btn:hover { background: var(--surface-soft); color: var(--ink); border-color: var(--ink-faint); }
+
+        .ghost-btn {
+            background: transparent;
+            border-style: dashed;
+            padding: 7px 14px;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 18px -8px rgba(191, 93, 22, 0.75);
+        }
+
+        .btn-primary:hover { filter: brightness(1.05); color: white; }
+        .btn-primary:active { transform: translateY(1px); }
+        .btn-primary:disabled { background: var(--ink-faint); box-shadow: none; cursor: not-allowed; filter: none; }
+
+        /* ───────── 교실 섹션 ───────── */
         .seating-container {
-            max-width: 980px;
+            max-width: 1040px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 22px;
         }
 
         .classroom-section {
+            position: relative;
             background: var(--surface);
-            padding: 28px 32px;
-            border-radius: var(--radius-lg);
+            padding: 26px 28px 28px;
+            border-radius: var(--r-xl);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--line);
-            border-top: 3px solid var(--line);
+            overflow: hidden;
         }
 
-        .classroom-section[data-room="2-3"] {
-            border-top-color: var(--room-a);
+        .classroom-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: var(--line);
         }
 
-        .classroom-section[data-room="2-4"] {
-            border-top-color: var(--room-b);
-        }
-
-        .room-title.color-2-3 {
-            color: var(--room-a);
-        }
-
-        .room-title.color-2-4 {
-            color: var(--room-b);
-        }
+        .classroom-section[data-room="2-3"]::before { background: linear-gradient(90deg, var(--room-a), #F0A45A); }
+        .classroom-section[data-room="2-4"]::before { background: linear-gradient(90deg, var(--room-b), #4FA9A5); }
 
         .classroom-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             gap: 12px;
             flex-wrap: wrap;
         }
 
         .room-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
+        .room-title::before {
+            content: '';
+            width: 12px; height: 12px; border-radius: 4px;
+            transform: rotate(45deg);
+        }
+
+        .room-title.color-2-3 { color: var(--sun-strong); }
+        .room-title.color-2-3::before { background: var(--room-a); }
+        .room-title.color-2-4 { color: var(--sea-strong); }
+        .room-title.color-2-4::before { background: var(--room-b); }
+
         .room-meta {
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.8rem;
+            font-weight: 700;
             color: var(--ink-soft);
             background: var(--surface-soft);
             border: 1px solid var(--line);
-            padding: 5px 14px;
+            padding: 6px 14px;
             border-radius: 100px;
             white-space: nowrap;
         }
@@ -262,284 +381,312 @@
 
         .seat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
-            gap: 10px;
-            margin-bottom: 4px;
+            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+            gap: 11px;
         }
 
+        /* ───────── 좌석 ───────── */
         .seat {
+            position: relative;
             border: 1px solid var(--line);
-            border-radius: var(--radius-md);
+            border-radius: var(--r-md);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background: var(--surface-soft);
-            padding: 16px 8px;
-            position: relative;
+            padding: 17px 10px 15px;
             cursor: pointer;
-            transition: all 0.15s ease;
             user-select: none;
+            transition: transform 0.14s cubic-bezier(0.3, 0.9, 0.4, 1), box-shadow 0.14s ease, border-color 0.14s ease, background 0.14s ease;
         }
 
         .seat:hover {
             border-color: var(--ink-faint);
             background: var(--surface);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
+        .seat:active { transform: translateY(0) scale(0.98); }
+
+        .student-id {
+            font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--ink-faint);
+            background: rgba(0, 0, 0, 0.03);
+            padding: 1px 7px;
+            border-radius: 100px;
+            margin-bottom: 7px;
+            letter-spacing: 0.02em;
+        }
+
+        .student-name {
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* 출석 = 초록 스탬프 */
         .seat.present {
             border: 1.5px solid var(--present);
             background: var(--present-soft);
-            color: var(--present);
+            color: var(--present-strong);
         }
 
         .seat.present .student-id {
             color: var(--present);
-            opacity: 0.7;
+            background: rgba(46, 128, 84, 0.12);
         }
 
-        .seat.has-memo::after {
-            content: '';
+        .seat.present::after {
+            content: '✓';
             position: absolute;
-            top: 9px;
-            right: 9px;
-            width: 6px;
-            height: 6px;
+            top: 8px;
+            right: 8px;
+            width: 19px;
+            height: 19px;
             border-radius: 50%;
-            background: var(--accent);
+            background: var(--present);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 7px -2px rgba(30, 99, 64, 0.6);
         }
 
-        .student-id {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--ink-faint);
-            margin-bottom: 4px;
-            letter-spacing: 0;
-        }
-
-        .student-name {
-            font-weight: 700;
-            font-size: 1.02rem;
-            letter-spacing: -0.02em;
-        }
-
+        /* 비고 = 포스트잇 태그 */
         .seat-memo {
-            margin-top: 7px;
+            margin-top: 8px;
             font-size: 0.72rem;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.35;
-            color: var(--accent-strong);
-            background: var(--accent-tint);
-            border: 1px solid var(--accent-soft);
-            border-radius: 6px;
-            padding: 3px 7px;
+            color: var(--memo-ink);
+            background: var(--memo-soft);
+            border: 1px solid #F1DDA0;
+            border-radius: 7px;
+            padding: 3px 8px;
             max-width: 100%;
             word-break: break-word;
-            white-space: normal;
             text-align: center;
+            box-shadow: 0 1px 0 #E7CE86;
         }
 
         .empty-room-msg {
             text-align: center;
             color: var(--ink-faint);
-            padding: 28px 0;
+            padding: 30px 0;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        /* Login Overlay */
+        /* ───────── 로그인 ───────── */
         .login-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(43, 42, 38, 0.35);
-            backdrop-filter: blur(3px);
+            inset: 0;
+            background: radial-gradient(120% 90% at 80% 0%, rgba(224, 123, 46, 0.28), transparent 55%), rgba(36, 30, 24, 0.5);
+            backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            padding: 20px;
+            padding: 22px;
         }
 
         .login-box {
             background: var(--surface);
-            padding: 36px 32px;
-            border-radius: var(--radius-lg);
+            padding: 34px 32px 30px;
+            border-radius: var(--r-xl);
             box-shadow: var(--shadow-lg);
             width: 100%;
-            max-width: 380px;
+            max-width: 390px;
             border: 1px solid var(--line);
             text-align: left;
+            position: relative;
+            overflow: hidden;
         }
 
-        .login-box .login-badge {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--accent-tint);
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--sun), var(--memo));
+        }
+
+        .login-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 15px;
+            background: linear-gradient(150deg, #FBE1C2, #F6C98A);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 16px;
+            color: var(--sun-strong);
+            margin-bottom: 18px;
+            box-shadow: 0 8px 18px -8px rgba(224, 123, 46, 0.6);
+        }
+
+        .login-badge svg { width: 30px; height: 30px; }
+
+        .login-eyebrow {
+            font-family: 'Nanum Myeongjo', serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.05em;
+            color: var(--sun-strong);
+            margin-bottom: 5px;
         }
 
         .login-box h2 {
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
             margin-bottom: 8px;
-            font-size: 1.3rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+        }
+
+        .login-desc {
+            color: var(--ink-soft);
+            font-size: 0.9rem;
+            word-break: keep-all;
         }
 
         .login-box input {
             width: 100%;
-            padding: 13px 14px;
-            border-radius: var(--radius-sm);
+            padding: 14px 15px;
+            border-radius: var(--r-md);
             border: 1px solid var(--line-strong);
             background: var(--surface-soft);
             font-size: 1rem;
             outline: none;
-            margin-top: 16px;
+            margin-top: 18px;
             font-family: inherit;
+            font-weight: 600;
             color: var(--ink);
-            transition: border-color 0.15s ease;
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
 
-        .login-box input:focus {
-            border-color: var(--accent);
-            background: var(--surface);
-        }
+        .login-box input:focus { border-color: var(--sun); background: var(--surface); }
+
+        .login-box input::placeholder { color: var(--ink-faint); font-weight: 500; }
 
         .login-box button {
             width: 100%;
             margin-top: 12px;
-            padding: 13px;
-            font-size: 0.98rem;
-            font-weight: 700;
-            border-radius: var(--radius-sm);
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: var(--r-md);
         }
 
-        /* Memo modal */
+        /* ───────── 비고 모달 ───────── */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(43, 42, 38, 0.4);
-            backdrop-filter: blur(3px);
+            inset: 0;
+            background: rgba(36, 30, 24, 0.5);
+            backdrop-filter: blur(4px);
             z-index: 20000;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 22px;
         }
 
         .modal-content {
             background: var(--surface);
             border: 1px solid var(--line);
             padding: 24px 22px;
-            border-radius: var(--radius-lg);
-            max-width: 360px;
+            border-radius: var(--r-xl);
+            max-width: 380px;
             width: 100%;
             box-shadow: var(--shadow-lg);
             text-align: left;
         }
 
         .modal-content h3 {
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 700;
-            margin-bottom: 14px;
+            margin-bottom: 15px;
             color: var(--ink-soft);
         }
 
-        .modal-content h3 span {
-            color: var(--ink);
-            font-weight: 800;
-        }
+        .modal-content h3 span { color: var(--ink); font-weight: 900; }
 
         .modal-content textarea {
             width: 100%;
-            min-height: 90px;
-            padding: 12px 14px;
+            min-height: 96px;
+            padding: 13px 14px;
             border: 1px solid var(--line-strong);
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
+            border-radius: var(--r-md);
+            font-size: 0.96rem;
             font-family: inherit;
             resize: vertical;
             outline: none;
             background: var(--surface-soft);
-            margin-bottom: 14px;
+            margin-bottom: 15px;
             color: var(--ink);
+            transition: border-color 0.15s ease, background 0.15s ease;
         }
 
-        .modal-content textarea:focus {
-            border-color: var(--accent);
-            background: var(--surface);
-        }
+        .modal-content textarea:focus { border-color: var(--sun); background: var(--surface); }
 
-        .modal-btns {
-            display: flex;
-            gap: 8px;
-        }
+        .modal-btns { display: flex; gap: 9px; }
 
         .modal-btns button {
             flex: 1;
-            padding: 11px;
-            border-radius: var(--radius-sm);
-            font-weight: 700;
-            font-size: 0.88rem;
+            padding: 12px;
+            border-radius: var(--r-md);
+            font-weight: 800;
+            font-size: 0.9rem;
+            font-family: inherit;
             cursor: pointer;
             border: none;
         }
 
-        .btn-cancel {
-            background: var(--surface-soft);
-            color: var(--ink-soft);
-            border: 1px solid var(--line);
-        }
+        .btn-cancel { background: var(--surface-soft); color: var(--ink-soft); border: 1px solid var(--line); }
+        .btn-cancel:hover { background: var(--paper-soft); }
 
-        .btn-save {
-            background: var(--accent);
-            color: white;
-        }
+        .btn-save { background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%); color: white; }
+        .btn-save:hover { filter: brightness(1.05); }
 
-        .btn-save:hover {
-            background: var(--accent-strong);
-        }
-
-        /* Toast */
+        /* ───────── 토스트 ───────── */
         #toast {
             position: fixed;
-            bottom: 32px;
+            bottom: calc(28px + env(safe-area-inset-bottom));
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
+            transform: translateX(-50%) translateY(120px);
             background: var(--ink);
-            color: white;
-            padding: 13px 22px;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
+            color: #FFF7EC;
+            padding: 14px 24px;
+            border-radius: 100px;
+            font-weight: 700;
             font-size: 0.9rem;
             box-shadow: var(--shadow-lg);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.2);
             z-index: 10000;
             max-width: 90vw;
             text-align: center;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
         }
 
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
+        #toast::before {
+            content: '';
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--sun);
         }
 
-        /* Loading */
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* ───────── 로딩 ───────── */
         #loadingOverlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(247, 244, 236, 0.92);
+            inset: 0;
+            background: radial-gradient(100% 70% at 50% 30%, rgba(248, 242, 230, 0.96), rgba(241, 233, 216, 0.96));
             z-index: 10000;
             display: none;
             flex-direction: column;
@@ -549,58 +696,42 @@
         }
 
         .loader {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--accent-soft);
-            border-top: 3px solid var(--accent);
+            width: 38px;
+            height: 38px;
+            border: 4px solid var(--sun-soft);
+            border-top-color: var(--sun);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         #loadingText {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--ink-soft);
             font-size: 0.95rem;
         }
 
+        /* ───────── 반응형 ───────── */
         @media (max-width: 768px) {
-            body {
-                padding: 16px 12px 70px;
-            }
+            body { padding: 14px 12px calc(80px + env(safe-area-inset-bottom)); }
 
-            header {
-                padding: 22px 18px;
-                border-radius: 16px;
-            }
+            .hero { padding: 26px 22px 24px; }
+            .hero-sun { width: 140px; height: 140px; right: -22px; top: -26px; }
 
-            h1 {
-                font-size: 1.25rem;
-            }
+            .controls-bar { padding: 16px 16px; }
+            .controls-row { flex-direction: column; align-items: stretch; gap: 10px; }
+            #dateInput { width: 100%; text-align: center; }
+            #periodButtons { width: 100%; }
+            #periodButtons .day-btn { flex: 1; padding: 11px 8px; white-space: nowrap; }
+            .spacer { display: none; }
+            .supervisor-chip { width: 100%; justify-content: space-between; }
 
-            .classroom-section {
-                padding: 20px 16px;
-            }
+            .classroom-section { padding: 20px 16px 22px; }
+            .room-title { font-size: 1.22rem; }
 
-            .seat-grid {
-                grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-                gap: 8px;
-            }
-
-            .classroom-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .info-text {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            .seat-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 9px; }
+            .student-name { font-size: 0.98rem; }
         }
     </style>
 </head>
@@ -608,11 +739,15 @@
 <body>
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
-            <div class="login-badge">☀️</div>
-            <h2>하계 야자 출석체크</h2>
-            <div style="color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 4px; word-break: keep-all;">
-                출석부에 기록될 감독 선생님 성함을 입력해주세요.
+            <div class="login-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4.4" fill="currentColor" stroke="none" />
+                    <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8" />
+                </svg>
             </div>
+            <div class="login-eyebrow">여름방학 · 자기주도학습</div>
+            <h2>출결 시작하기</h2>
+            <p class="login-desc">출석부에 기록될 감독 선생님 성함을 입력해 주세요.</p>
             <input type="text" id="teacherNameInput" placeholder="이름 입력 (예: 홍길동)"
                 onkeypress="if(event.key==='Enter') handleLogin()">
             <button class="btn btn-primary" onclick="handleLogin()">시작하기</button>
@@ -632,31 +767,38 @@
 
     <div id="mainApp" style="display: none;">
         <header>
-            <h1>하계 야자 출석체크</h1>
-            <div class="controls">
-                <div class="btn-group">
+            <div class="hero">
+                <svg class="hero-sun" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="50" cy="50" r="20" fill="currentColor" stroke="none" opacity="0.95" />
+                    <g opacity="0.85">
+                        <path d="M50 12V2M50 98V88M12 50H2M98 50H88M23 23l-7-7M84 84l-7-7M77 23l7-7M16 84l7-7" />
+                    </g>
+                </svg>
+                <div class="eyebrow">여름방학 · 자기주도학습</div>
+                <h1><span class="accent">자기주도학습</span> 출결</h1>
+                <p class="hero-sub">교실별 좌석에서 출결을 체크하고, 반별로 전송하세요.</p>
+            </div>
+            <div class="controls-bar">
+                <div class="controls-row">
                     <input type="date" id="dateInput">
                     <div id="periodButtons">
                         <button class="day-btn active" data-period="1" onclick="selectPeriod(this)">1교시</button>
                         <button class="day-btn" data-period="2" onclick="selectPeriod(this)">2교시</button>
                         <button class="day-btn" data-period="3" onclick="selectPeriod(this)">3교시</button>
                     </div>
-                </div>
-                <input type="hidden" id="gasUrl"
-                    value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
-                <div class="info-text">
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span>클릭=출석 · 길게 누르거나 우클릭=비고</span>
-                        <button class="btn" style="padding:4px 12px; font-size:0.78rem;"
-                            onclick="refreshStudentList()">명단 갱신</button>
-                    </div>
-                    <div style="font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 10px;">
+                    <div class="spacer"></div>
+                    <div class="supervisor-chip">
                         <span id="displaySupervisorName"></span> 선생님
-                        <button onclick="handleLogout()"
-                            style="background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; padding: 4px 10px; font-size: 0.78rem; cursor: pointer; color: var(--ink-soft);">로그아웃</button>
+                        <button class="logout-btn" onclick="handleLogout()">로그아웃</button>
                     </div>
+                </div>
+                <div class="info-text">
+                    <span class="hint">클릭 = 출석 · 길게 누르거나 우클릭 = 비고</span>
+                    <button class="btn ghost-btn" onclick="refreshStudentList()">명단 갱신</button>
                 </div>
             </div>
+            <input type="hidden" id="gasUrl"
+                value="https://script.google.com/macros/s/AKfycby4opXfNbOGVjC0rnBPg2XoiJiDllGbnrabI-DZ7kqc7qi0IqxNI2mB-lqlIo6APWTM/exec">
         </header>
 
         <div class="seating-container" id="seatingDisplay"></div>
@@ -740,7 +882,7 @@
             const hasStudents = loadStudentListFromCache();
 
             if (supervisorName && hasStudents) {
-                // 캐시가 있으면 네트워크 응답을 기다리지 않고 즉시 화면을 띄움 (index.html과 동일한 방식)
+                // 캐시가 있으면 네트워크 응답을 기다리지 않고 즉시 화면을 띄움
                 await startAppSession(supervisorName, { skipFetch: true });
             } else if (supervisorName) {
                 showLoading('학생 명단을 불러오는 중...');
@@ -802,7 +944,7 @@
                     return;
                 }
                 if (!studentResult.success) {
-                    alert('구글 시트에서 하계 학생명단을 가져오는 데 실패했습니다.');
+                    alert('구글 시트에서 자기주도학습 명단을 가져오는 데 실패했습니다.');
                     return;
                 }
             }
@@ -864,7 +1006,7 @@
                     return { success: true, changed };
                 }
             } catch (e) {
-                console.error('하계 학생명단 로드 실패', e);
+                console.error('자기주도학습 명단 로드 실패', e);
             }
             return { success: globalData.length > 0, changed: false };
         }
@@ -915,12 +1057,12 @@
             const display = document.getElementById('seatingDisplay');
 
             if (isWeekend) {
-                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">주말(${day}요일)에는 하계 야자가 운영되지 않습니다.</div></div>`;
+                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">주말(${day}요일)에는 여름방학 자기주도학습이 운영되지 않습니다.</div></div>`;
                 return;
             }
 
             if (!globalData.length) {
-                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">하계 학생명단을 불러오지 못했습니다. [명단 갱신]을 눌러주세요.</div></div>`;
+                display.innerHTML = `<div class="classroom-section"><div class="empty-room-msg">여름방학 자기주도학습 명단을 불러오지 못했습니다. [명단 갱신]을 눌러주세요.</div></div>`;
                 return;
             }
 
