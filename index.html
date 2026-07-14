@@ -428,6 +428,7 @@
             /* 세로 여백을 다듬고 가로 여백을 조절하여 이름 줄바꿈 방지 */
             cursor: pointer;
             user-select: none;
+            touch-action: manipulation;
             transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
         }
 
@@ -1273,30 +1274,51 @@
         function setupSeatEvents(seatEl, room) {
             let pressTimer = null;
             let isLong = false;
+            let isMoved = false;
+            let startX = 0, startY = 0;
 
             const openMemo = () => {
                 isLong = true;
                 openMemoModal(seatEl.dataset.id, seatEl.dataset.name, room, seatEl.dataset.remark);
             };
 
-            seatEl.addEventListener('mousedown', (e) => {
+            // pointer events prevent double execution (touch + simulated mouse events)
+            seatEl.addEventListener('pointerdown', (e) => {
+                if (e.button !== 0) return; // Only trigger for primary click / tap
+                isLong = false;
+                isMoved = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                if (pressTimer) clearTimeout(pressTimer);
+                pressTimer = setTimeout(openMemo, 550);
+            });
+
+            seatEl.addEventListener('pointermove', (e) => {
+                if (!pressTimer) return;
+                const dx = Math.abs(e.clientX - startX);
+                const dy = Math.abs(e.clientY - startY);
+                if (dx > 10 || dy > 10) {
+                    isMoved = true;
+                    clearTimeout(pressTimer);
+                }
+            });
+
+            seatEl.addEventListener('pointerup', (e) => {
                 if (e.button !== 0) return;
-                isLong = false;
-                pressTimer = setTimeout(openMemo, 550);
-            });
-            seatEl.addEventListener('mouseup', () => {
                 clearTimeout(pressTimer);
-                if (!isLong) togglePresent(seatEl, room);
+                if (!isLong && !isMoved) {
+                    togglePresent(seatEl, room);
+                }
             });
-            seatEl.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-            seatEl.addEventListener('touchstart', (e) => {
-                isLong = false;
-                pressTimer = setTimeout(openMemo, 550);
-            }, { passive: true });
-            seatEl.addEventListener('touchend', () => {
+
+            seatEl.addEventListener('pointerleave', () => {
                 clearTimeout(pressTimer);
-                if (!isLong) togglePresent(seatEl, room);
             });
+
+            seatEl.addEventListener('pointercancel', () => {
+                clearTimeout(pressTimer);
+            });
+
             seatEl.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 openMemoModal(seatEl.dataset.id, seatEl.dataset.name, room, seatEl.dataset.remark);

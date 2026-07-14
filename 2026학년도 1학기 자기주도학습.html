@@ -318,6 +318,7 @@
             cursor: pointer;
             transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
+            touch-action: manipulation;
             box-shadow: 0 4px 10px rgba(3, 4, 94, 0.02);
             min-width: 0;
             overflow: hidden;
@@ -3098,23 +3099,18 @@
          * - 짧게 누르면: 출석/결석 토글 (기존 기능)
          * - 길게 누르면 (500ms): 메모 입력 모달 표시
          */
-        let lastTouchTime = 0;
-
         function setupLongPress(seatElement, studentId, studentName, attKey) {
             let pressTimer = null;
             let isLong = false;
             let isMoved = false;
             let startX = 0, startY = 0;
 
-            seatElement.style.touchAction = 'pan-y';
-
-            const startPress = (x, y, isTouch = false) => {
-                if (!isTouch && Date.now() - lastTouchTime < 500) return; // 마우스-터치 중복 발화 방지
-
+            seatElement.addEventListener('pointerdown', (e) => {
+                if (e.button !== 0) return; // Only trigger for primary click / tap
                 isLong = false;
                 isMoved = false;
-                startX = x;
-                startY = y;
+                startX = e.clientX;
+                startY = e.clientY;
 
                 if (pressTimer) clearTimeout(pressTimer);
                 pressTimer = setTimeout(() => {
@@ -3124,16 +3120,20 @@
                     const roomName = seatElement.closest('.classroom-section').dataset.room;
                     openMemoModal(studentId, studentName, currentDay, currentPeriod, roomName);
                 }, 600); // 500ms -> 600ms로 약간 여유있게
-            };
+            });
 
-            const cancelPress = () => {
-                clearTimeout(pressTimer);
-            };
+            seatElement.addEventListener('pointermove', (e) => {
+                if (!pressTimer) return;
+                const dx = Math.abs(e.clientX - startX);
+                const dy = Math.abs(e.clientY - startY);
+                if (dx > 20 || dy > 20) {
+                    isMoved = true;
+                    clearTimeout(pressTimer);
+                }
+            });
 
-            const endPress = (isTouch = false) => {
-                if (!isTouch && Date.now() - lastTouchTime < 500) return;
-                if (isTouch) lastTouchTime = Date.now();
-
+            seatElement.addEventListener('pointerup', (e) => {
+                if (e.button !== 0) return;
                 clearTimeout(pressTimer);
 
                 if (!isLong && !isMoved) {
@@ -3144,54 +3144,17 @@
                 }
                 isLong = false;
                 isMoved = false;
-            };
-
-            // Touch events (mobile)
-            seatElement.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                startPress(touch.clientX, touch.clientY, true);
-            }, { passive: true });
-
-            seatElement.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                const dx = Math.abs(touch.clientX - startX);
-                const dy = Math.abs(touch.clientY - startY);
-                // 판별 임계값을 20px로 상향 (너무 민감하지 않게)
-                if (dx > 20 || dy > 20) {
-                    isMoved = true;
-                    cancelPress();
-                }
-            }, { passive: true });
-
-            seatElement.addEventListener('touchend', (e) => {
-                endPress(true);
             });
 
-            // Mouse events (desktop)
-            seatElement.addEventListener('mousedown', (e) => {
-                if (e.button !== 0) return;
-                startPress(e.clientX, e.clientY, false);
-            });
-
-            seatElement.addEventListener('mousemove', (e) => {
-                if (!pressTimer && !isMoved) return;
-                const dx = Math.abs(e.clientX - startX);
-                const dy = Math.abs(e.clientY - startY);
-                if (dx > 20 || dy > 20) {
-                    isMoved = true;
-                    cancelPress();
-                }
-            });
-
-            seatElement.addEventListener('mouseup', (e) => {
-                if (e.button !== 0) return;
-                endPress(false);
-            });
-
-            seatElement.addEventListener('mouseleave', () => {
-                cancelPress();
+            seatElement.addEventListener('pointerleave', () => {
+                clearTimeout(pressTimer);
                 isMoved = false;
             });
+
+            seatElement.addEventListener('pointercancel', () => {
+                clearTimeout(pressTimer);
+            });
+
             seatElement.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
