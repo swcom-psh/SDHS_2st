@@ -19,8 +19,10 @@
             --surface-2: #FFFFFF;
             --sunken: #EFECE3;
             --ink: #29251F;
-            --ink-2: #5A554A; /* 텍스트 대비 향상을 위해 기존 #6B6659보다 조금 더 어둡게 변경 */
-            --ink-3: #807A6F; /* 텍스트 대비 향상을 위해 기존 #9D9789보다 조금 더 어둡게 변경 */
+            --ink-2: #5A554A;
+            /* 텍스트 대비 향상을 위해 기존 #6B6659보다 조금 더 어둡게 변경 */
+            --ink-3: #807A6F;
+            /* 텍스트 대비 향상을 위해 기존 #9D9789보다 조금 더 어둡게 변경 */
             --line: #E7E2D6;
             --line-2: #D8D2C3;
 
@@ -373,19 +375,19 @@
             border-radius: 50%;
         }
 
-        .room-title.color-2-3 {
+        .room-title.color-2-5 {
             color: var(--clay-strong);
         }
 
-        .room-title.color-2-3::before {
+        .room-title.color-2-5::before {
             background: var(--clay);
         }
 
-        .room-title.color-2-4 {
+        .room-title.color-2-6 {
             color: var(--slate-strong);
         }
 
-        .room-title.color-2-4::before {
+        .room-title.color-2-6::before {
             background: var(--slate);
         }
 
@@ -422,7 +424,8 @@
             justify-content: center;
             align-items: center;
             background: var(--surface-2);
-            padding: 14px 8px 12px; /* 세로 여백을 다듬고 가로 여백을 조절하여 이름 줄바꿈 방지 */
+            padding: 14px 8px 12px;
+            /* 세로 여백을 다듬고 가로 여백을 조절하여 이름 줄바꿈 방지 */
             cursor: pointer;
             user-select: none;
             transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
@@ -439,17 +442,22 @@
         }
 
         .student-id {
-            font-size: 0.72rem; /* 가독성을 위해 크기를 소폭 키우고 */
-            font-weight: 600; /* 조금 더 선명하게 굵기 조정 */
-            color: var(--ink-2); /* 텍스트 대비 향상 */
+            font-size: 0.72rem;
+            /* 가독성을 위해 크기를 소폭 키우고 */
+            font-weight: 600;
+            /* 조금 더 선명하게 굵기 조정 */
+            color: var(--ink-2);
+            /* 텍스트 대비 향상 */
             margin-bottom: 5px;
             letter-spacing: 0.01em;
         }
 
         .student-name {
-            font-weight: 700; /* 이름의 가독성 향상을 위해 600에서 700(Bold)으로 강화 */
+            font-weight: 700;
+            /* 이름의 가독성 향상을 위해 600에서 700(Bold)으로 강화 */
             font-size: 1.05rem;
-            letter-spacing: -0.03em; /* 한글 자간 밀착으로 더욱 깔끔하게 표시 */
+            letter-spacing: -0.03em;
+            /* 한글 자간 밀착으로 더욱 깔끔하게 표시 */
         }
 
         /* 출석 = 세이지 그린 */
@@ -828,12 +836,14 @@
             }
 
             .seat-grid {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* 모바일에서 글자가 좁아져 넘치는 현상 방지 */
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                /* 모바일에서 글자가 좁아져 넘치는 현상 방지 */
                 gap: 10px;
             }
 
             .student-name {
-                font-size: 1rem; /* 가독성을 위해 최소 1rem 크기 유지 */
+                font-size: 1rem;
+                /* 가독성을 위해 최소 1rem 크기 유지 */
             }
         }
     </style>
@@ -922,10 +932,10 @@
         let globalData = [];
         let currentPeriod = '1';
         // attendance[room][studentId] = { status: bool, remark: string }
-        let attendance = { '2-3': {}, '2-4': {} };
+        let attendance = { '2-5': {}, '2-6': {} };
         let memoTargetId = null;
 
-        const ROOMS = ['2-3', '2-4'];
+        const ROOMS = ['2-5', '2-6'];
         const DAY_MAP = ['일', '월', '화', '수', '목', '금', '토'];
 
         function showLoading(text) {
@@ -1144,7 +1154,7 @@
         }
 
         function getRoomLists(day) {
-            const lists = { '2-3': [], '2-4': [] };
+            const lists = { '2-5': [], '2-6': [] };
             const periodKey = `${day}${currentPeriod}`; // 예: "월1" = 월요일 1교시 신청 여부
             globalData.forEach(s => {
                 // 해당 교시 신청 컬럼이 있으면, 신청한(값이 있는) 학생만 포함
@@ -1173,14 +1183,14 @@
             }
 
             // 출결 데이터가 도착하기 전에도 명단부터 먼저 그려서 "오래 걸린다"는 느낌을 줄임
-            attendance = { '2-3': {}, '2-4': {} };
+            attendance = { '2-5': {}, '2-6': {} };
             renderSeating(day, true);
 
             await fetchAllAttendance(day);
             renderSeating(day, false);
         }
 
-        // 2-3반/2-4반을 따로 조회하지 않고 한 번의 요청으로 합쳐서 가져와 GAS 콜드스타트 지연을 절반으로 줄임
+        // 2-5반/2-6반을 따로 조회하지 않고 한 번의 요청으로 합쳐서 가져와 GAS 콜드스타트 지연을 절반으로 줄임
         async function fetchAllAttendance(day) {
             const { dateVal } = getSelectedDayInfo();
             const gasUrl = document.getElementById('gasUrl').value.trim();
@@ -1196,7 +1206,7 @@
                 clearTimeout(timeoutId);
                 const data = await res.json();
 
-                attendance = { '2-3': {}, '2-4': {} };
+                attendance = { '2-5': {}, '2-6': {} };
                 Object.keys(data || {}).forEach(id => {
                     const room = idToRoom[id];
                     if (room) attendance[room][id] = data[id];
