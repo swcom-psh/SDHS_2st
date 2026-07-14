@@ -10,48 +10,45 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 여름 공부방 — 따뜻한 종이 + 석양 오렌지 + 청록/솔록 */
-            --paper: #F1E9D8;
-            --paper-soft: #F8F2E6;
-            --surface: #FFFDF7;
-            --surface-soft: #F6EFE0;
-            --ink: #241E18;
-            --ink-soft: #6C6154;
-            --ink-faint: #A99C87;
-            --line: #E7DBC4;
-            --line-strong: #D8C7A6;
+            /* Claude 디자인 톤 — 따뜻한 아이보리 + 클레이(테라코타) 단일 액센트 */
+            --bg: #F3F1EA;
+            --surface-1: #FBFAF5;
+            --surface-2: #FFFFFF;
+            --sunken: #EFECE3;
+            --ink: #29251F;
+            --ink-2: #6B6659;
+            --ink-3: #9D9789;
+            --line: #E7E2D6;
+            --line-2: #D8D2C3;
 
-            --sun: #E07B2E;
-            --sun-strong: #BF5D16;
-            --sun-soft: #F8E2C9;
-            --sun-tint: #FCF1E2;
+            --clay: #C2633D;
+            --clay-strong: #A44E2C;
+            --clay-soft: #F1E1D6;
+            --clay-tint: #FAF1EA;
 
-            --sea: #2B7B78;
-            --sea-strong: #1F5E5C;
-            --sea-soft: #D8ECEA;
+            --sage: #4E7A57;
+            --sage-strong: #3B6144;
+            --sage-soft: #E5EDE3;
 
-            --present: #2E8054;
-            --present-strong: #1E6340;
-            --present-soft: #DDEEE0;
+            --slate: #4A6885;
+            --slate-strong: #375068;
 
-            --memo: #E5A417;
-            --memo-soft: #FBEDC4;
-            --memo-ink: #8A6209;
+            --amber: #9E7415;
+            --amber-soft: #F6ECCE;
 
-            --room-a: var(--sun);
-            --room-b: var(--sea);
+            --shadow-sm: 0 1px 2px rgba(41, 37, 31, 0.05);
+            --shadow-md: 0 12px 32px -20px rgba(41, 37, 31, 0.25);
+            --shadow-lg: 0 30px 70px -30px rgba(41, 37, 31, 0.4);
 
-            --shadow-sm: 0 1px 2px rgba(52, 40, 26, 0.06);
-            --shadow-md: 0 10px 30px -14px rgba(52, 40, 26, 0.28);
-            --shadow-lg: 0 30px 70px -24px rgba(52, 40, 26, 0.45);
-
-            --r-xl: 24px;
-            --r-lg: 18px;
-            --r-md: 13px;
+            --r-xl: 20px;
+            --r-lg: 16px;
+            --r-md: 12px;
             --r-sm: 9px;
+
+            --serif: 'Nanum Myeongjo', 'Apple SD Gothic Neo', serif;
         }
 
         * {
@@ -63,104 +60,95 @@
 
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
-            background:
-                radial-gradient(140% 60% at 100% -5%, rgba(224, 123, 46, 0.10), transparent 55%),
-                radial-gradient(120% 55% at -10% 0%, rgba(43, 123, 120, 0.08), transparent 50%),
-                var(--paper);
+            background: var(--bg);
             color: var(--ink);
             line-height: 1.55;
             letter-spacing: -0.01em;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
-            padding: 28px 20px calc(90px + env(safe-area-inset-bottom));
+            padding: 32px 24px calc(96px + env(safe-area-inset-bottom));
         }
 
-        .wrap {
-            max-width: none;
-            margin: 0 auto;
-        }
-
-        /* ───────── 헤더 (석양 히어로 + 컨트롤) ───────── */
+        /* ───────── 헤더 (플랫 편집 스타일) ───────── */
         header {
+            position: relative;
+            background: var(--surface-1);
+            border: 1px solid var(--line);
             border-radius: var(--r-xl);
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--line);
-            margin: 0 auto 26px;
+            box-shadow: var(--shadow-sm);
+            margin: 0 auto 22px;
             max-width: none;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--clay);
         }
 
         .hero {
             position: relative;
-            overflow: hidden;
-            padding: 34px 34px 30px;
-            color: #FFF7EC;
-            background:
-                radial-gradient(90% 130% at 84% -30%, #F7B45A 0%, #E9843311 45%, transparent 62%),
-                linear-gradient(135deg, #3A2320 0%, #7C3A1E 52%, #C4611D 100%);
+            padding: 38px 40px 30px;
+            border-bottom: 1px solid var(--line);
         }
 
         .hero-sun {
-            position: absolute;
-            right: -28px;
-            top: -34px;
-            width: 190px;
-            height: 190px;
-            opacity: 0.9;
-            color: #FFCE7A;
-            filter: drop-shadow(0 8px 20px rgba(255, 180, 90, 0.35));
-            pointer-events: none;
+            display: none;
         }
 
         .eyebrow {
-            font-family: 'Nanum Myeongjo', serif;
+            font-family: var(--serif);
             font-weight: 700;
-            font-size: 0.9rem;
-            letter-spacing: 0.06em;
-            color: #FFD9A8;
-            margin-bottom: 10px;
-            position: relative;
+            font-size: 0.88rem;
+            letter-spacing: 0.04em;
+            color: var(--clay-strong);
+            margin-bottom: 12px;
         }
 
         .hero h1 {
-            font-size: clamp(1.8rem, 5.5vw, 2.55rem);
-            font-weight: 900;
-            letter-spacing: -0.035em;
-            line-height: 1.05;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 16px rgba(40, 18, 10, 0.25);
+            font-family: var(--serif);
+            font-size: clamp(1.9rem, 4.5vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.12;
+            color: var(--ink);
+            margin-bottom: 14px;
         }
 
         .hero h1 .accent {
-            display: inline-block;
             position: relative;
+            display: inline-block;
         }
 
         .hero h1 .accent::after {
             content: '';
             position: absolute;
-            left: -2px;
-            right: -2px;
-            bottom: 0.08em;
-            height: 0.32em;
-            background: rgba(255, 206, 122, 0.42);
-            border-radius: 3px;
+            left: -1px;
+            right: -1px;
+            bottom: 0.1em;
+            height: 0.26em;
+            background: var(--clay-soft);
+            border-radius: 2px;
             z-index: -1;
         }
 
         .hero-sub {
-            font-size: 0.95rem;
-            color: rgba(255, 240, 224, 0.82);
-            font-weight: 500;
-            max-width: 40ch;
-            line-height: 1.5;
+            font-size: 0.98rem;
+            color: var(--ink-2);
+            font-weight: 400;
+            max-width: 46ch;
+            line-height: 1.6;
             word-break: keep-all;
         }
 
         .controls-bar {
-            background: var(--surface);
-            padding: 18px 22px;
-            border-top: 1px solid var(--line);
+            background: var(--surface-2);
+            padding: 18px 24px;
         }
 
         .controls-row {
@@ -176,43 +164,42 @@
         }
 
         #dateInput {
-            padding: 10px 14px;
+            padding: 10px 15px;
             border-radius: var(--r-md);
-            border: 1px solid var(--line-strong);
+            border: 1px solid var(--line-2);
             font-size: 0.95rem;
             font-family: inherit;
-            font-weight: 600;
-            background: var(--surface-soft);
+            font-weight: 500;
+            background: var(--surface-2);
             color: var(--ink);
-            transition: border-color 0.15s ease, background 0.15s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         #dateInput:focus {
             outline: none;
-            border-color: var(--sun);
-            background: var(--surface);
+            border-color: var(--clay);
+            box-shadow: 0 0 0 3px var(--clay-tint);
         }
 
         #periodButtons {
-            background: var(--surface-soft);
+            background: var(--sunken);
             padding: 4px;
             border-radius: var(--r-md);
             display: inline-flex;
             gap: 3px;
-            border: 1px solid var(--line);
         }
 
         #periodButtons .day-btn {
             background: transparent;
-            color: var(--ink-soft);
+            color: var(--ink-2);
             border: none;
-            padding: 9px 17px;
+            padding: 9px 18px;
             border-radius: var(--r-sm);
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.9rem;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.18s cubic-bezier(0.3, 0.9, 0.4, 1);
+            transition: all 0.16s ease;
         }
 
         #periodButtons .day-btn:hover {
@@ -220,40 +207,40 @@
         }
 
         #periodButtons .day-btn.active {
-            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            background: var(--clay);
             color: #fff;
-            box-shadow: 0 6px 14px -6px rgba(191, 93, 22, 0.7);
+            box-shadow: var(--shadow-sm);
         }
 
         .supervisor-chip {
             display: inline-flex;
             align-items: center;
-            gap: 9px;
-            font-weight: 700;
+            gap: 10px;
+            font-weight: 500;
             font-size: 0.9rem;
             color: var(--ink);
-            background: var(--sun-tint);
-            border: 1px solid var(--sun-soft);
-            padding: 7px 8px 7px 15px;
+            background: var(--clay-tint);
+            border: 1px solid var(--clay-soft);
+            padding: 6px 7px 6px 15px;
             border-radius: 100px;
         }
 
         .logout-btn {
-            background: var(--surface);
-            border: 1px solid var(--line-strong);
+            background: var(--surface-2);
+            border: 1px solid var(--line-2);
             border-radius: 100px;
             padding: 5px 12px;
             font-size: 0.78rem;
-            font-weight: 600;
+            font-weight: 500;
             font-family: inherit;
             cursor: pointer;
-            color: var(--ink-soft);
+            color: var(--ink-2);
             transition: all 0.15s ease;
         }
 
         .logout-btn:hover {
-            color: var(--sun-strong);
-            border-color: var(--sun-soft);
+            color: var(--clay-strong);
+            border-color: var(--clay-soft);
         }
 
         .info-text {
@@ -263,27 +250,27 @@
             gap: 12px;
             flex-wrap: wrap;
             font-size: 0.83rem;
-            color: var(--ink-soft);
+            color: var(--ink-2);
         }
 
         .info-text .hint {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: var(--sea-soft);
-            color: var(--sea-strong);
-            padding: 8px 14px;
+            background: var(--sunken);
+            color: var(--ink-2);
+            padding: 8px 15px;
             border-radius: 100px;
-            font-weight: 600;
+            font-weight: 500;
             word-break: keep-all;
         }
 
         .info-text .hint::before {
             content: '';
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: var(--sea);
+            background: var(--clay);
             flex: none;
         }
 
@@ -291,20 +278,20 @@
         .btn {
             padding: 9px 16px;
             border-radius: var(--r-md);
-            font-weight: 700;
+            font-weight: 500;
             font-family: inherit;
             cursor: pointer;
             transition: all 0.15s ease;
-            border: 1px solid var(--line-strong);
-            background: var(--surface);
-            color: var(--ink-soft);
+            border: 1px solid var(--line-2);
+            background: var(--surface-2);
+            color: var(--ink-2);
             font-size: 0.85rem;
         }
 
         .btn:hover {
-            background: var(--surface-soft);
+            background: var(--surface-1);
             color: var(--ink);
-            border-color: var(--ink-faint);
+            border-color: var(--ink-3);
         }
 
         .ghost-btn {
@@ -315,14 +302,16 @@
         }
 
         .btn-primary {
-            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            background: var(--clay);
             color: white;
-            border: none;
-            box-shadow: 0 8px 18px -8px rgba(191, 93, 22, 0.75);
+            border: 1px solid var(--clay);
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-primary:hover {
-            filter: brightness(1.05);
+            background: var(--clay-strong);
+            border-color: var(--clay-strong);
             color: white;
         }
 
@@ -331,10 +320,10 @@
         }
 
         .btn-primary:disabled {
-            background: var(--ink-faint);
+            background: var(--ink-3);
+            border-color: var(--ink-3);
             box-shadow: none;
             cursor: not-allowed;
-            filter: none;
         }
 
         /* ───────── 교실 섹션 ───────── */
@@ -343,85 +332,67 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 20px;
         }
 
         .classroom-section {
             position: relative;
-            background: var(--surface);
+            background: var(--surface-1);
             padding: 26px 28px 28px;
             border-radius: var(--r-xl);
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--line);
-            overflow: hidden;
-        }
-
-        .classroom-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: var(--line);
-        }
-
-        .classroom-section[data-room="2-3"]::before {
-            background: linear-gradient(90deg, var(--room-a), #F0A45A);
-        }
-
-        .classroom-section[data-room="2-4"]::before {
-            background: linear-gradient(90deg, var(--room-b), #4FA9A5);
         }
 
         .classroom-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
             gap: 12px;
             flex-wrap: wrap;
         }
 
         .room-title {
-            font-size: 1.4rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
+            font-family: var(--serif);
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 11px;
         }
 
         .room-title::before {
             content: '';
-            width: 12px;
-            height: 12px;
-            border-radius: 4px;
-            transform: rotate(45deg);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
         }
 
         .room-title.color-2-3 {
-            color: var(--sun-strong);
+            color: var(--clay-strong);
         }
 
         .room-title.color-2-3::before {
-            background: var(--room-a);
+            background: var(--clay);
         }
 
         .room-title.color-2-4 {
-            color: var(--sea-strong);
+            color: var(--slate-strong);
         }
 
         .room-title.color-2-4::before {
-            background: var(--room-b);
+            background: var(--slate);
         }
 
         .room-meta {
             font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--ink-soft);
-            background: var(--surface-soft);
-            border: 1px solid var(--line);
+            font-weight: 500;
+            color: var(--ink-2);
+            background: var(--sunken);
             padding: 6px 14px;
             border-radius: 100px;
             white-space: nowrap;
@@ -436,29 +407,28 @@
 
         .seat-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-            gap: 11px;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
         }
 
         /* ───────── 좌석 ───────── */
         .seat {
             position: relative;
-            border: 1px solid var(--line);
+            border: 1px solid var(--line-2);
             border-radius: var(--r-md);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: var(--surface-soft);
+            background: var(--surface-2);
             padding: 17px 10px 15px;
             cursor: pointer;
             user-select: none;
-            transition: transform 0.14s cubic-bezier(0.3, 0.9, 0.4, 1), box-shadow 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
         }
 
         .seat:hover {
-            border-color: var(--ink-faint);
-            background: var(--surface);
+            border-color: var(--ink-3);
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
@@ -470,31 +440,27 @@
         .student-id {
             font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
             font-size: 0.68rem;
-            font-weight: 600;
-            color: var(--ink-faint);
-            background: rgba(0, 0, 0, 0.03);
-            padding: 1px 7px;
-            border-radius: 100px;
-            margin-bottom: 7px;
+            font-weight: 500;
+            color: var(--ink-3);
+            margin-bottom: 6px;
             letter-spacing: 0.02em;
         }
 
         .student-name {
-            font-weight: 800;
-            font-size: 1.05rem;
+            font-weight: 600;
+            font-size: 1.04rem;
             letter-spacing: -0.02em;
         }
 
-        /* 출석 = 초록 스탬프 */
+        /* 출석 = 세이지 그린 */
         .seat.present {
-            border: 1.5px solid var(--present);
-            background: var(--present-soft);
-            color: var(--present-strong);
+            border: 1.5px solid var(--sage);
+            background: var(--sage-soft);
+            color: var(--sage-strong);
         }
 
         .seat.present .student-id {
-            color: var(--present);
-            background: rgba(46, 128, 84, 0.12);
+            color: var(--sage);
         }
 
         .seat.present::after {
@@ -505,39 +471,36 @@
             width: 19px;
             height: 19px;
             border-radius: 50%;
-            background: var(--present);
+            background: var(--sage);
             color: #fff;
             font-size: 0.68rem;
-            font-weight: 900;
+            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 7px -2px rgba(30, 99, 64, 0.6);
         }
 
-        /* 비고 = 포스트잇 태그 */
+        /* 비고 = 앰버 태그 */
         .seat-memo {
             margin-top: 8px;
             font-size: 0.72rem;
-            font-weight: 700;
+            font-weight: 600;
             line-height: 1.35;
-            color: var(--memo-ink);
-            background: var(--memo-soft);
-            border: 1px solid #F1DDA0;
-            border-radius: 7px;
+            color: var(--amber);
+            background: var(--amber-soft);
+            border-radius: 6px;
             padding: 3px 8px;
             max-width: 100%;
             word-break: break-word;
             text-align: center;
-            box-shadow: 0 1px 0 #E7CE86;
         }
 
         .empty-room-msg {
             text-align: center;
-            color: var(--ink-faint);
+            color: var(--ink-3);
             padding: 30px 0;
             font-size: 0.9rem;
-            font-weight: 500;
+            font-weight: 400;
             word-break: keep-all;
         }
 
@@ -545,7 +508,7 @@
         .login-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(120% 90% at 80% 0%, rgba(224, 123, 46, 0.28), transparent 55%), rgba(36, 30, 24, 0.5);
+            background: rgba(41, 37, 31, 0.4);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
@@ -555,12 +518,12 @@
         }
 
         .login-box {
-            background: var(--surface);
-            padding: 34px 32px 30px;
+            background: var(--surface-1);
+            padding: 36px 34px 30px;
             border-radius: var(--r-xl);
             box-shadow: var(--shadow-lg);
             width: 100%;
-            max-width: 390px;
+            max-width: 400px;
             border: 1px solid var(--line);
             text-align: left;
             position: relative;
@@ -573,46 +536,47 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--sun), var(--memo));
+            height: 3px;
+            background: var(--clay);
         }
 
         .login-badge {
-            width: 52px;
-            height: 52px;
-            border-radius: 15px;
-            background: linear-gradient(150deg, #FBE1C2, #F6C98A);
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: var(--clay-tint);
+            border: 1px solid var(--clay-soft);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--sun-strong);
+            color: var(--clay);
             margin-bottom: 18px;
-            box-shadow: 0 8px 18px -8px rgba(224, 123, 46, 0.6);
         }
 
         .login-badge svg {
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
         }
 
         .login-eyebrow {
-            font-family: 'Nanum Myeongjo', serif;
+            font-family: var(--serif);
             font-weight: 700;
             font-size: 0.82rem;
-            letter-spacing: 0.05em;
-            color: var(--sun-strong);
-            margin-bottom: 5px;
+            letter-spacing: 0.04em;
+            color: var(--clay-strong);
+            margin-bottom: 6px;
         }
 
         .login-box h2 {
-            font-size: 1.45rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            margin-bottom: 8px;
+            font-family: var(--serif);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            margin-bottom: 9px;
         }
 
         .login-desc {
-            color: var(--ink-soft);
+            color: var(--ink-2);
             font-size: 0.9rem;
             word-break: keep-all;
         }
@@ -621,25 +585,25 @@
             width: 100%;
             padding: 14px 15px;
             border-radius: var(--r-md);
-            border: 1px solid var(--line-strong);
-            background: var(--surface-soft);
+            border: 1px solid var(--line-2);
+            background: var(--surface-2);
             font-size: 1rem;
             outline: none;
             margin-top: 18px;
             font-family: inherit;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--ink);
-            transition: border-color 0.15s ease, background 0.15s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .login-box input:focus {
-            border-color: var(--sun);
-            background: var(--surface);
+            border-color: var(--clay);
+            box-shadow: 0 0 0 3px var(--clay-tint);
         }
 
         .login-box input::placeholder {
-            color: var(--ink-faint);
-            font-weight: 500;
+            color: var(--ink-3);
+            font-weight: 400;
         }
 
         .login-box button {
@@ -647,7 +611,7 @@
             margin-top: 12px;
             padding: 14px;
             font-size: 1rem;
-            font-weight: 800;
+            font-weight: 600;
             border-radius: var(--r-md);
         }
 
@@ -656,7 +620,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(36, 30, 24, 0.5);
+            background: rgba(41, 37, 31, 0.4);
             backdrop-filter: blur(4px);
             z-index: 20000;
             justify-content: center;
@@ -665,9 +629,9 @@
         }
 
         .modal-content {
-            background: var(--surface);
+            background: var(--surface-1);
             border: 1px solid var(--line);
-            padding: 24px 22px;
+            padding: 26px 24px;
             border-radius: var(--r-xl);
             max-width: 380px;
             width: 100%;
@@ -676,36 +640,36 @@
         }
 
         .modal-content h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
+            font-size: 1.02rem;
+            font-weight: 500;
             margin-bottom: 15px;
-            color: var(--ink-soft);
+            color: var(--ink-2);
         }
 
         .modal-content h3 span {
             color: var(--ink);
-            font-weight: 900;
+            font-weight: 700;
         }
 
         .modal-content textarea {
             width: 100%;
             min-height: 96px;
             padding: 13px 14px;
-            border: 1px solid var(--line-strong);
+            border: 1px solid var(--line-2);
             border-radius: var(--r-md);
             font-size: 0.96rem;
             font-family: inherit;
             resize: vertical;
             outline: none;
-            background: var(--surface-soft);
+            background: var(--surface-2);
             margin-bottom: 15px;
             color: var(--ink);
-            transition: border-color 0.15s ease, background 0.15s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
         .modal-content textarea:focus {
-            border-color: var(--sun);
-            background: var(--surface);
+            border-color: var(--clay);
+            box-shadow: 0 0 0 3px var(--clay-tint);
         }
 
         .modal-btns {
@@ -717,7 +681,7 @@
             flex: 1;
             padding: 12px;
             border-radius: var(--r-md);
-            font-weight: 800;
+            font-weight: 600;
             font-size: 0.9rem;
             font-family: inherit;
             cursor: pointer;
@@ -725,22 +689,22 @@
         }
 
         .btn-cancel {
-            background: var(--surface-soft);
-            color: var(--ink-soft);
+            background: var(--sunken);
+            color: var(--ink-2);
             border: 1px solid var(--line);
         }
 
         .btn-cancel:hover {
-            background: var(--paper-soft);
+            background: var(--line);
         }
 
         .btn-save {
-            background: linear-gradient(180deg, var(--sun) 0%, var(--sun-strong) 100%);
+            background: var(--clay);
             color: white;
         }
 
         .btn-save:hover {
-            filter: brightness(1.05);
+            background: var(--clay-strong);
         }
 
         /* ───────── 토스트 ───────── */
@@ -750,10 +714,10 @@
             left: 50%;
             transform: translateX(-50%) translateY(120px);
             background: var(--ink);
-            color: #FFF7EC;
+            color: #F7F4EC;
             padding: 14px 24px;
             border-radius: 100px;
-            font-weight: 700;
+            font-weight: 500;
             font-size: 0.9rem;
             box-shadow: var(--shadow-lg);
             transition: transform 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.2);
@@ -770,7 +734,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--sun);
+            background: var(--clay);
         }
 
         #toast.show {
@@ -781,7 +745,7 @@
         #loadingOverlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(100% 70% at 50% 30%, rgba(248, 242, 230, 0.96), rgba(241, 233, 216, 0.96));
+            background: rgba(243, 241, 234, 0.95);
             z-index: 10000;
             display: none;
             flex-direction: column;
@@ -791,10 +755,10 @@
         }
 
         .loader {
-            width: 38px;
-            height: 38px;
-            border: 4px solid var(--sun-soft);
-            border-top-color: var(--sun);
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--clay-soft);
+            border-top-color: var(--clay);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -806,26 +770,19 @@
         }
 
         #loadingText {
-            font-weight: 700;
-            color: var(--ink-soft);
+            font-weight: 500;
+            color: var(--ink-2);
             font-size: 0.95rem;
         }
 
         /* ───────── 반응형 ───────── */
         @media (max-width: 768px) {
             body {
-                padding: 14px 12px calc(80px + env(safe-area-inset-bottom));
+                padding: 16px 12px calc(84px + env(safe-area-inset-bottom));
             }
 
             .hero {
-                padding: 26px 22px 24px;
-            }
-
-            .hero-sun {
-                width: 140px;
-                height: 140px;
-                right: -22px;
-                top: -26px;
+                padding: 30px 22px 24px;
             }
 
             .controls-bar {
@@ -867,7 +824,7 @@
             }
 
             .room-title {
-                font-size: 1.22rem;
+                font-size: 1.2rem;
             }
 
             .seat-grid {
