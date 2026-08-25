@@ -1,0 +1,11 @@
+# 파이썬이 자동으로 만드는 캐시 (소스가 아니라 부산물)
+__pycache__/
+*.py[cod]
+
+# OS / 편집기 부스러기
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Word 가 문서를 열어 두는 동안 만드는 임시 잠금 파일
+~$*
