@@ -31,6 +31,16 @@ def fetch_with_retry(url, max_retries=3):
 # 메인 로직
 # ────────────────────────────────────────────────
 
+def sort_room_names(rooms):
+    """교실명을 2-3, 2-4 … 순으로 정렬. 숫자형이 아닌 이름(도서관 등)은 뒤에 가나다순."""
+    def key(name):
+        m = re.match(r'^(\d+)\s*-\s*(\d+)$', str(name).strip())
+        if m:
+            return (0, int(m.group(1)), int(m.group(2)), '')
+        return (1, 0, 0, str(name))
+    return sorted(set(r for r in rooms if str(r).strip()), key=key)
+
+
 def main():
     print("=" * 60)
     print("  2학년 야간자율학습 '주간' 출결 보고서 생성기")
@@ -103,7 +113,7 @@ def main():
     # 3. 학생 명단 로드
     print("\n[1/3] 학생 명단을 구글 시트에서 가져오는 중...")
     try:
-        student_url = f"{gas_url}?action=getStudents"
+        student_url = f"{gas_url}?action=getSecondStudents"
         students = fetch_with_retry(student_url)
         if not students:
             raise Exception("응답이 없습니다")
@@ -113,17 +123,70 @@ def main():
         input("엔터키를 누르면 종료됩니다...")
         sys.exit(1)
 
+    # 3-1. 요일별 교실 배정 정보 계산
+    #  [2학기 정책] 자동 배정 없음. 시트의 [요일_배정] 칸에 적힌 교실만 따르고,
+    #  교실 목록도 그 칸에 실제로 적힌 값에서 만든다.
+    valid_students = [s for s in students
+                      if str(s.get('학번', '')).strip().startswith('2')
+                      and len(str(s.get('학번', '')).strip()) >= 5]
+
+    def get_assigned_rooms_for_day(day_name):
+        """그 요일에 신청 + 교실 배정이 된 학생만 {학번: 교실} 로 반환"""
+        col1 = f"{day_name}1"
+        col2 = f"{day_name}2"
+        override_col = f"{day_name}_배정"
+
+        assigned = {}
+        for s in valid_students:
+            s_id = str(s.get('학번', '')).strip()
+            has_p1 = s.get(col1, '').strip() != ''
+            has_p2 = s.get(col2, '').strip() != ''
+            if not has_p1 and not has_p2:
+                continue
+            manual = s.get(override_col, '').strip()
+            if manual:
+                assigned[s_id] = manual
+        return assigned
+
+    def get_unassigned_ids_for_day(day_name):
+        """그 요일에 신청은 했지만 교실 배정이 안 된 학번 집합"""
+        col1 = f"{day_name}1"
+        col2 = f"{day_name}2"
+        override_col = f"{day_name}_배정"
+
+        ids = set()
+        for s in valid_students:
+            s_id = str(s.get('학번', '')).strip()
+            has_p1 = s.get(col1, '').strip() != ''
+            has_p2 = s.get(col2, '').strip() != ''
+            if (has_p1 or has_p2) and not s.get(override_col, '').strip():
+                ids.add(s_id)
+        return ids
+
+    daily_assignments = {}
+    daily_rooms = {}
+    daily_unassigned = {}
+    for wd in week_days:
+        d = wd['day_name']
+        daily_assignments[d] = get_assigned_rooms_for_day(d)
+        daily_rooms[d] = sort_room_names(set(daily_assignments[d].values()))
+        daily_unassigned[d] = get_unassigned_ids_for_day(d)
+        if daily_rooms[d]:
+            print(f"   {d}요일 배정 교실: {', '.join(daily_rooms[d])} (배정 {len(daily_assignments[d])}명, 미배정 {len(daily_unassigned[d])}명)")
+        else:
+            print(f"   [경고] {d}요일에 교실이 배정된 학생이 없습니다. (신청 {len(daily_unassigned[d])}명 모두 미배정)")
+
     # 4. 5일치 출결 로그 병렬 로드
     print("\n[2/3] 주간 출결 로그를 구글 시트에서 가져오는 중...")
-    rooms = ['2-3', '2-4', '2-5', '2-6']
     periods = ['1교시', '2교시']
 
-    # 전체 요청 목록 생성: 5일 × 4교실 × 2교시 = 40 요청
+    # 전체 요청 목록 생성: 요일별로 실제 배정된 교실만 조회
     fetch_tasks = []
     for wd in week_days:
-        for room in rooms:
+        for room in daily_rooms[wd['day_name']]:
             for period in periods:
                 params = {
+                    'sheetTarget': 'second',   # -> "2학기 야자 출석" 시트
                     'date': wd['date_str'],
                     'day': wd['day_name'],
                     'period': period,
@@ -183,59 +246,6 @@ def main():
 
     # 5. 학급별 보고서 생성
     print("\n[3/3] 학급별 주간 보고서 HTML 생성 중...")
-
-    valid_students = [s for s in students
-                      if str(s.get('학번', '')).strip().startswith('2')
-                      and len(str(s.get('학번', '')).strip()) >= 5]
-
-    # 야자실 배정 로직 (각 요일별)
-    def get_assigned_rooms_for_day(day_name):
-        col1 = f"{day_name}1"
-        col2 = f"{day_name}2"
-        override_col = f"{day_name}_배정"
-
-        room_lists = {'2-3': [], '2-4': [], '2-5': [], '2-6': []}
-        unassigned = []
-
-        for s in valid_students:
-            s_id = str(s.get('학번', '')).strip()
-            manual = s.get(override_col, '').strip()
-            has_p1 = s.get(col1, '').strip() != ''
-            has_p2 = s.get(col2, '').strip() != ''
-
-            if manual in room_lists:
-                room_lists[manual].append(s_id)
-            elif has_p1 or has_p2:
-                unassigned.append(s)
-
-        both = [s for s in unassigned if s.get(col1, '').strip() != '' and s.get(col2, '').strip() != '']
-        p1_only = [s for s in unassigned if s.get(col1, '').strip() != '' and s.get(col2, '').strip() == '']
-        p2_only = [s for s in unassigned if s.get(col1, '').strip() == '' and s.get(col2, '').strip() != '']
-
-        both.sort(key=lambda x: int(x.get('학번', 0)))
-        p1_only.sort(key=lambda x: int(x.get('학번', 0)))
-        p2_only.sort(key=lambda x: int(x.get('학번', 0)))
-
-        for s in p1_only:
-            room_lists['2-5'].append(str(s['학번']).strip())
-        for s in p2_only:
-            room_lists['2-6'].append(str(s['학번']).strip())
-        half = (len(both) + 1) // 2
-        for s in both[:half]:
-            room_lists['2-3'].append(str(s['학번']).strip())
-        for s in both[half:]:
-            room_lists['2-4'].append(str(s['학번']).strip())
-
-        assigned = {}
-        for room, ids in room_lists.items():
-            for sid in ids:
-                assigned[sid] = room
-        return assigned
-
-    # 각 요일별 배정 정보 미리 계산
-    daily_assignments = {}
-    for wd in week_days:
-        daily_assignments[wd['day_name']] = get_assigned_rooms_for_day(wd['day_name'])
 
     # 학급별 그룹화
     classes = {f"20{i}": [] for i in range(1, 10)}
@@ -344,6 +354,7 @@ def main():
   .s-no {{ color: var(--danger); font-weight: 800; font-size: .85rem; }}
   .s-na {{ color: #D0D0D0; }}
   .s-uc {{ color: #E09200; font-size: .7rem; }}
+  .s-un {{ color: #B06000; font-weight: 800; font-size: .7rem; }}
 
   .name-col {{ text-align: left !important; padding-left: 6px; font-weight: 600; white-space: nowrap; }}
   .rate-col {{ font-weight: 700; }}
@@ -418,6 +429,9 @@ def main():
                             has_any_absent = True
                         else:
                             cells += '<td><span class="s-uc">?</span></td>'
+                    elif has_sched and (s_id in daily_unassigned[dn]):
+                        # 신청은 했지만 아직 교실 배정이 안 된 상태
+                        cells += '<td><span class="s-un" title="교실 미배정">▲</span></td>'
                     else:
                         cells += '<td><span class="s-na">-</span></td>'
 
@@ -479,6 +493,7 @@ def main():
     <span><span class="s-no">✕</span> 결석</span>
     <span><span class="s-na">-</span> 야자 없음</span>
     <span><span class="s-uc">?</span> 미체크</span>
+    <span><span class="s-un">▲</span> 교실 미배정</span>
   </div>
 
   <table>

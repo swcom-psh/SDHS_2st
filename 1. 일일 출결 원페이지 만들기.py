@@ -60,6 +60,16 @@ def get_korean_holidays(year):
     
     return holidays
 
+def sort_room_names(rooms):
+    """교실명을 2-3, 2-4 … 순으로 정렬. 숫자형이 아닌 이름(도서관 등)은 뒤에 가나다순."""
+    def key(name):
+        m = re.match(r'^(\d+)\s*-\s*(\d+)$', str(name).strip())
+        if m:
+            return (0, int(m.group(1)), int(m.group(2)), '')
+        return (1, 0, 0, str(name))
+    return sorted(set(r for r in rooms if str(r).strip()), key=key)
+
+
 def main():
     print("=" * 60)
     print(" 2학년 야간자율학습 '원페이퍼' 출결 결과 보고서 생성기 ")
@@ -142,7 +152,7 @@ def main():
     # 3. 학생 명단 API 호출
     print("\n[1/3] 학생 명단을 구글 시트에서 가져오는 중...")
     try:
-        student_url = f"{gas_url}?action=getStudents"
+        student_url = f"{gas_url}?action=getSecondStudents"
         req = urllib.request.Request(student_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req) as res:
             students = json.loads(res.read().decode('utf-8'))
@@ -154,10 +164,41 @@ def main():
         input("엔터키를 누르면 종료됩니다...")
         sys.exit(1)
 
+    # 3-1. 교실 배정 정보 계산
+    #  [2학기 정책] 자동 배정을 하지 않는다. 시트의 [요일_배정] 칸에 적힌 교실만 따르고,
+    #  교실 목록도 그 칸에 실제로 적힌 값에서 만든다. (2-3, 2-7, 도서관 … 무엇이든 가능)
+    col1 = f"{target_day_name}1"
+    col2 = f"{target_day_name}2"
+    override_col = f"{target_day_name}_배정"
+
+    # 2학년 학생만 필터링
+    valid_students = [s for s in students if str(s.get('학번', '')).strip().startswith('2') and len(str(s.get('학번', '')).strip()) >= 5]
+
+    assigned_rooms = {}      # 학번 -> 교실
+    unassigned_ids = set()   # 신청은 했지만 아직 배정 안 된 학번
+    for s in valid_students:
+        s_id = str(s.get('학번', '')).strip()
+        has_p1 = s.get(col1, '').strip() != ''
+        has_p2 = s.get(col2, '').strip() != ''
+        if not has_p1 and not has_p2:
+            continue
+        manual_room = s.get(override_col, '').strip()
+        if manual_room:
+            assigned_rooms[s_id] = manual_room
+        else:
+            unassigned_ids.add(s_id)
+
+    rooms = sort_room_names(set(assigned_rooms.values()))
+    if rooms:
+        print(f"[OK] {target_day_name}요일 배정 교실: {', '.join(rooms)} (배정 {len(assigned_rooms)}명, 미배정 {len(unassigned_ids)}명)")
+    else:
+        print(f"[경고] {target_day_name}요일에 교실이 배정된 학생이 없습니다. 시트의 [{override_col}] 칸을 확인해주세요.")
+        if unassigned_ids:
+            print(f"       ({target_day_name}요일 신청자 {len(unassigned_ids)}명이 모두 미배정 상태입니다.)")
+
     # 4. 출결 로그 호출 및 병합 (재시도 로직 포함)
     print("\n[2/3] 야자 출결 로그를 구글 시트에서 가져오는 중...")
     attendance_data = {}
-    rooms = ['2-3', '2-4', '2-5', '2-6']
     periods = ['1교시', '2교시']
     
     total_requests = len(rooms) * len(periods)
@@ -168,6 +209,7 @@ def main():
     for room in rooms:
         for period in periods:
             params = {
+                'sheetTarget': 'second',   # -> "2학기 야자 출석" 시트
                 'date': target_date_str,
                 'day': target_day_name,
                 'period': period,
@@ -229,55 +271,8 @@ def main():
         print("       해당 교실/교시의 학생은 '미체크'로 표시됩니다.")
     print(f"[OK] 출결 로그 병합 완료 (체크된 학생: {len(attendance_data)}명)")
 
-    # 5. 야자실 배정 로직 시뮬레이션
+    # 5. 보고서 작성
     print("\n[3/3] 학급별 보고서 작성 및 파일 생성 중...")
-    col1 = f"{target_day_name}1"
-    col2 = f"{target_day_name}2"
-    override_col = f"{target_day_name}_배정"
-    
-    room_lists = { '2-3': [], '2-4': [], '2-5': [], '2-6': [] }
-    unassigned_students = []
-    
-    # 2학년 학생만 필터링
-    valid_students = [s for s in students if str(s.get('학번', '')).strip().startswith('2') and len(str(s.get('학번', '')).strip()) >= 5]
-    
-    for s in valid_students:
-        s_id = str(s.get('학번', '')).strip()
-        manual_room = s.get(override_col, '').strip()
-        has_p1 = s.get(col1, '').strip() != ''
-        has_p2 = s.get(col2, '').strip() != ''
-        
-        if manual_room in room_lists:
-            room_lists[manual_room].append(s_id)
-        else:
-            if has_p1 or has_p2:
-                unassigned_students.append(s)
-                
-    # 미배정 학생 자동 분배
-    both_p = [s for s in unassigned_students if s.get(col1, '').strip() != '' and s.get(col2, '').strip() != '']
-    p1_only = [s for s in unassigned_students if s.get(col1, '').strip() != '' and s.get(col2, '').strip() == '']
-    p2_only = [s for s in unassigned_students if s.get(col1, '').strip() == '' and s.get(col2, '').strip() != '']
-    
-    both_p.sort(key=lambda x: int(x.get('학번', 0)))
-    p1_only.sort(key=lambda x: int(x.get('학번', 0)))
-    p2_only.sort(key=lambda x: int(x.get('학번', 0)))
-    
-    for s in p1_only:
-        room_lists['2-5'].append(str(s['학번']).strip())
-    for s in p2_only:
-        room_lists['2-6'].append(str(s['학번']).strip())
-        
-    half = (len(both_p) + 1) // 2
-    for s in both_p[:half]:
-        room_lists['2-3'].append(str(s['학번']).strip())
-    for s in both_p[half:]:
-        room_lists['2-4'].append(str(s['학번']).strip())
-        
-    # 배정된 방 매핑
-    assigned_rooms = {}
-    for room, s_ids in room_lists.items():
-        for s_id in s_ids:
-            assigned_rooms[s_id] = room
 
     # 학급별 그룹화 (201 ~ 209)
     classes = {f"20{i}": [] for i in range(1, 10)}
@@ -499,6 +494,7 @@ def main():
         present_count = 0
         absent_count = 0
         unchecked_count = 0
+        unassigned_count = 0
         
         table_rows_html = ""
         
@@ -509,7 +505,10 @@ def main():
             
             # 야자 배정 정보 확인
             room_assigned = assigned_rooms.get(s_id, "")
+            is_unassigned = (s_id in unassigned_ids)   # 신청했지만 교실 미배정
             is_scheduled = (room_assigned != "")
+            if is_unassigned:
+                unassigned_count += 1
             
             p1_status_badge = '<span class="badge-none">-</span>'
             p2_status_badge = '<span class="badge-none">-</span>'
@@ -569,7 +568,7 @@ def main():
                 <td>{num}</td>
                 <td>{s_id}</td>
                 <td style="font-weight: bold;">{name}</td>
-                <td>{room_assigned if room_assigned else '-'}</td>
+                <td>{room_assigned if room_assigned else ('<span style="color:#B06000; font-weight:700;">미배정</span>' if is_unassigned else '-')}</td>
                 <td>{p1_status_badge}</td>
                 <td>{p2_status_badge}</td>
                 <td class="remark-text" title="{remark_text}">{remark_text}</td>
@@ -603,6 +602,10 @@ def main():
             <div class="summary-card">
                 <div class="title">출결 미체크</div>
                 <div class="value" style="color: #B06000;">{unchecked_count}명</div>
+            </div>
+            <div class="summary-card">
+                <div class="title">교실 미배정</div>
+                <div class="value" style="color: #B06000;">{unassigned_count}명</div>
             </div>
         </div>
         

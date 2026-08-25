@@ -1,5 +1,5 @@
 /**
- * Google Apps Script for Yaja Attendance Management (v30 - Apply API via static page + Google Sign-In)
+ * Google Apps Script for Yaja Attendance Management (v31 - 2학기 대응: getSecondStudents / sheetTarget=second)
  *
  * [적용 방법]
  * 1. 구글 스프레드시트의 [확장 프로그램] -> [Apps Script] 창을 엽니다.
@@ -10,11 +10,29 @@
  * 5. 오른쪽 상단의 [배포] -> [배포 관리]에서 기존 웹앱 버전을 "새 버전"으로 올려서 다시 배포합니다.
  *    - 출결 체크 시스템(index.html)과 신청 페이지(apply.html) 모두 같은 웹앱 URL의 doPost/doGet을 함께 사용합니다.
  * 6. apply.html의 GAS_URL, GOOGLE_CLIENT_ID 값을 실제 값으로 교체하고 정적 호스팅(GitHub Pages 등)에 올립니다.
+ *
+ * [v31 변경점 - 2학기]
+ *  - doGet ?action=getSecondStudents  : "2학기 학생명단" 탭을 읽어 index.html에 전달
+ *  - sheetTarget=second               : 출결 로그를 "2학기 야자 출석" 탭에 기록/조회
+ *  - getMyApplicationData_ 의 열 인덱스 off-by-one 수정
+ *    (기존 코드는 신청 수정 화면에서 체크가 한 칸씩 밀려 보였고, 그대로 저장하면 밀린 채로 덮어써짐)
  */
 
 // =========================================================
 // ================  기존 출결 체크 시스템  ===================
 // =========================================================
+
+/**
+ * 출결 로그를 기록할 시트 이름을 결정한다.
+ *  - "summer" : 하계 야자 출석
+ *  - "second" : 2학기 야자 출석   (index.html → 2학기 자기주도적 학습)
+ *  - 그 외   : Attendance_Log      (1학기)
+ */
+function resolveLogSheetName_(target) {
+  if (target === "summer") return "하계 야자 출석";
+  if (target === "second") return "2학기 야자 출석";
+  return "Attendance_Log";
+}
 
 function doPost(e) {
   var data = JSON.parse(e.postData.contents);
@@ -31,7 +49,7 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
   try {
-    var sheetName = (data.sheetTarget === "summer") ? "하계 야자 출석" : "Attendance_Log";
+    var sheetName = resolveLogSheetName_(data.sheetTarget);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName(sheetName);
 
@@ -221,6 +239,22 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify(jsonArray)).setMimeType(ContentService.MimeType.JSON);
   }
 
+  // 2학기 명단 (index.html 이 사용)
+  if (action === 'getSecondStudents') {
+    var secondSheet = ss.getSheetByName(APPLY_SHEET_NAME);   // "2학기 학생명단"
+    if (!secondSheet) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
+    var secValues = secondSheet.getDataRange().getDisplayValues();
+    var secHeaders = secValues[0];
+    var secJsonArray = secValues.slice(1)
+      .filter(function (row) { return row[1] && row[1].toString().trim() !== ""; }) // 학번이 있는 행만
+      .map(function (row) {
+        var obj = {};
+        secHeaders.forEach(function (header, j) { obj[header.toString().trim()] = row[j]; });
+        return obj;
+      });
+    return ContentService.createTextOutput(JSON.stringify(secJsonArray)).setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === 'getSummerStudents') {
     var summerSheet = ss.getSheetByName("하계 학생명단");
     if (!summerSheet) return ContentService.createTextOutput("[]").setMimeType(ContentService.MimeType.JSON);
@@ -236,7 +270,7 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify(sJsonArray)).setMimeType(ContentService.MimeType.JSON);
   }
 
-  var sheetName = (e.parameter.sheetTarget === "summer") ? "하계 야자 출석" : "Attendance_Log";
+  var sheetName = resolveLogSheetName_(e.parameter.sheetTarget);
   var sheet = ss.getSheetByName(sheetName);
   if (!sheet) return ContentService.createTextOutput("{}").setMimeType(ContentService.MimeType.JSON);
   var displayValues = sheet.getDataRange().getDisplayValues();
@@ -304,7 +338,9 @@ function cleanId(idVal) {
 //          월_배정, 화_배정, 수_배정, 목_배정, 금_배정, 참여횟수,
 //          월1, 월2, 화1, 화2, 수1, 수2, 목1, 목2, 금1, 금2
 //
-// - 월_배정~금_배정 : 담당교사가 직접 반(2-3~2-6)을 배정하는 칸. 앱은 건드리지 않음.
+// - 월_배정~금_배정 : 담당교사가 직접 교실을 적는 칸. 앱은 건드리지 않음.
+//                    index.html은 이 칸에 적힌 값만 따르고(자동 배정 없음), 교실 목록도 이 값에서 만든다.
+//                    "2-3" 같은 반 이름이든 "도서관" 같은 이름이든 자유.
 // - 월1,월2,... : 해당 요일의 1교시/2교시 신청 여부 (신청 시 숫자 1, 아니면 "")
 // - 참여횟수 : 신청한 교시(월1~금2) 총 개수
 // - 신청시간 : 최초 제출 시각 (한번 기록되면 변경 안 함)
@@ -517,11 +553,12 @@ function getMyApplicationData_(studentId, profileName) {
   var applyTime = row[3] || "";
   var updateTime = row[4] || "";
 
+  // row 는 A열이 row[0] 인 0-based 배열. L열(12번째) → row[11]
   var colIdx = { L: 11, M: 12, N: 13, O: 14, P: 15, Q: 16, R: 17, S: 18, T: 19, U: 20 };
   var selection = {};
   APPLY_DAYS.forEach(function (d) {
-    var v1 = row[colIdx[d.p1Col] - 1];
-    var v2 = row[colIdx[d.p2Col] - 1];
+    var v1 = row[colIdx[d.p1Col]];
+    var v2 = row[colIdx[d.p2Col]];
     selection[d.key] = {
       p1: (v1 === "1" || v1 === "참여"),  // 숫자 1(신규) / "참여"(구버전 데이터) 모두 인식
       p2: (v2 === "1" || v2 === "참여")

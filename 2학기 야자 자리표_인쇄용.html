@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>2학기 야자 자리표 — 인쇄용</title>
+<style>
+@page { size: A4 portrait; margin: 9mm; }
+
+* { box-sizing: border-box; }
+
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+body {
+  margin: 0;
+  background: #e9edf2;
+  font-family: "맑은 고딕", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  color: #111;
+}
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  padding: 9mm;
+  margin: 0 auto 8mm;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 요일 머리글 */
+.daybar {
+  border-bottom: 1.6mm solid #111;
+  padding-bottom: 2mm;
+  margin-bottom: 3.5mm;
+  flex: none;
+}
+
+.daybar h2 { margin: 0; font-size: 20pt; letter-spacing: -0.03em; }
+
+.daybar p {
+  margin: 1mm 0 0;
+  font-size: 8.6pt;
+  color: #333;
+  word-break: keep-all;
+}
+
+/* 자리표 4개를 2x2 로 */
+.panels {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4.5mm;
+  min-height: 0;
+}
+
+.panel {
+  border: 0.4mm solid #111;
+  border-radius: 1.6mm;
+  padding: 2mm 2.2mm 2.4mm;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.panel > header {
+  display: flex;
+  align-items: baseline;
+  gap: 1.6mm;
+  border-bottom: 0.3mm solid #bbb;
+  padding-bottom: 1.2mm;
+  margin-bottom: 1.6mm;
+  flex: none;
+}
+
+.panel h3 { margin: 0; font-size: 13pt; letter-spacing: -0.03em; }
+
+.tag {
+  font-size: 8pt;
+  font-weight: 700;
+  background: #111;
+  color: #fff;
+  border-radius: 0.8mm;
+  padding: 0.4mm 1.4mm;
+  white-space: nowrap;
+}
+
+.meta { margin-left: auto; font-size: 7.6pt; color: #555; white-space: nowrap; }
+
+/* 좌석 격자: 두 칸씩 붙이고 통로 두 곳 */
+.grid {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 2.2mm repeat(2, 1fr) 2.2mm repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1mm;
+  min-height: 0;
+}
+
+.gap { display: block; }
+
+.s {
+  position: relative;
+  border: 0.35mm solid #111;
+  border-radius: 1.2mm;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2.6mm;      /* 왼쪽 위 자리 번호 자리를 비워 둔다 */
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 학번 — 이름 바로 위 */
+.id {
+  text-decoration: none;
+  font-size: 6.2pt;
+  font-weight: 600;
+  color: #666;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+/* 자리 번호 — 칸 왼쪽 위 */
+.s > b {
+  position: absolute;
+  top: 0.5mm;
+  left: 0.9mm;
+  font-size: 6.6pt;
+  font-weight: 700;
+  color: #777;
+  line-height: 1;
+}
+
+.s.off {
+  border-style: dashed;
+  border-color: #b9b9b9;
+  background: #fafafa;
+}
+
+.s.off > b { color: #b0b0b0; }
+
+/* 짝꿍이 있는 자리는 옅은 음영 (흑백 인쇄에서도 구분됨) */
+.s.pair { background: #ebebeb; }
+
+.nm {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11pt;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  margin-top: 0.7mm;
+  white-space: nowrap;
+}
+
+.nm.n4 { font-size: 8.6pt; letter-spacing: -0.07em; }
+.nm.n5 { font-size: 7pt; letter-spacing: -0.08em; }
+
+.desk {
+  flex: none;
+  margin: 1.6mm auto 0;
+  width: 46%;
+  border: 0.35mm solid #111;
+  border-radius: 1mm;
+  text-align: center;
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  padding: 0.8mm 0;
+  background: #f0f0f0;
+}
+
+.foot {
+  flex: none;
+  margin-top: 3mm;
+  border-top: 0.3mm solid #ccc;
+  padding-top: 1.4mm;
+  font-size: 7.4pt;
+  color: #666;
+  text-align: right;
+}
+
+/* 찾아보기 */
+.index {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5mm;
+  min-height: 0;
+}
+
+.index table { width: 100%; border-collapse: collapse; font-size: 7.4pt; }
+
+.index thead th, .index thead td {
+  background: #111;
+  color: #fff;
+  font-size: 7.4pt;
+  padding: 1mm 0.6mm;
+  text-align: center;
+}
+
+.index thead th { text-align: left; padding-left: 1.6mm; }
+
+.index tbody th {
+  text-align: left;
+  font-size: 8pt;
+  padding: 0.35mm 1.6mm;
+  white-space: nowrap;
+  border-bottom: 0.2mm solid #ddd;
+}
+
+.index tbody td {
+  text-align: center;
+  padding: 0.35mm 0.4mm;
+  border-bottom: 0.2mm solid #ddd;
+  white-space: nowrap;
+}
+
+.index tbody tr:nth-child(even) th,
+.index tbody tr:nth-child(even) td { background: #f4f4f4; }
+
+.index td b { font-weight: 700; }
+
+.index td .sn {
+  display: inline-block;
+  min-width: 4mm;
+  font-weight: 800;
+}
+
+.index td small { font-size: 5.8pt; color: #777; }
+
+.index td u { text-decoration: none; color: #bbb; }
+
+/* 화면에서만 보이는 안내 */
+.hint {
+  max-width: 210mm;
+  margin: 6mm auto 3mm;
+  padding: 3mm 4mm;
+  background: #fff;
+  border-left: 1.5mm solid #111;
+  font-size: 10pt;
+  line-height: 1.6;
+}
+
+@media print {
+  body { background: #fff; }
+  .hint { display: none; }
+  .page { margin: 0; padding: 0; width: auto; height: auto; page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+}
+</style>
+</head>
+<body>
+<div class="hint">
+  <b>인쇄 방법</b> — Ctrl+P → 용지 <b>A4</b>, 배율 <b>100%</b>, 여백 <b>기본</b>,
+  <b>“배경 그래픽”을 켜면</b> 짝꿍 자리 음영이 함께 인쇄됩니다. 총 6쪽입니다.
+</div>
+<div class="page">
+  <div class="daybar">
+    <h2>월요일 자리표</h2>
+    <p>내 자리 번호는 <b>교탁에서 바라볼 때 창가쪽 맨 앞이 1번</b>, 뒤로 갈수록 2, 3, 4, 5번입니다.</p>
+  </div>
+  <div class="panels"><section class="panel">
+      <header><h3>2-3반</h3><span class="tag">1·2교시 공통</span><span class="meta">15명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20526</u><em class="nm">홍성민</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20303</u><em class="nm">김나경</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20912</u><em class="nm">박하나</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20614</u><em class="nm">이채원</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20108</u><em class="nm">문하윤</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20506</u><em class="nm">김보은</em></i><i class="s"><b>28</b><u class="id">20816</u><em class="nm">이서현</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20917</u><em class="nm">안정호</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20413</u><em class="nm">신지윤</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20926</u><em class="nm">최창준</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20406</u><em class="nm">김효민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20202</u><em class="nm">김민주</em></i><i class="s"><b>26</b><u class="id">20717</u><em class="nm">이재인</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20909</u><em class="nm">박수아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20401</u><em class="nm">김가온</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-4반</h3><span class="tag">1·2교시 공통</span><span class="meta">16명 · 옆자리 1쌍</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20120</u><em class="nm">정민영</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20708</u><em class="nm">김하빈</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20121</u><em class="nm">정시안</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20921</u><em class="nm">이지민</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20215</u><em class="nm">이연훈</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20814</u><em class="nm">용나경</em></i><i class="s"><b>28</b><u class="id">20918</u><em class="nm">여지우</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s pair"><b>18</b><u class="id">20611</u><em class="nm">윤서영</em></i><i class="s pair"><b>13</b><u class="id">20421</u><em class="nm">장온별</em></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20216</u><em class="nm">이재현</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20511</u><em class="nm">유가영</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20317</u><em class="nm">이강민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20519</u><em class="nm">이초현</em></i><i class="s"><b>26</b><u class="id">20916</u><em class="nm">심재민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20311</u><em class="nm">손혜원</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20826</u><em class="nm">허주영</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">1교시</span><span class="meta">14명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20427</u><em class="nm">한다인</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20906</u><em class="nm">김태완</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20119</u><em class="nm">정민기</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20710</u><em class="nm">박소현</em></i><i class="gap"></i><i class="s"><b>9</b><u class="id">20320</u><em class="nm">이영서</em></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20501</u><em class="nm">고병민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20602</u><em class="nm">길범렬</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20725</u><em class="nm">한소희</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20408</u><em class="nm">박서진</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20726</u><em class="nm">홍예은</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20715</u><em class="nm">이서후</em></i><i class="s"><b>26</b><u class="id">20624</u><em class="nm">허준혁</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20620</u><em class="nm">조윤아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20915</u><em class="nm">신채연</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">2교시</span><span class="meta">9명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20525</u><em class="nm">최창아</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20204</u><em class="nm">김환</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20110</u><em class="nm">박형준</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20806</u><em class="nm">박혜령</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s off"><b>18</b></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20523</u><em class="nm">정서연</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20325</u><em class="nm">최시원</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20606</u><em class="nm">박성결</em></i><i class="s off"><b>26</b></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20419</u><em class="nm">이지후</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20615</u><em class="nm">이충원</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 월요일</div>
+</div><div class="page">
+  <div class="daybar">
+    <h2>화요일 자리표</h2>
+    <p>내 자리 번호는 <b>교탁에서 바라볼 때 창가쪽 맨 앞이 1번</b>, 뒤로 갈수록 2, 3, 4, 5번입니다.</p>
+  </div>
+  <div class="panels"><section class="panel">
+      <header><h3>2-3반</h3><span class="tag">1·2교시 공통</span><span class="meta">15명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20526</u><em class="nm">홍성민</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20314</u><em class="nm">심민서</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20525</u><em class="nm">최창아</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20414</u><em class="nm">유주원</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20712</u><em class="nm">박재우</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20306</u><em class="nm">남선우</em></i><i class="s"><b>28</b><u class="id">20816</u><em class="nm">이서현</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20917</u><em class="nm">안정호</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20820</u><em class="nm">정성호</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20926</u><em class="nm">최창준</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20406</u><em class="nm">김효민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20606</u><em class="nm">박성결</em></i><i class="s"><b>26</b><u class="id">20624</u><em class="nm">허준혁</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20419</u><em class="nm">이지후</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20915</u><em class="nm">신채연</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-4반</h3><span class="tag">1·2교시 공통</span><span class="meta">14명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20120</u><em class="nm">정민영</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20321</u><em class="nm">이은결</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20204</u><em class="nm">김환</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20228</u><em class="nm">하단비</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20814</u><em class="nm">용나경</em></i><i class="s"><b>28</b><u class="id">20822</u><em class="nm">최승민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20611</u><em class="nm">윤서영</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20725</u><em class="nm">한소희</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20511</u><em class="nm">유가영</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20214</u><em class="nm">이소민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20715</u><em class="nm">이서후</em></i><i class="s"><b>26</b><u class="id">20802</u><em class="nm">김시연</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20311</u><em class="nm">손혜원</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20826</u><em class="nm">허주영</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">1교시</span><span class="meta">13명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20127</u><em class="nm">한보영</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20619</u><em class="nm n4">조에스더</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20517</u><em class="nm">이승영</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20119</u><em class="nm">정민기</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20605</u><em class="nm">김중현</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20804</u><em class="nm">류한율</em></i><i class="s"><b>28</b><u class="id">20501</u><em class="nm">고병민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20602</u><em class="nm">길범렬</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20216</u><em class="nm">이재현</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s off"><b>22</b></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20317</u><em class="nm">이강민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s off"><b>2</b></i><i class="s"><b>26</b><u class="id">20916</u><em class="nm">심재민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20909</u><em class="nm">박수아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20401</u><em class="nm">김가온</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">2교시</span><span class="meta">5명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20213</u><em class="nm">유은빈</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20824</u><em class="nm">최효민</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s off"><b>24</b></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20918</u><em class="nm">여지우</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s off"><b>18</b></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20523</u><em class="nm">정서연</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s off"><b>12</b></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s off"><b>2</b></i><i class="s"><b>26</b><u class="id">20902</u><em class="nm">김규민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s off"><b>16</b></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s off"><b>6</b></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 화요일</div>
+</div><div class="page">
+  <div class="daybar">
+    <h2>수요일 자리표</h2>
+    <p>내 자리 번호는 <b>교탁에서 바라볼 때 창가쪽 맨 앞이 1번</b>, 뒤로 갈수록 2, 3, 4, 5번입니다.</p>
+  </div>
+  <div class="panels"><section class="panel">
+      <header><h3>2-3반</h3><span class="tag">1·2교시 공통</span><span class="meta">12명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20303</u><em class="nm">김나경</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20912</u><em class="nm">박하나</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20614</u><em class="nm">이채원</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20506</u><em class="nm">김보은</em></i><i class="s"><b>28</b><u class="id">20816</u><em class="nm">이서현</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20917</u><em class="nm">안정호</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20820</u><em class="nm">정성호</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s off"><b>22</b></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20405</u><em class="nm">김준혁</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20606</u><em class="nm">박성결</em></i><i class="s"><b>26</b><u class="id">20624</u><em class="nm">허준혁</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20909</u><em class="nm">박수아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20401</u><em class="nm">김가온</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-4반</h3><span class="tag">1·2교시 공통</span><span class="meta">10명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20708</u><em class="nm">김하빈</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s off"><b>24</b></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20215</u><em class="nm">이연훈</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20822</u><em class="nm">최승민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s off"><b>18</b></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20725</u><em class="nm">한소희</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20408</u><em class="nm">박서진</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20317</u><em class="nm">이강민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20715</u><em class="nm">이서후</em></i><i class="s"><b>26</b><u class="id">20802</u><em class="nm">김시연</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20311</u><em class="nm">손혜원</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20826</u><em class="nm">허주영</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">1교시</span><span class="meta">2명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20121</u><em class="nm">정시안</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s off"><b>24</b></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20501</u><em class="nm">고병민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s off"><b>18</b></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s off"><b>22</b></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s off"><b>12</b></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s off"><b>2</b></i><i class="s off"><b>26</b></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s off"><b>16</b></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s off"><b>6</b></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">2교시</span><span class="meta">13명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20613</u><em class="nm">이지인</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20921</u><em class="nm">이지민</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20110</u><em class="nm">박형준</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20204</u><em class="nm">김환</em></i><i class="s"><b>28</b><u class="id">20918</u><em class="nm">여지우</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20611</u><em class="nm">윤서영</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20413</u><em class="nm">신지윤</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20926</u><em class="nm">최창준</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20406</u><em class="nm">김효민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20911</u><em class="nm">박채원</em></i><i class="s"><b>26</b><u class="id">20916</u><em class="nm">심재민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20419</u><em class="nm">이지후</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20915</u><em class="nm">신채연</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 수요일</div>
+</div><div class="page">
+  <div class="daybar">
+    <h2>목요일 자리표</h2>
+    <p>내 자리 번호는 <b>교탁에서 바라볼 때 창가쪽 맨 앞이 1번</b>, 뒤로 갈수록 2, 3, 4, 5번입니다.</p>
+  </div>
+  <div class="panels"><section class="panel">
+      <header><h3>2-3반</h3><span class="tag">1·2교시 공통</span><span class="meta">14명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20526</u><em class="nm">홍성민</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20314</u><em class="nm">심민서</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20906</u><em class="nm">김태완</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20414</u><em class="nm">유주원</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20712</u><em class="nm">박재우</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20306</u><em class="nm">남선우</em></i><i class="s"><b>28</b><u class="id">20816</u><em class="nm">이서현</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20917</u><em class="nm">안정호</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20820</u><em class="nm">정성호</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20926</u><em class="nm">최창준</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20406</u><em class="nm">김효민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20606</u><em class="nm">박성결</em></i><i class="s"><b>26</b><u class="id">20624</u><em class="nm">허준혁</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20419</u><em class="nm">이지후</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s off"><b>6</b></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-4반</h3><span class="tag">2교시만</span><span class="meta">8명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20524</u><em class="nm">지우빈</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s off"><b>24</b></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20228</u><em class="nm">하단비</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s off"><b>28</b></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s off"><b>18</b></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20725</u><em class="nm">한소희</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20511</u><em class="nm">유가영</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20418</u><em class="nm">이지영</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20715</u><em class="nm">이서후</em></i><i class="s"><b>26</b><u class="id">20714</u><em class="nm">안성은</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20909</u><em class="nm">박수아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s off"><b>6</b></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">1교시</span><span class="meta">17명 · 옆자리 2쌍</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20127</u><em class="nm">한보영</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20619</u><em class="nm n4">조에스더</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20517</u><em class="nm">이승영</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20119</u><em class="nm">정민기</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20605</u><em class="nm">김중현</em></i><i class="gap"></i><i class="s pair"><b>9</b><u class="id">20320</u><em class="nm">이영서</em></i><i class="s pair"><b>4</b><u class="id">20804</u><em class="nm">류한율</em></i><i class="s"><b>28</b><u class="id">20501</u><em class="nm">고병민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20602</u><em class="nm">길범렬</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20216</u><em class="nm">이재현</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20408</u><em class="nm">박서진</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20317</u><em class="nm">이강민</em></i><i class="gap"></i><i class="s pair"><b>7</b><u class="id">20920</u><em class="nm">이봄서</em></i><i class="s pair"><b>2</b><u class="id">20519</u><em class="nm">이초현</em></i><i class="s"><b>26</b><u class="id">20916</u><em class="nm">심재민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20620</u><em class="nm">조윤아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20401</u><em class="nm">김가온</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">2교시</span><span class="meta">9명</span></header>
+      <div class="grid"><i class="s"><b>30</b><u class="id">20613</u><em class="nm">이지인</em></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20213</u><em class="nm">유은빈</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20525</u><em class="nm">최창아</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20204</u><em class="nm">김환</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s off"><b>28</b></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20611</u><em class="nm">윤서영</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20523</u><em class="nm">정서연</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s off"><b>12</b></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20911</u><em class="nm">박채원</em></i><i class="s"><b>26</b><u class="id">20902</u><em class="nm">김규민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s off"><b>16</b></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20915</u><em class="nm">신채연</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 목요일</div>
+</div><div class="page">
+  <div class="daybar">
+    <h2>금요일 자리표</h2>
+    <p>내 자리 번호는 <b>교탁에서 바라볼 때 창가쪽 맨 앞이 1번</b>, 뒤로 갈수록 2, 3, 4, 5번입니다.</p>
+  </div>
+  <div class="panels"><section class="panel">
+      <header><h3>2-3반</h3><span class="tag">1·2교시 공통</span><span class="meta">9명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20314</u><em class="nm">심민서</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s off"><b>24</b></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20816</u><em class="nm">이서현</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20917</u><em class="nm">안정호</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20413</u><em class="nm">신지윤</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s off"><b>22</b></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20406</u><em class="nm">김효민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20606</u><em class="nm">박성결</em></i><i class="s"><b>26</b><u class="id">20902</u><em class="nm">김규민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20419</u><em class="nm">이지후</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20304</u><em class="nm">김미희</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-4반</h3><span class="tag">1·2교시 공통</span><span class="meta">9명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s off"><b>10</b></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20921</u><em class="nm">이지민</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20215</u><em class="nm">이연훈</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20521</u><em class="nm">전시은</em></i><i class="s off"><b>28</b></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20611</u><em class="nm">윤서영</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20503</u><em class="nm">김도윤</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20317</u><em class="nm">이강민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s off"><b>2</b></i><i class="s"><b>26</b><u class="id">20802</u><em class="nm">김시연</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20620</u><em class="nm">조윤아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20826</u><em class="nm">허주영</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">1교시</span><span class="meta">13명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s off"><b>20</b></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20824</u><em class="nm">최효민</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20414</u><em class="nm">유주원</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s"><b>14</b><u class="id">20108</u><em class="nm">문하윤</em></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s"><b>4</b><u class="id">20306</u><em class="nm">남선우</em></i><i class="s"><b>28</b><u class="id">20501</u><em class="nm">고병민</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20602</u><em class="nm">길범렬</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s"><b>8</b><u class="id">20820</u><em class="nm">정성호</em></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20408</u><em class="nm">박서진</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20726</u><em class="nm">홍예은</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20519</u><em class="nm">이초현</em></i><i class="s"><b>26</b><u class="id">20624</u><em class="nm">허준혁</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s"><b>16</b><u class="id">20909</u><em class="nm">박수아</em></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20401</u><em class="nm">김가온</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section><section class="panel">
+      <header><h3>2-5반</h3><span class="tag">2교시</span><span class="meta">10명</span></header>
+      <div class="grid"><i class="s off"><b>30</b></i><i class="s off"><b>25</b></i><i class="gap"></i><i class="s"><b>20</b><u class="id">20321</u><em class="nm">이은결</em></i><i class="s off"><b>15</b></i><i class="gap"></i><i class="s"><b>10</b><u class="id">20525</u><em class="nm">최창아</em></i><i class="s off"><b>5</b></i><i class="s off"><b>29</b></i><i class="s"><b>24</b><u class="id">20204</u><em class="nm">김환</em></i><i class="gap"></i><i class="s off"><b>19</b></i><i class="s off"><b>14</b></i><i class="gap"></i><i class="s off"><b>9</b></i><i class="s off"><b>4</b></i><i class="s"><b>28</b><u class="id">20918</u><em class="nm">여지우</em></i><i class="s off"><b>23</b></i><i class="gap"></i><i class="s"><b>18</b><u class="id">20113</u><em class="nm">안선후</em></i><i class="s off"><b>13</b></i><i class="gap"></i><i class="s off"><b>8</b></i><i class="s off"><b>3</b></i><i class="s off"><b>27</b></i><i class="s"><b>22</b><u class="id">20926</u><em class="nm">최창준</em></i><i class="gap"></i><i class="s off"><b>17</b></i><i class="s"><b>12</b><u class="id">20214</u><em class="nm">이소민</em></i><i class="gap"></i><i class="s off"><b>7</b></i><i class="s"><b>2</b><u class="id">20911</u><em class="nm">박채원</em></i><i class="s"><b>26</b><u class="id">20916</u><em class="nm">심재민</em></i><i class="s off"><b>21</b></i><i class="gap"></i><i class="s off"><b>16</b></i><i class="s off"><b>11</b></i><i class="gap"></i><i class="s"><b>6</b><u class="id">20103</u><em class="nm">김시은</em></i><i class="s off"><b>1</b></i></div>
+      <div class="desk">교 탁</div>
+    </section></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 금요일</div>
+</div><div class="page">
+  <div class="daybar">
+    <h2>이름으로 찾기</h2>
+    <p>가나다순입니다. <b>교실 · 자리 번호 · 교시</b> 순으로 적혀 있습니다. 예를 들어
+       <b>2-3 14 1·2</b> 는 2-3반 14번 자리, 1교시와 2교시 모두라는 뜻입니다.</p>
+  </div>
+  <div class="index"><table><thead><tr><th>이름</th><td>월</td><td>화</td><td>수</td><td>목</td><td>금</td></tr></thead><tbody><tr><th>고병민</th><td><b>2-5</b> <span class="sn">28</span> <small>1</small></td><td><b>2-5</b> <span class="sn">28</span> <small>1</small></td><td><b>2-5</b> <span class="sn">28</span> <small>1</small></td><td><b>2-5</b> <span class="sn">28</span> <small>1</small></td><td><b>2-5</b> <span class="sn">28</span> <small>1</small></td></tr><tr><th>길범렬</th><td><b>2-5</b> <span class="sn">18</span> <small>1</small></td><td><b>2-5</b> <span class="sn">18</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">18</span> <small>1</small></td><td><b>2-5</b> <span class="sn">18</span> <small>1</small></td></tr><tr><th>김가온</th><td><b>2-3</b> <span class="sn">6</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">6</span> <small>1</small></td><td><b>2-3</b> <span class="sn">6</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">6</span> <small>1</small></td><td><b>2-5</b> <span class="sn">6</span> <small>1</small></td></tr><tr><th>김규민</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">26</span> <small>2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">26</span> <small>2</small></td><td><b>2-3</b> <span class="sn">26</span> <small>1·2</small></td></tr><tr><th>김나경</th><td><b>2-3</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>김도윤</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">22</span> <small>1·2</small></td></tr><tr><th>김미희</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">6</span> <small>1·2</small></td></tr><tr><th>김민주</th><td><b>2-3</b> <span class="sn">2</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>김보은</th><td><b>2-3</b> <span class="sn">4</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">4</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>김시연</th><td><u>—</u></td><td><b>2-4</b> <span class="sn">26</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">26</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">26</span> <small>1·2</small></td></tr><tr><th>김시은</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">6</span> <small>2</small></td></tr><tr><th>김준혁</th><td><u>—</u></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">12</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>김중현</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">14</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">14</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>김태완</th><td><b>2-5</b> <span class="sn">10</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">10</span> <small>1·2</small></td><td><u>—</u></td></tr><tr><th>김하빈</th><td><b>2-4</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>김환</th><td><b>2-5</b> <span class="sn">24</span> <small>2</small></td><td><b>2-4</b> <span class="sn">24</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">4</span> <small>2</small></td><td><b>2-5</b> <span class="sn">24</span> <small>2</small></td><td><b>2-5</b> <span class="sn">24</span> <small>2</small></td></tr><tr><th>김효민</th><td><b>2-3</b> <span class="sn">12</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">12</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">12</span> <small>2</small></td><td><b>2-3</b> <span class="sn">12</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">12</span> <small>1·2</small></td></tr><tr><th>남선우</th><td><u>—</u></td><td><b>2-3</b> <span class="sn">4</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">4</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">4</span> <small>1</small></td></tr><tr><th>류한율</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">4</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">4</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>문하윤</th><td><b>2-3</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">14</span> <small>1</small></td></tr><tr><th>박서진</th><td><b>2-5</b> <span class="sn">22</span> <small>1</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">22</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">22</span> <small>1</small></td><td><b>2-5</b> <span class="sn">22</span> <small>1</small></td></tr><tr><th>박성결</th><td><b>2-5</b> <span class="sn">2</span> <small>2</small></td><td><b>2-3</b> <span class="sn">2</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">2</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">2</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">2</span> <small>1·2</small></td></tr><tr><th>박소현</th><td><b>2-5</b> <span class="sn">14</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>박수아</th><td><b>2-3</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">16</span> <small>1</small></td><td><b>2-3</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">16</span> <small>2</small></td><td><b>2-5</b> <span class="sn">16</span> <small>1</small></td></tr><tr><th>박재우</th><td><u>—</u></td><td><b>2-3</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td></tr><tr><th>박채원</th><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">2</span> <small>2</small></td><td><b>2-5</b> <span class="sn">2</span> <small>2</small></td><td><b>2-5</b> <span class="sn">2</span> <small>2</small></td></tr><tr><th>박하나</th><td><b>2-3</b> <span class="sn">10</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">10</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>박형준</th><td><b>2-5</b> <span class="sn">14</span> <small>2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">14</span> <small>2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>박혜령</th><td><b>2-5</b> <span class="sn">28</span> <small>2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>손혜원</th><td><b>2-4</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">16</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>신지윤</th><td><b>2-3</b> <span class="sn">8</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">8</span> <small>2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">8</span> <small>1·2</small></td></tr><tr><th>신채연</th><td><b>2-5</b> <span class="sn">6</span> <small>1</small></td><td><b>2-3</b> <span class="sn">6</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">6</span> <small>2</small></td><td><b>2-5</b> <span class="sn">6</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>심민서</th><td><u>—</u></td><td><b>2-3</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">20</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">20</span> <small>1·2</small></td></tr><tr><th>심재민</th><td><b>2-4</b> <span class="sn">26</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">26</span> <small>1</small></td><td><b>2-5</b> <span class="sn">26</span> <small>2</small></td><td><b>2-5</b> <span class="sn">26</span> <small>1</small></td><td><b>2-5</b> <span class="sn">26</span> <small>2</small></td></tr><tr><th>안선후</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">18</span> <small>2</small></td></tr><tr><th>안성은</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">26</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>안정호</th><td><b>2-3</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">18</span> <small>1·2</small></td></tr><tr><th>여지우</th><td><b>2-4</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">28</span> <small>2</small></td><td><b>2-5</b> <span class="sn">28</span> <small>2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">28</span> <small>2</small></td></tr><tr><th>용나경</th><td><b>2-4</b> <span class="sn">4</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">4</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>유가영</th><td><b>2-4</b> <span class="sn">22</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">22</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">22</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>유은빈</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">20</span> <small>2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">20</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>유주원</th><td><u>—</u></td><td><b>2-3</b> <span class="sn">24</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">24</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">24</span> <small>1</small></td></tr></tbody></table><table><thead><tr><th>이름</th><td>월</td><td>화</td><td>수</td><td>목</td><td>금</td></tr></thead><tbody><tr><th>윤서영</th><td><b>2-4</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">18</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">18</span> <small>2</small></td><td><b>2-5</b> <span class="sn">18</span> <small>2</small></td><td><b>2-4</b> <span class="sn">18</span> <small>1·2</small></td></tr><tr><th>이강민</th><td><b>2-4</b> <span class="sn">12</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">12</span> <small>1</small></td><td><b>2-4</b> <span class="sn">12</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">12</span> <small>1</small></td><td><b>2-4</b> <span class="sn">12</span> <small>1·2</small></td></tr><tr><th>이봄서</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">7</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>이서현</th><td><b>2-3</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">28</span> <small>1·2</small></td></tr><tr><th>이서후</th><td><b>2-5</b> <span class="sn">2</span> <small>1</small></td><td><b>2-4</b> <span class="sn">2</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">2</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">2</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>이소민</th><td><u>—</u></td><td><b>2-4</b> <span class="sn">12</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">12</span> <small>2</small></td></tr><tr><th>이승영</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>이연훈</th><td><b>2-4</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">14</span> <small>1·2</small></td></tr><tr><th>이영서</th><td><b>2-5</b> <span class="sn">9</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">9</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>이은결</th><td><u>—</u></td><td><b>2-4</b> <span class="sn">20</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">20</span> <small>2</small></td></tr><tr><th>이재인</th><td><b>2-3</b> <span class="sn">26</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>이재현</th><td><b>2-4</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">8</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">8</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>이지민</th><td><b>2-4</b> <span class="sn">24</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">24</span> <small>2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">24</span> <small>1·2</small></td></tr><tr><th>이지영</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">12</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>이지인</th><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">30</span> <small>2</small></td><td><b>2-5</b> <span class="sn">30</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>이지후</th><td><b>2-5</b> <span class="sn">16</span> <small>2</small></td><td><b>2-3</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">16</span> <small>2</small></td><td><b>2-3</b> <span class="sn">16</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">16</span> <small>1·2</small></td></tr><tr><th>이채원</th><td><b>2-3</b> <span class="sn">24</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">24</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>이초현</th><td><b>2-4</b> <span class="sn">2</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">2</span> <small>1</small></td><td><b>2-5</b> <span class="sn">2</span> <small>1</small></td></tr><tr><th>이충원</th><td><b>2-5</b> <span class="sn">6</span> <small>2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>장온별</th><td><b>2-4</b> <span class="sn">13</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>전시은</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">4</span> <small>1·2</small></td></tr><tr><th>정민기</th><td><b>2-5</b> <span class="sn">24</span> <small>1</small></td><td><b>2-5</b> <span class="sn">24</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">24</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>정민영</th><td><b>2-4</b> <span class="sn">30</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">30</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>정서연</th><td><b>2-5</b> <span class="sn">22</span> <small>2</small></td><td><b>2-5</b> <span class="sn">22</span> <small>2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">22</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>정성호</th><td><u>—</u></td><td><b>2-3</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">8</span> <small>1</small></td></tr><tr><th>정시안</th><td><b>2-4</b> <span class="sn">10</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>조에스더</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">20</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">20</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>조윤아</th><td><b>2-5</b> <span class="sn">16</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">16</span> <small>1</small></td><td><b>2-4</b> <span class="sn">16</span> <small>1·2</small></td></tr><tr><th>지우빈</th><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">30</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>최승민</th><td><u>—</u></td><td><b>2-4</b> <span class="sn">28</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">28</span> <small>1·2</small></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>최시원</th><td><b>2-5</b> <span class="sn">12</span> <small>2</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>최창아</th><td><b>2-5</b> <span class="sn">10</span> <small>2</small></td><td><b>2-3</b> <span class="sn">10</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>2</small></td><td><b>2-5</b> <span class="sn">10</span> <small>2</small></td></tr><tr><th>최창준</th><td><b>2-3</b> <span class="sn">22</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">22</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">22</span> <small>2</small></td><td><b>2-3</b> <span class="sn">22</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">22</span> <small>2</small></td></tr><tr><th>최효민</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>2</small></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">10</span> <small>1</small></td></tr><tr><th>하단비</th><td><u>—</u></td><td><b>2-4</b> <span class="sn">14</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">14</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>한다인</th><td><b>2-5</b> <span class="sn">30</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td></tr><tr><th>한보영</th><td><u>—</u></td><td><b>2-5</b> <span class="sn">30</span> <small>1</small></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">30</span> <small>1</small></td><td><u>—</u></td></tr><tr><th>한소희</th><td><b>2-5</b> <span class="sn">8</span> <small>1</small></td><td><b>2-4</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">8</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">8</span> <small>2</small></td><td><u>—</u></td></tr><tr><th>허주영</th><td><b>2-4</b> <span class="sn">6</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">6</span> <small>1·2</small></td><td><b>2-4</b> <span class="sn">6</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-4</b> <span class="sn">6</span> <small>1·2</small></td></tr><tr><th>허준혁</th><td><b>2-5</b> <span class="sn">26</span> <small>1</small></td><td><b>2-3</b> <span class="sn">26</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">26</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">26</span> <small>1·2</small></td><td><b>2-5</b> <span class="sn">26</span> <small>1</small></td></tr><tr><th>홍성민</th><td><b>2-3</b> <span class="sn">30</span> <small>1·2</small></td><td><b>2-3</b> <span class="sn">30</span> <small>1·2</small></td><td><u>—</u></td><td><b>2-3</b> <span class="sn">30</span> <small>1·2</small></td><td><u>—</u></td></tr><tr><th>홍예은</th><td><b>2-5</b> <span class="sn">12</span> <small>1</small></td><td><u>—</u></td><td><u>—</u></td><td><u>—</u></td><td><b>2-5</b> <span class="sn">12</span> <small>1</small></td></tr></tbody></table></div>
+  <div class="foot">2026학년도 2학기 · 2학년 야간 자율학습 · 이름으로 찾기</div>
+</div>
+</body>
+</html>
