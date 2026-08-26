@@ -178,14 +178,12 @@
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
             border: 1px solid rgba(255, 255, 255, 0.4);
             background: rgba(255, 255, 255, 0.6);
             color: var(--text-sub);
             font-size: 0.93rem;
             box-shadow: var(--shadow-sm);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
         }
 
         .btn:hover {
@@ -235,7 +233,7 @@
             border-radius: 28px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
-            transition: all 0.3s ease;
+            transition: box-shadow 0.25s ease;
         }
 
         .classroom-section:hover {
@@ -312,10 +310,9 @@
             font-size: 0.85rem;
             position: relative;
             cursor: pointer;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background-color 0.18s ease, border-color 0.18s ease;
             user-select: none;
             touch-action: manipulation;
-            box-shadow: 0 4px 10px rgba(3, 4, 94, 0.02);
             min-width: 0;
             overflow: hidden;
         }
@@ -2556,6 +2553,66 @@
 
             .grid-6x5 {
                 gap: 3px;
+            }
+        }
+
+        /* ── 성능 보정 ─────────────────────────────────────────────
+         * backdrop-filter(유리 블러)는 스크롤할 때마다 뒤 배경을 다시
+         * 읽어 흐리므로 휴대폰에서 가장 비싼 효과다. 항상 떠 있는
+         * 요소에서는 걷어내고, 잠깐만 뜨는 모달·토스트에는 남겨 둔다.
+         * ------------------------------------------------------- */
+        @media (max-width: 900px) {
+            header,
+            #periodButtons,
+            #dayButtons,
+            .btn-group,
+            .classroom-section,
+            .teacher-desk,
+            .info-text,
+            .attendance-section {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+
+            /* 좌석 90칸에 걸린 그림자는 그리기 비용이 큰 데 비해
+               테두리만으로도 충분히 구분된다 */
+            .seat,
+            .seat.present,
+            .seat.empty {
+                box-shadow: none;
+            }
+
+            /* 배경 물결: background-position 을 계속 옮기면 화면 전체를
+               매 프레임 다시 그린다. 휴대폰에서는 정지 그라데이션으로 */
+            body {
+                animation: none;
+                background-size: 100% 100%;
+                background-attachment: fixed;
+            }
+
+            /* 떠다니는 거품 20개도 쉬지 않고 합성 비용을 쓴다 */
+            .bubble-container {
+                display: none;
+            }
+        }
+
+        /* 사용자가 기기에서 '동작 줄이기'를 켠 경우 존중 */
+        @media (prefers-reduced-motion: reduce) {
+            body {
+                animation: none;
+                background-size: 100% 100%;
+            }
+
+            .bubble-container {
+                display: none;
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
