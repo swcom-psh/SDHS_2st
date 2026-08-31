@@ -80,6 +80,35 @@ def sort_room_names(rooms):
     return sorted(set(r for r in rooms if str(r).strip()), key=key)
 
 
+def parse_date_arg(text):
+    """날짜 입력을 너그럽게 읽는다.
+
+    20260831 / 2026-08-31 / 2026.8.31 / 2026 08 31 모두 같은 날로 본다.
+    읽을 수 없으면 ValueError 를 낸다.
+    """
+    raw = str(text).strip()
+
+    # ① 구분자를 뺀 숫자 8자리 (20260831)
+    digits = ''.join(ch for ch in raw if ch.isdigit())
+    if len(digits) == 8:
+        try:
+            return datetime.datetime.strptime(digits, "%Y%m%d").date()
+        except ValueError:
+            raise ValueError("없는 날짜입니다: %s" % raw)
+
+    # ② 한 자리 월/일을 쓴 경우 (2026-8-31, 2026.8.5 …)
+    sep = raw.replace('.', '-').replace('/', '-').replace(' ', '-')
+    parts = [p for p in sep.split('-') if p]
+    if len(parts) == 3 and all(p.isdigit() for p in parts):
+        y, m, d = (int(p) for p in parts)
+        try:
+            return datetime.date(y, m, d)
+        except ValueError:
+            raise ValueError("없는 날짜입니다: %s" % raw)
+
+    raise ValueError("날짜를 알아볼 수 없습니다: %s (예: 20260831)" % raw)
+
+
 def main():
     print("=" * 60)
     print(" 2학년 야간자율학습 '결석자 현황' 보고서 생성기 ")
@@ -139,13 +168,13 @@ def main():
     if len(sys.argv) > 1:
         date_arg = sys.argv[1].strip()
         try:
-            parsed_date = datetime.datetime.strptime(date_arg, "%Y-%m-%d").date()
+            parsed_date = parse_date_arg(date_arg)   # 20260831 / 2026-08-31 둘 다
             target_date_str = parsed_date.strftime("%Y-%m-%d")
             print(f"-> 선택된 날짜: {target_date_str}")
         except ValueError:
-            print("[오류] 입력된 날짜 형식이 올바르지 않습니다 (YYYY-MM-DD 필요). 기본 날짜로 진행합니다.")
+            print("[오류] 입력된 날짜 형식이 올바르지 않습니다 (20260831 또는 2026-08-31). 기본 날짜로 진행합니다.")
     else:
-        print("-> 추가 명령줄 인자가 없어 기본 날짜로 진행합니다. (원하는 날짜 지정 방법: python 스크립트명 YYYY-MM-DD)")
+        print("-> 추가 명령줄 인자가 없어 기본 날짜로 진행합니다. (원하는 날짜 지정 방법: python 스크립트명 20260831)")
 
     days_map = {0: '월', 1: '화', 2: '수', 3: '목', 4: '금', 5: '토', 6: '일'}
     target_date_obj = datetime.datetime.strptime(target_date_str, "%Y-%m-%d").date()
