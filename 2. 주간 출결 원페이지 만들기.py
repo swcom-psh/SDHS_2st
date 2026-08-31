@@ -222,7 +222,9 @@ def main():
                 period_num = '1' if period == '1교시' else '2'
                 key_prefix = day_name + period_num  # 예: '월1', '화2'
 
-                if data and isinstance(data, dict) and 'error' not in data:
+                # 빈 딕셔너리({})는 '그 교실·교시에 배정된 학생이 없음'이라는
+                # 정상 응답이다. 파이썬에서 {} 가 거짓이라 예전에는 실패로 셌다.
+                if isinstance(data, dict) and 'error' not in data:
                     for s_id, att in data.items():
                         s_id = str(s_id).strip()
                         if not s_id or s_id in ("error", "supervisor"):

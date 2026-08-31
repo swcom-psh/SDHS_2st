@@ -234,7 +234,8 @@ def main():
                 room, period, res_data = future.result()
                 label = f"{room}실 {period}"
                 
-                if res_data and isinstance(res_data, dict) and 'error' not in res_data:
+                # 빈 딕셔너리({})는 배정된 학생이 없다는 정상 응답이므로 실패가 아니다.
+                if isinstance(res_data, dict) and 'error' not in res_data:
                     for s_id, att in res_data.items():
                         s_id = str(s_id).strip()
                         if not s_id or s_id in ("error", "supervisor"):
