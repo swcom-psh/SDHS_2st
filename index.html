@@ -3565,10 +3565,72 @@
                 localStorage.removeItem(remarkKey);
             }
 
-            closeMemoModal();
-            showToast(text ? '📝 메모가 임시 저장되었습니다.' : '🗑️ 메모가 삭제되었습니다.');
+            // closeMemoModal() 이 memoCurrentStudentId 를 비우므로 먼저 붙잡아 둔다
+            const sid = memoCurrentStudentId;
+            const sDay = memoCurrentDay;
+            const sPeriod = memoCurrentPeriod;
+            const sRoom = memoCurrentRoom;
 
+            closeMemoModal();
             renderSeating();
+
+            if (isPastDay) {
+                // 과거 메모는 기존대로 [과거 메모 전송] 버튼으로 한꺼번에 보낸다
+                showToast(text ? '📝 메모가 임시 저장되었습니다.' : '🗑️ 메모가 삭제되었습니다.');
+                return;
+            }
+
+            // 오늘 메모는 바로 시트에 보낸다.
+            //   past_memos 경로는 '비고'만 고치고 출결·감독교사는 건드리지 않으므로,
+            //   감독이 아닌 선생님이 써도 다른 사람의 출결을 덮어쓸 일이 없다.
+            sendTodayMemo(sid, sDay, sPeriod, sRoom, text);
+        }
+
+        /**
+         * 오늘 날짜 메모 한 건을 시트에 반영한다. (출결은 건드리지 않음)
+         * 실패해도 로컬에는 남아 있으므로 [시트 전송] 때 다시 올라간다.
+         */
+        async function sendTodayMemo(studentId, day, period, roomName, text) {
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            const student = globalData.find(s => String(s['학번']) === String(studentId));
+            if (!gasUrl || !student || !roomName) {
+                showToast(text ? '📝 메모가 임시 저장되었습니다.' : '🗑️ 메모가 삭제되었습니다.');
+                return;
+            }
+
+            const payload = {
+                type: "past_memos",
+                sheetTarget: "second",
+                memos: [{
+                    date: getTodayDateString(),
+                    day: day,
+                    period: period + '교시',
+                    room: roomName,
+                    supervisor: (typeof supervisorName !== 'undefined' && supervisorName) ? supervisorName : "선생님",
+                    student: {
+                        id: studentId,
+                        name: student['이름'],
+                        remark: text,
+                        status: false
+                    }
+                }]
+            };
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000);
+                await fetch(gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                showToast(text ? '📝 메모를 시트에 기록했습니다.' : '🗑️ 메모를 시트에서 지웠습니다.');
+            } catch (error) {
+                console.error('메모 전송 실패:', error);
+                showToast('📝 메모는 저장했지만 시트 전송에 실패했습니다. 나중에 다시 시도됩니다.');
+            }
         }
 
         function clearMemo() {
