@@ -3425,8 +3425,68 @@
             sendRoomAttendancePayload(roomName, activeStudents, dateStr);
         }
 
+        /**
+         * 전송 직전에 '비고'만 시트와 맞춰 둔다. (출결은 절대 건드리지 않는다)
+         *
+         * 다른 선생님이 남긴 메모를 이 기기가 모르면 빈 값으로 덮어써 버린다.
+         * 그래서 보내기 전에 시트를 한 번 읽어,
+         *   - 이 기기에서 직접 고친 메모(rem_ !== initial_rem_)는 내 값을 유지하고
+         *   - 손대지 않은 메모는 시트 값으로 채운다.
+         *
+         * 조회에 실패하면 갖고 있는 값 그대로 진행한다(출결 전송을 막지 않는다).
+         * @returns {boolean} 시트와 맞추는 데 성공했으면 true
+         */
+        async function mergeRemarksFromSheet(roomName, day, period, dateStr) {
+            const gasUrl = document.getElementById('gasUrl').value.trim();
+            if (!gasUrl) return false;
+
+            try {
+                const url = `${gasUrl}${gasUrl.includes('?') ? '&' : '?'}sheetTarget=second`
+                    + `&date=${encodeURIComponent(dateStr)}&day=${encodeURIComponent(day)}`
+                    + `&period=${encodeURIComponent(period + '교시')}&room=${encodeURIComponent(roomName)}`;
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                const results = await res.json();
+                if (!results || typeof results !== 'object' || results.error) return false;
+
+                Object.keys(results).forEach(key => {
+                    const data = results[key];
+                    if (!data || typeof data !== 'object') return;
+                    const sid = (data['학번'] || key || '').toString().trim();
+                    if (!sid || sid === 'error' || sid === 'supervisor') return;
+
+                    const remKey = `rem_${dateStr}_${day}_${period}_${sid}`;
+                    const initKey = `initial_rem_${dateStr}_${day}_${period}_${sid}`;
+                    const localRem = localStorage.getItem(remKey);
+                    const initialRem = localStorage.getItem(initKey);
+                    const sheetRem = (data['비고'] || data.remark || '').trim();
+
+                    // 이 기기에서 고친 메모라면 내 값을 지킨다
+                    const editedHere = (localRem !== null) && (localRem !== (initialRem === null ? '' : initialRem));
+                    if (editedHere) return;
+
+                    localStorage.setItem(remKey, sheetRem);
+                    localStorage.setItem(initKey, sheetRem);
+                });
+                return true;
+            } catch (e) {
+                console.error('메모 동기화 실패:', e);
+                return false;
+            }
+        }
+
         /** 실제 전송 페이로드를 만들어 SyncManager 에 넘긴다. */
-        function sendRoomAttendancePayload(roomName, activeStudents, dateStr) {
+        async function sendRoomAttendancePayload(roomName, activeStudents, dateStr) {
+            // 다른 선생님의 메모를 지우지 않도록 비고만 먼저 맞춘다
+            const merged = await mergeRemarksFromSheet(roomName, currentDay, currentPeriod, dateStr);
+            if (!merged) {
+                showToast('⚠️ 메모를 시트와 맞추지 못했습니다. 출결은 그대로 전송됩니다.');
+            }
+
             let isAnyStatusChanged = false;
             activeStudents.forEach(s => {
                 const attKey = `att_${dateStr}_${currentDay}_${currentPeriod}_${s.학번}`;
